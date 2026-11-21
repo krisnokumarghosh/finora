@@ -95,7 +95,7 @@ export default function Navbar() {
   const current = pending ?? active;
   const getStarted = (
     <Button
-      onPress={() => router.push("/signup")}
+      onPress={() => router.push("/login")}
       className="h-11 rounded-full bg-[#2C2C2C] px-7 py-2.5 text-sm font-medium text-white transition-colors duration-200 data-[hovered=true]:bg-[#E6FB2D] data-[hovered=true]:text-[#2C2C2C] hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
     >
       Get started
@@ -130,7 +130,9 @@ export default function Navbar() {
                       href={item.href}
                       aria-current={isActive ? "location" : undefined}
                       className={`rounded-full border border-transparent px-4 py-2 text-sm font-medium transition-colors duration-200 hover:border-[#E6FB2D] hover:bg-white hover:text-black ${
-                        isActive ? "text-black" : "text-black/55"
+                        isActive
+                          ? "text-black  border-[#E6FB2D]"
+                          : "text-black/55"
                       }`}
                     >
                       {item.label}
