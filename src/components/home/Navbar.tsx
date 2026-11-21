@@ -11,6 +11,7 @@ import {
   PricingIcon,
   SecurityIcon,
 } from "@/lib/utils/NavIcons";
+import { authClient } from "@/lib/auth-client";
 
 const NAV_ITEMS = [
   { label: "Home", href: "#home", Icon: FeaturesIcon },
@@ -18,6 +19,12 @@ const NAV_ITEMS = [
   { label: "Security", href: "#security", Icon: SecurityIcon },
   { label: "Pricing", href: "#pricing", Icon: PricingIcon },
 ] as const;
+
+const DASHBOARD_BY_ROLE: Record<string, string> = {
+  customer: "/dashboard/customer/status",
+  admin: "/dashboard/admin/analytics",
+  "bank-staff": "/dashboard/bank-staff/operations",
+};
 
 /** Highlights the link whose section is currently in view. */
 function useActiveSection(ids: string[]) {
@@ -80,10 +87,14 @@ function useHideOnScroll(threshold = 8, topOffset = 64) {
 
 const ids = NAV_ITEMS.map((i) => i.href.slice(1));
 
+const ctaClass =
+  "h-11 min-w-[132px] rounded-full bg-[#2C2C2C] px-7 py-2.5 text-sm font-medium text-white transition-colors duration-200 data-[hovered=true]:bg-[#E6FB2D] data-[hovered=true]:text-[#2C2C2C] hover:bg-[#E6FB2D] hover:text-[#2C2C2C]";
+
 export default function Navbar() {
   const router = useRouter();
   const active = useActiveSection(ids);
   const { hidden, show } = useHideOnScroll();
+  const { data: session, isPending } = authClient.useSession();
 
   // Mark a tapped item as selected right away; scroll-spy takes over once it arrives.
   const [pending, setPending] = useState<string | null>(null);
@@ -93,11 +104,22 @@ export default function Navbar() {
     return () => clearTimeout(t);
   }, [pending]);
   const current = pending ?? active;
-  const getStarted = (
-    <Button
-      onPress={() => router.push("/login")}
-      className="h-11 rounded-full bg-[#2C2C2C] px-7 py-2.5 text-sm font-medium text-white transition-colors duration-200 data-[hovered=true]:bg-[#E6FB2D] data-[hovered=true]:text-[#2C2C2C] hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
-    >
+
+  const role = (session?.user as { role?: string } | undefined)?.role;
+  const dashboardPath =
+    DASHBOARD_BY_ROLE[role ?? "customer"] ?? DASHBOARD_BY_ROLE.customer;
+
+  // Session load howar shomoy same size er placeholder, jate button ta lafay na
+  const cta = isPending ? (
+    <div className="flex h-11 min-w-33 items-center justify-center rounded-full bg-[#2C2C2C]">
+      <span className="h-2.5 w-16 animate-pulse rounded-full bg-white/30" />
+    </div>
+  ) : session ? (
+    <Button onPress={() => router.push(dashboardPath)} className={ctaClass}>
+      Dashboard
+    </Button>
+  ) : (
+    <Button onPress={() => router.push("/login")} className={ctaClass}>
       Get started
     </Button>
   );
@@ -107,13 +129,13 @@ export default function Navbar() {
       {/* Top bar */}
       <header
         onFocusCapture={show}
-        className={`sticky top-0 z-50 w-full  bg-white/80 backdrop-blur-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
+        className={`sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
           hidden ? "-translate-y-full" : "translate-y-0"
         }`}
       >
         <nav
           aria-label="Main"
-          className="mx-auto flex h-16  items-center justify-between px-5 md:px-8"
+          className="mx-auto flex h-16 items-center justify-between px-5 md:px-8"
         >
           <Link href="/" aria-label="Finora home" className="rounded-md">
             <Logo />
@@ -131,7 +153,7 @@ export default function Navbar() {
                       aria-current={isActive ? "location" : undefined}
                       className={`rounded-full border border-transparent px-4 py-2 text-sm font-medium transition-colors duration-200 hover:border-[#E6FB2D] hover:bg-white hover:text-black ${
                         isActive
-                          ? "text-black  border-[#E6FB2D]"
+                          ? "border-[#E6FB2D] text-black"
                           : "text-black/55"
                       }`}
                     >
@@ -142,7 +164,7 @@ export default function Navbar() {
               })}
             </ul>
 
-            {getStarted}
+            {cta}
           </div>
         </nav>
       </header>

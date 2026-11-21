@@ -12,6 +12,8 @@ import {
 } from "@heroui/react";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
 import { RegisterPayload } from "@/lib/dataInterface/authentication";
+import { errorToast, successToast } from "@/lib/utils/toasts";
+import { authClient } from "@/lib/auth-client";
 
 const labelClass = "mb-2 block text-sm text-black/50";
 const inputClass =
@@ -23,38 +25,49 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+  const handleRegister = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
 
-    const payload: RegisterPayload = {
-      name: userName.trim(),
-      email: email.trim(),
-      password: password.trim(),
-    };
+    try {
+      const payload: RegisterPayload = {
+        name: userName.trim(),
+        email: email.trim(),
+        password: password.trim(),
+      };
 
-    console.log(payload);
+      const { data, error } = await authClient.signUp.email(payload);
 
-    // try {
-    //   // TODO: connect your auth here, e.g. with Better Auth:
-    //   // const { error } = await authClient.signUp.email({ name, email, password });
-    //   // if (error) throw new Error(error.message);
+      if (error) {
+        errorToast(error.message || "Could not create account.");
+        return;
+      }
 
-    //   // router.push("/dashboard");
-    // } catch (err) {
-    //   setError(
-    //     err instanceof Error ? err.message : "Could not create account.",
-    //   );
-    // } finally {
-    //   setLoading(false);
-    // }
-  }
+      if (!data) {
+        errorToast("Something went wrong. Please try again.");
+        return;
+      }
+
+      successToast("Your account has been created successfully.");
+      // notun account shobshomoy customer role e toiri hoy
+      router.push("/dashboard/customer/status");
+      router.refresh();
+    } catch (err) {
+      console.error("Registration error:", err);
+
+      errorToast(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleRegister} className="flex flex-col gap-5">
       <div>
         <TextField isRequired name="name" type="text">
           <Label className={labelClass}>Name</Label>
@@ -140,12 +153,6 @@ export default function RegisterForm() {
           <FieldError />
         </TextField>
       </div>
-
-      {error && (
-        <p role="alert" className="text-sm text-red-600">
-          {error}
-        </p>
-      )}
 
       <Button
         type="submit"

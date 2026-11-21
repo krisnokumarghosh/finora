@@ -9,17 +9,21 @@ export function LogoMark(props: SVGProps<SVGSVGElement>) {
       aria-hidden="true"
       {...props}
     >
-      <rect width="32" height="32" rx="9" fill="#2C2C2C" />
-      {/* F built from a vertical stem and two bars */}
+      <rect width="32" height="32" rx="8" fill="#2C2C2C" />
+      {/* F with rounded corner and rounded ends */}
       <path
-        d="M11 23V9.5h10.5M11 15.5h7"
-        stroke="#FFFFFF"
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M10 24V12.5Q10 8 14.5 8H20.25A2.25 2.25 0 0 1 20.25 12.5H14.5V24A2.25 2.25 0 0 1 10 24Z"
+        fill="#FFFFFF"
       />
-      {/* coin dot */}
-      <circle cx="22" cy="21.5" r="3" fill="#E6FB2D" />
+      {/* coin */}
+      <circle cx="19.5" cy="18.25" r="3.5" fill="#E6FB2D" />
+      <circle
+        cx="19.5"
+        cy="18.25"
+        r="1.5"
+        stroke="#2C2C2C"
+        strokeWidth="0.75"
+      />
     </svg>
   );
 }
@@ -29,6 +33,17 @@ export function Logo() {
     <span className="inline-flex items-center gap-2.5">
       <LogoMark className="size-8" />
       <span className="text-lg font-semibold tracking-tight text-black">
+        FINORA
+      </span>
+    </span>
+  );
+}
+
+export function LogoLight() {
+  return (
+    <span className="inline-flex items-center gap-2.5">
+      <LogoMark className="size-8" />
+      <span className="text-lg font-semibold tracking-tight text-[#FFFFFF]">
         FINORA
       </span>
     </span>

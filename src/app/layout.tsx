@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Red_Hat_Display } from "next/font/google";
 import "./globals.css";
+import { Toast } from "@heroui/react";
 
 const redHatDisplay = Red_Hat_Display({
   subsets: ["latin"],
@@ -14,7 +15,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${redHatDisplay.className} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#FFFFFF]">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#FFFFFF]">
+        <Toast.Provider />
+        {children}
+      </body>
     </html>
   );
 }

@@ -11,6 +11,15 @@ import {
   TextField,
 } from "@heroui/react";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
+import { LoginPayload } from "@/lib/dataInterface/authentication";
+import { authClient } from "@/lib/auth-client";
+import { errorToast, successToast } from "@/lib/utils/toasts";
+
+const DASHBOARD_BY_ROLE: Record<string, string> = {
+  customer: "/dashboard/customer/status",
+  admin: "/dashboard/admin/analytics",
+  "bank-staff": "/dashboard/bank-staff/operations",
+};
 
 const labelClass = "mb-2 block text-sm text-black/50";
 const inputClass =
@@ -22,34 +31,49 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+  const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
 
-    const form = new FormData(e.currentTarget);
-    const email = String(form.get("email"));
-    const password = String(form.get("password"));
-
     try {
-      // TODO: connect your auth here, e.g. with Better Auth:
-      // const { error } = await authClient.signIn.email({ email, password });
-      // if (error) throw new Error(error.message);
-      void email;
-      void password;
+      const payload: LoginPayload = {
+        email: email.trim(),
+        password: password.trim(),
+      };
 
-      router.push("/dashboard");
+      const { data, error } = await authClient.signIn.email(payload);
+
+      if (error) {
+        errorToast(error.message || "Could not log in.");
+        return;
+      }
+
+      if (!data) {
+        errorToast("Login failed. Please try again.");
+        return;
+      }
+
+      successToast("Welcome back! You have logged in successfully.");
+
+      const role = (data.user as { role?: string }).role ?? "customer";
+      router.push(DASHBOARD_BY_ROLE[role] ?? DASHBOARD_BY_ROLE.customer);
+      router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not log in.");
+      console.error("Login error:", err);
+
+      errorToast(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleLogin} className="flex flex-col gap-5">
       <div>
         <TextField
           isRequired
@@ -121,12 +145,6 @@ export default function LoginForm() {
           <FieldError />
         </TextField>
       </div>
-
-      {error && (
-        <p role="alert" className="text-sm text-red-600">
-          {error}
-        </p>
-      )}
 
       <Button
         type="submit"
