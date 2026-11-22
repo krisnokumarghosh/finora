@@ -13,12 +13,14 @@
     "@gravity-ui/icons": "^2.23.1",
     "@heroui/react": "^3.2.7",
     "@heroui/styles": "^3.2.7",
+    "@reduxjs/toolkit": "^2.15.0",
     "better-auth": "^1.7.27",
     "lucide-react": "^1.77.0",
     "mongodb": "^7.9.1",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "react-redux": "^9.3.1",
     "recharts": "^3.11.0"
   },
   "devDependencies": {

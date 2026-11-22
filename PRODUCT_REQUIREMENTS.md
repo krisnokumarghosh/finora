@@ -56,7 +56,6 @@ The primary goals are:
 | State Management | Redux Toolkit |
 | API Data Management | RTK Query |
 | Form Management | React Hook Form |
-| Validation | Zod |
 | Charts | Recharts |
 | Backend | Next.js Route Handlers |
 
