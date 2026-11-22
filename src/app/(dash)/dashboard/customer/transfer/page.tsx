@@ -1,11 +1,5 @@
-import React from 'react';
+import FundTransferView from "@/components/dashboard/customer/FundTransferView";
 
-const CustomerFundTransPage = () => {
-    return (
-        <div>
-            
-        </div>
-    );
-};
-
-export default CustomerFundTransPage;
+export default function CustomerFundTransPage() {
+  return <FundTransferView />;
+}
