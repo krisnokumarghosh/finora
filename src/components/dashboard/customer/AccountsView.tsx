@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import {
@@ -8,9 +8,7 @@ import {
   Check,
   ArrowUpRight,
   Plus,
-  Wallet,
-  ShieldCheck,
-  CreditCard,
+
 } from "lucide-react";
 import { useGetAccountsQuery, type Account } from "@/lib/redux/api";
 import { useAppDispatch } from "@/lib/redux/store";
@@ -60,33 +58,31 @@ function AccountCard({
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold capitalize tracking-wide text-white/90">
               {account.type}
             </span>
-            
+
           </div>
 
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium capitalize ${
-              isActive
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium capitalize ${isActive
                 ? "bg-emerald-500/20 text-emerald-300"
                 : account.status === "pending"
-                ? "bg-amber-500/20 text-amber-300"
-                : "bg-red-500/20 text-red-300"
-            }`}
+                  ? "bg-amber-500/20 text-amber-300"
+                  : "bg-red-500/20 text-red-300"
+              }`}
           >
             <span
-              className={`size-1.5 rounded-full ${
-                isActive
+              className={`size-1.5 rounded-full ${isActive
                   ? "bg-emerald-400"
                   : account.status === "pending"
-                  ? "bg-amber-400"
-                  : "bg-red-400"
-              }`}
+                    ? "bg-amber-400"
+                    : "bg-red-400"
+                }`}
             />
             {account.status}
           </span>
         </div>
 
         {/* Card Chip & Contactless Visual */}
-      
+
 
         {/* Account Number with Copy Button */}
         <div className="mt-5 flex items-center justify-between">
@@ -192,19 +188,9 @@ export default function AccountsView({ children }: AccountsViewProps) {
   } = useGetAccountsQuery();
 
   // Metrics summary
-  const totalBalance = useMemo(
-    () =>
-      accounts.reduce(
-        (sum, a) => (a.status === "active" ? sum + a.balance : sum),
-        0
-      ),
-    [accounts]
-  );
 
-  const activeAccountsCount = useMemo(
-    () => accounts.filter((a) => a.status === "active").length,
-    [accounts]
-  );
+
+
 
   const handleTransferFrom = (accId: string) => {
     dispatch(setSelectedAccount(accId));
@@ -234,64 +220,7 @@ export default function AccountsView({ children }: AccountsViewProps) {
         )}
       </div>
 
-      {/* Overview Stat Cards (Fills space nicely on tablet/desktop) */}
-      {!isLoading && accounts.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Stat 1: Total Active Balance */}
-          <div className="rounded-2xl bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-black/50">
-                Total Net Balance
-              </span>
-              <span className="flex size-8 items-center justify-center rounded-xl bg-black/5 text-[#2C2C2C]">
-                <Wallet size={16} />
-              </span>
-            </div>
-            <p className="mt-3 text-2xl font-bold tracking-tight text-black sm:text-3xl">
-              {formatBDT(totalBalance)}
-            </p>
-            <p className="mt-1 text-xs text-neutral-400">
-              Combined available across all active accounts
-            </p>
-          </div>
 
-          {/* Stat 2: Portfolio Utilization */}
-          <div className="rounded-2xl bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-black/50">
-                Account Portfolio
-              </span>
-              <span className="flex size-8 items-center justify-center rounded-xl bg-black/5 text-[#2C2C2C]">
-                <CreditCard size={16} />
-              </span>
-            </div>
-            <p className="mt-3 text-2xl font-bold tracking-tight text-black sm:text-3xl">
-              {accounts.length} of 3
-            </p>
-            <p className="mt-1 text-xs text-neutral-400">
-              {activeAccountsCount} active, {accounts.length - activeAccountsCount} pending/frozen
-            </p>
-          </div>
-
-          {/* Stat 3: Single Transfer Limit */}
-          <div className="rounded-2xl bg-white p-5 shadow-sm sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-black/50">
-                Max Transfer Limit
-              </span>
-              <span className="flex size-8 items-center justify-center rounded-xl bg-black/5 text-[#2C2C2C]">
-                <ShieldCheck size={16} />
-              </span>
-            </div>
-            <p className="mt-3 text-2xl font-bold tracking-tight text-black sm:text-3xl">
-              ৳100,000.00
-            </p>
-            <p className="mt-1 text-xs text-neutral-400">
-              Per-transaction limit per active account
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Create Account Form Modal/Inline */}
       {showForm && <CreateAccountForm onClose={() => setShowForm(false)} />}

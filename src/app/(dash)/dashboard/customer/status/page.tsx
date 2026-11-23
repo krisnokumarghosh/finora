@@ -1,11 +1,19 @@
-import React from 'react';
+import { redirect } from "next/navigation";
+import { getUserSession } from "@/lib/core/session";
+import CustomerDashboardView from "@/components/dashboard/customer/CustomerDashboardView";
 
-const CustomerStatusPage = () => {
-    return (
-        <div>
-            hii
-        </div>
-    );
-};
+export default async function CustomerStatusPage() {
+  const user = await getUserSession();
+  if (!user) {
+    redirect("/login");
+  }
 
-export default CustomerStatusPage;
+  return (
+    <CustomerDashboardView
+      user={{
+        name: user.name || "Customer",
+        email: user.email || "",
+      }}
+    />
+  );
+}

@@ -125,7 +125,7 @@ export default function DepositWithdrawalView() {
       : false;
 
   // Handle Form Submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError("");
 

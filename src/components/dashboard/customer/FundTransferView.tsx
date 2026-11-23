@@ -120,7 +120,7 @@ export default function FundTransferView() {
   const isAmountOverLimit = numAmount > currentLimit;
 
   // Form submit handler
-  const handleTransferSubmit = async (e: React.FormEvent) => {
+  const handleTransferSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError("");
 
@@ -196,7 +196,7 @@ export default function FundTransferView() {
       const apiErr = err as { data?: { error?: string } };
       setFormError(
         apiErr.data?.error ||
-          "Transfer could not be processed. Please verify your details."
+        "Transfer could not be processed. Please verify your details."
       );
     }
   };
@@ -292,21 +292,19 @@ export default function FundTransferView() {
                       key={acc.id}
                       type="button"
                       onClick={() => handleSwitchAccount(acc.id)}
-                      className={`flex items-center justify-between rounded-xl px-4 py-3 text-left transition-all ${
-                        isSelected
+                      className={`flex items-center justify-between rounded-xl px-4 py-3 text-left transition-all ${isSelected
                           ? "bg-[#2C2C2C] text-white shadow-sm"
                           : "bg-[#F3F3EE] text-black hover:bg-black/5"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <span
-                          className={`size-2 rounded-full ${
-                            isActive
+                          className={`size-2 rounded-full ${isActive
                               ? "bg-emerald-400"
                               : acc.status === "pending"
-                              ? "bg-amber-400"
-                              : "bg-red-400"
-                          }`}
+                                ? "bg-amber-400"
+                                : "bg-red-400"
+                            }`}
                         />
                         <div>
                           <div className="flex items-center gap-2">
@@ -315,20 +313,18 @@ export default function FundTransferView() {
                             </span>
                             {index === 0 && (
                               <span
-                                className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ${
-                                  isSelected
+                                className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ${isSelected
                                     ? "bg-white/20 text-white"
                                     : "bg-black/10 text-black/60"
-                                }`}
+                                  }`}
                               >
                                 Primary
                               </span>
                             )}
                           </div>
                           <span
-                            className={`font-mono text-xs ${
-                              isSelected ? "text-white/60" : "text-black/40"
-                            }`}
+                            className={`font-mono text-xs ${isSelected ? "text-white/60" : "text-black/40"
+                              }`}
                           >
                             •••• {acc.accountNumber.slice(-4)}
                           </span>
@@ -337,22 +333,20 @@ export default function FundTransferView() {
 
                       <div className="text-right">
                         <p
-                          className={`text-sm font-semibold ${
-                            isSelected ? "text-white" : "text-black"
-                          }`}
+                          className={`text-sm font-semibold ${isSelected ? "text-white" : "text-black"
+                            }`}
                         >
                           {formatMoney(acc.balance)}
                         </p>
                         <span
-                          className={`text-[11px] capitalize ${
-                            isActive
+                          className={`text-[11px] capitalize ${isActive
                               ? isSelected
                                 ? "text-emerald-300"
                                 : "text-emerald-600"
                               : isSelected
-                              ? "text-amber-300"
-                              : "text-amber-600"
-                          }`}
+                                ? "text-amber-300"
+                                : "text-amber-600"
+                            }`}
                         >
                           {acc.status}
                         </span>
@@ -378,16 +372,14 @@ export default function FundTransferView() {
                   </h3>
                 </div>
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium capitalize ${
-                    isSenderActive
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium capitalize ${isSenderActive
                       ? "bg-emerald-500/20 text-emerald-300"
                       : "bg-amber-500/20 text-amber-300"
-                  }`}
+                    }`}
                 >
                   <span
-                    className={`size-1.5 rounded-full ${
-                      isSenderActive ? "bg-emerald-400" : "bg-amber-400"
-                    }`}
+                    className={`size-1.5 rounded-full ${isSenderActive ? "bg-emerald-400" : "bg-amber-400"
+                      }`}
                   />
                   {activeAccount.status}
                 </span>

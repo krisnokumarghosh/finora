@@ -71,6 +71,41 @@ export type TransactionItem = {
   createdAt: string;
 };
 
+export type UnifiedTransaction = {
+  id: string;
+  transactionId: string;
+  type: "transfer" | "deposit" | "withdrawal";
+  direction?: "debit" | "credit";
+  accountNumber: string;
+  accountType: AccountType;
+  accountName?: string;
+  counterpartAccountNumber?: string;
+  counterpartName?: string;
+  amount: number;
+  fee?: number;
+  balanceAfter?: number;
+  description: string;
+  status: "completed" | "approved" | "pending" | "rejected";
+  isCredit: boolean;
+  createdAt: string;
+};
+
+export type GetTransactionsParams = {
+  limit?: number;
+  offset?: number;
+  accountType?: string;
+  type?: string;
+  search?: string;
+};
+
+export type TransactionsResponse = {
+  transactions: UnifiedTransaction[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
 export type FundRequestType = "deposit" | "withdrawal";
 export type FundRequestStatus = "pending" | "approved" | "rejected";
 
@@ -96,10 +131,38 @@ export type CreateFundRequestBody = {
   pin: string;
 };
 
+export type LoanType = "home" | "car" | "education" | "personal" | "business";
+export type LoanStatus = "pending" | "approved" | "rejected";
+
+export type Loan = {
+  id: string;
+  loanId: string;
+  accountId?: string;
+  accountNumber?: string;
+  accountType?: string;
+  title: string;
+  type: LoanType;
+  amount: number;
+  termMonths: number;
+  purpose: string;
+  status: LoanStatus;
+  dueDate: string;
+  createdAt: string;
+};
+
+export type ApplyLoanBody = {
+  accountId: string;
+  type: LoanType;
+  amount: number;
+  termMonths: number;
+  purpose: string;
+  pin: string;
+};
+
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
-  tagTypes: ["Accounts", "Transactions", "FundRequests"],
+  tagTypes: ["Accounts", "Transactions", "FundRequests", "Loans"],
   refetchOnMountOrArgChange: true, // Always refetch fresh financial data when switching pages / mounting
   refetchOnFocus: true, // Auto refetch when tab is refocused
   refetchOnReconnect: true, // Auto refetch when network reconnects
@@ -150,6 +213,38 @@ export const api = createApi({
       }),
       invalidatesTags: ["FundRequests", "Accounts"],
     }),
+    getLoans: build.query<Loan[], void>({
+      query: () => "/loans",
+      providesTags: ["Loans"],
+    }),
+    applyLoan: build.mutation<{ success: boolean; loan: Loan }, ApplyLoanBody>({
+      query: (body) => ({
+        url: "/loans",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Loans"],
+    }),
+    getTransactions: build.query<
+      TransactionsResponse,
+      GetTransactionsParams | void
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.limit) queryParams.set("limit", String(params.limit));
+        if (params?.offset !== undefined) queryParams.set("offset", String(params.offset));
+        if (params?.accountType && params.accountType !== "all") {
+          queryParams.set("accountType", params.accountType);
+        }
+        if (params?.type && params.type !== "all") {
+          queryParams.set("type", params.type);
+        }
+        if (params?.search) queryParams.set("search", params.search);
+        const qs = queryParams.toString();
+        return `/transactions${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["Transactions", "FundRequests"],
+    }),
   }),
 });
 
@@ -161,4 +256,7 @@ export const {
   useGetRecentTransfersQuery,
   useGetFundRequestsQuery,
   useCreateFundRequestMutation,
+  useGetLoansQuery,
+  useApplyLoanMutation,
+  useGetTransactionsQuery,
 } = api;
