@@ -71,10 +71,35 @@ export type TransactionItem = {
   createdAt: string;
 };
 
+export type FundRequestType = "deposit" | "withdrawal";
+export type FundRequestStatus = "pending" | "approved" | "rejected";
+
+export type FundRequest = {
+  id: string;
+  requestId: string;
+  accountNumber: string;
+  accountName: string;
+  type: FundRequestType;
+  amount: number;
+  requestDate: string;
+  description: string;
+  status: FundRequestStatus;
+  createdAt: string;
+};
+
+export type CreateFundRequestBody = {
+  accountNumber: string;
+  amount: number;
+  type: FundRequestType;
+  requestDate?: string;
+  description: string;
+  pin: string;
+};
+
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
-  tagTypes: ["Accounts", "Transactions"],
+  tagTypes: ["Accounts", "Transactions", "FundRequests"],
   refetchOnMountOrArgChange: true, // Always refetch fresh financial data when switching pages / mounting
   refetchOnFocus: true, // Auto refetch when tab is refocused
   refetchOnReconnect: true, // Auto refetch when network reconnects
@@ -106,6 +131,25 @@ export const api = createApi({
         `/transfers/recent${arg?.accountId ? `?accountId=${arg.accountId}` : ""}`,
       providesTags: ["Transactions"],
     }),
+    getFundRequests: build.query<
+      FundRequest[],
+      { accountNumber?: string } | void
+    >({
+      query: (arg) =>
+        `/funds${arg?.accountNumber ? `?accountNumber=${arg.accountNumber}` : ""}`,
+      providesTags: ["FundRequests"],
+    }),
+    createFundRequest: build.mutation<
+      { success: boolean; message: string; request: FundRequest },
+      CreateFundRequestBody
+    >({
+      query: (body) => ({
+        url: "/funds",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["FundRequests", "Accounts"],
+    }),
   }),
 });
 
@@ -115,4 +159,6 @@ export const {
   useTransferFundsMutation,
   useLazyLookupAccountQuery,
   useGetRecentTransfersQuery,
+  useGetFundRequestsQuery,
+  useCreateFundRequestMutation,
 } = api;

@@ -12,7 +12,7 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
   if (!user) redirect("/login");
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-[#F3F3EE] md:bg-white text-black">
       <DashboardSidebar
         user={{
           name: user.name,
@@ -20,10 +20,10 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
           role: (user as { role?: string }).role,
         }}
       />
-      <main className="px-4 pb-28 pt-6 md:pb-6 md:pl-74 md:pr-6">
+      <main className="px-0 pb-28 pt-0 sm:px-4 sm:pt-6 md:pb-6 md:pl-74 md:pr-6">
         <StoreProvider>
           <div
-            className="min-h-[calc(100svh-8.5rem)] rounded-[2rem] bg-[#F3F3EE] p-6 sm:p-8 lg:p-10 md:min-h-[calc(100svh-3rem)]"
+            className="min-h-screen rounded-none bg-[#F3F3EE] p-4 sm:min-h-[calc(100svh-8.5rem)] sm:rounded-[2rem] sm:p-8 lg:p-10 md:min-h-[calc(100svh-3rem)]"
           >
             {children}
           </div>

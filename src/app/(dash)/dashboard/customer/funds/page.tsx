@@ -1,11 +1,5 @@
-import React from 'react';
+import DepositWithdrawalView from "@/components/dashboard/customer/DepositWithdrawalView";
 
-const CustomerAllFundsPage = () => {
-    return (
-        <div>
-            
-        </div>
-    );
-};
-
-export default CustomerAllFundsPage;
+export default function CustomerAllFundsPage() {
+  return <DepositWithdrawalView />;
+}

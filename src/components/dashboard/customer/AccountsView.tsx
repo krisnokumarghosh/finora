@@ -60,7 +60,7 @@ function AccountCard({
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold capitalize tracking-wide text-white/90">
               {account.type}
             </span>
-            <span className="size-2 rounded-full bg-[#E6FB2D]" />
+            
           </div>
 
           <span
@@ -86,12 +86,7 @@ function AccountCard({
         </div>
 
         {/* Card Chip & Contactless Visual */}
-        <div className="mt-6 flex items-center justify-between">
-          <div className="flex h-8 w-11 items-center justify-center rounded-lg border border-amber-300/40 bg-gradient-to-br from-amber-200/20 via-amber-400/10 to-amber-200/5">
-            <div className="h-4 w-7 rounded border border-amber-300/30" />
-          </div>
-          <CreditCard size={20} className="text-white/20" />
-        </div>
+      
 
         {/* Account Number with Copy Button */}
         <div className="mt-5 flex items-center justify-between">
@@ -126,7 +121,7 @@ function AccountCard({
       {/* Card Footer: Holder Name, Limit & Quick Action */}
       <div className="mt-6 border-t border-white/10 pt-4">
         <div className="flex items-center justify-between text-xs text-white/60">
-          <span className="truncate max-w-[150px] font-medium text-white/80">
+          <span className="truncate max-w-37.5 font-medium text-white/80">
             {account.name}
           </span>
           <span>
@@ -161,7 +156,7 @@ function AddAccountCard({ onOpen }: { onOpen: () => void }) {
     <button
       type="button"
       onClick={onOpen}
-      className="group flex min-h-[340px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-black/15 bg-white/40 p-6 text-center transition-all duration-200 hover:border-black/30 hover:bg-white/80 hover:shadow-sm"
+      className="group flex min-h-85 flex-col items-center justify-center rounded-3xl border-2 border-dashed border-black/15 bg-white/40 p-6 text-center transition-all duration-200 hover:border-black/30 hover:bg-white/80 hover:shadow-sm"
     >
       <div className="flex size-14 items-center justify-center rounded-2xl bg-[#2C2C2C] text-white transition-transform duration-200 group-hover:scale-110 group-hover:bg-[#E6FB2D] group-hover:text-[#2C2C2C]">
         <Plus size={26} />
@@ -169,7 +164,7 @@ function AddAccountCard({ onOpen }: { onOpen: () => void }) {
       <h3 className="mt-4 text-base font-bold text-black">
         Open Another Account
       </h3>
-      <p className="mt-1 max-w-[200px] text-xs text-black/50">
+      <p className="mt-1 max-w-50 text-xs text-black/50">
         Add a Savings, Current or Business account to your portfolio.
       </p>
       <span className="mt-5 inline-flex items-center gap-1 rounded-full bg-black/5 px-4 py-1.5 text-xs font-semibold text-black/70 group-hover:bg-[#2C2C2C] group-hover:text-white">
