@@ -25,6 +25,7 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const handleRegister = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,18 +42,20 @@ export default function RegisterForm() {
 
       if (error) {
         errorToast(error.message || "Could not create account.");
+        setLoading(false);
         return;
       }
 
       if (!data) {
         errorToast("Something went wrong. Please try again.");
+        setLoading(false);
         return;
       }
 
       successToast("Your account has been created successfully.");
+      setIsRedirecting(true);
       // notun account shobshomoy customer role e toiri hoy
-      router.push("/dashboard/customer/status");
-      router.refresh();
+      router.replace("/dashboard/customer/status");
     } catch (err) {
       console.error("Registration error:", err);
 
@@ -61,8 +64,8 @@ export default function RegisterForm() {
           ? err.message
           : "Something went wrong. Please try again.",
       );
-    } finally {
       setLoading(false);
+      setIsRedirecting(false);
     }
   };
 
@@ -156,10 +159,14 @@ export default function RegisterForm() {
 
       <Button
         type="submit"
-        isDisabled={loading}
+        isDisabled={loading || isRedirecting}
         className="mt-2 h-13 w-full rounded-full bg-[#2C2C2C] px-8 text-base font-medium text-white transition-colors duration-200 data-[hovered=true]:bg-[#E6FB2D] data-[hovered=true]:text-[#2C2C2C] hover:bg-[#E6FB2D] hover:text-[#2C2C2C] disabled:opacity-60"
       >
-        {loading ? "Please wait..." : "Create account"}
+        {isRedirecting
+          ? "Redirecting..."
+          : loading
+          ? "Please wait..."
+          : "Create account"}
       </Button>
     </form>
   );

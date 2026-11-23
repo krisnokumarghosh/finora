@@ -31,6 +31,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,19 +47,24 @@ export default function LoginForm() {
 
       if (error) {
         errorToast(error.message || "Could not log in.");
+        setLoading(false);
         return;
       }
 
       if (!data) {
         errorToast("Login failed. Please try again.");
+        setLoading(false);
         return;
       }
 
       successToast("Welcome back! You have logged in successfully.");
+      setIsRedirecting(true);
 
       const role = (data.user as { role?: string }).role ?? "customer";
-      router.push(DASHBOARD_BY_ROLE[role] ?? DASHBOARD_BY_ROLE.customer);
-      router.refresh();
+      const destination = DASHBOARD_BY_ROLE[role] ?? DASHBOARD_BY_ROLE.customer;
+      
+      // router.replace smoothly moves to the dashboard without blocking on current page reload
+      router.replace(destination);
     } catch (err) {
       console.error("Login error:", err);
 
@@ -67,8 +73,8 @@ export default function LoginForm() {
           ? err.message
           : "Something went wrong. Please try again.",
       );
-    } finally {
       setLoading(false);
+      setIsRedirecting(false);
     }
   };
 
@@ -148,10 +154,14 @@ export default function LoginForm() {
 
       <Button
         type="submit"
-        isDisabled={loading}
+        isDisabled={loading || isRedirecting}
         className="mt-2 h-13 w-full rounded-full bg-[#2C2C2C] px-8 text-base font-medium text-white transition-colors duration-200 data-[hovered=true]:bg-[#E6FB2D] data-[hovered=true]:text-[#2C2C2C] hover:bg-[#E6FB2D] hover:text-[#2C2C2C] disabled:opacity-60"
       >
-        {loading ? "Please wait..." : "Log in"}
+        {isRedirecting
+          ? "Redirecting..."
+          : loading
+          ? "Please wait..."
+          : "Log in"}
       </Button>
     </form>
   );
