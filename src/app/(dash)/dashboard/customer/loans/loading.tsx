@@ -1,0 +1,70 @@
+export default function Loading() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      {/* ── Page Header ── */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="h-9 w-40 rounded-2xl bg-black/10 sm:h-10 sm:w-52" />
+          <div className="mt-2 h-4 w-72 rounded-xl bg-black/5 sm:w-96" />
+        </div>
+        <div className="h-10 w-28 rounded-full bg-black/5" />
+      </div>
+
+      {/* ── Filter & Search Bar Card ── */}
+      <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6 space-y-4">
+        {/* Search input skeleton */}
+        <div className="h-12 w-full rounded-2xl bg-[#F3F3EE]" />
+
+        {/* Filter pills skeleton */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="h-4 w-16 rounded bg-black/5" />
+            <div className="h-8 w-20 rounded-full bg-[#F3F3EE]" />
+            <div className="h-8 w-16 rounded-full bg-[#F3F3EE]" />
+            <div className="h-8 w-16 rounded-full bg-[#F3F3EE]" />
+            <div className="h-8 w-20 rounded-full bg-[#F3F3EE]" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-12 rounded bg-black/5" />
+            <div className="h-8 w-20 rounded-full bg-[#F3F3EE]" />
+            <div className="h-8 w-20 rounded-full bg-[#F3F3EE]" />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Loans List Card ── */}
+      <div className="rounded-3xl bg-white p-5 sm:p-7 shadow-sm">
+        <div className="flex items-center justify-between border-b border-black/5 pb-4">
+          <div className="h-5 w-36 rounded-xl bg-black/10" />
+          <div className="h-4 w-24 rounded bg-black/5" />
+        </div>
+
+        {/* Table rows skeleton */}
+        <div className="divide-y divide-black/5 mt-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between py-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-black/5" />
+                <div className="space-y-1.5">
+                  <div className="h-4 w-28 rounded bg-black/10" />
+                  <div className="h-3 w-40 rounded bg-black/5" />
+                </div>
+              </div>
+              <div className="hidden sm:block space-y-1 text-center">
+                <div className="h-4 w-28 rounded bg-black/10" />
+                <div className="h-3 w-16 mx-auto rounded bg-black/5" />
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="h-5 w-20 rounded bg-black/10" />
+                <div className="size-8 rounded-xl bg-black/5" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

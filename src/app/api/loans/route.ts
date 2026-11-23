@@ -16,16 +16,70 @@ const LOAN_TITLES: Record<string, string> = {
   business: "Business Loan",
 };
 
-export async function GET() {
+export async function GET(req: Request) {
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { searchParams } = new URL(req.url);
+  const isPaginated =
+    searchParams.get("paginated") === "true" || searchParams.has("limit");
+  const limitParam = Number(searchParams.get("limit")) || 15;
+  const offsetParam = Number(searchParams.get("offset")) || 0;
+  const typeParam = searchParams.get("type") || "all";
+  const searchParam = (searchParams.get("search") || "").trim();
+
+  const query: Record<string, unknown> = { userId: user.id };
+
+  if (typeParam && typeParam !== "all") {
+    query.type = typeParam;
+  }
+
+  if (searchParam) {
+    query.$or = [
+      { accountNumber: { $regex: searchParam, $options: "i" } },
+      { loanId: { $regex: searchParam, $options: "i" } },
+    ];
+  }
+
+  const sortOrder = { createdAt: -1 as const };
+
+  if (!isPaginated) {
+    const rows = await db
+      .collection("loans")
+      .find(query)
+      .sort(sortOrder)
+      .toArray();
+
+    const loans = rows.map(({ _id, createdAt, dueDate, ...rest }) => ({
+      id: _id.toString(),
+      ...rest,
+      dueDate:
+        typeof dueDate === "string"
+          ? dueDate
+          : dueDate instanceof Date
+          ? dueDate.toISOString().split("T")[0]
+          : new Date().toISOString().split("T")[0],
+      createdAt:
+        createdAt instanceof Date
+          ? createdAt.toISOString()
+          : new Date(createdAt).toISOString(),
+    }));
+
+    return NextResponse.json(loans);
+  }
+
+  const limit = Math.max(1, Math.min(100, limitParam));
+  const offset = Math.max(0, offsetParam);
+
+  const total = await db.collection("loans").countDocuments(query);
   const rows = await db
     .collection("loans")
-    .find({ userId: user.id })
-    .sort({ createdAt: -1 })
+    .find(query)
+    .sort(sortOrder)
+    .skip(offset)
+    .limit(limit)
     .toArray();
 
   const loans = rows.map(({ _id, createdAt, dueDate, ...rest }) => ({
@@ -43,7 +97,13 @@ export async function GET() {
         : new Date(createdAt).toISOString(),
   }));
 
-  return NextResponse.json(loans);
+  return NextResponse.json({
+    loans,
+    total,
+    limit,
+    offset,
+    hasMore: offset + loans.length < total,
+  });
 }
 
 export async function POST(req: Request) {
@@ -157,4 +217,51 @@ export async function POST(req: Request) {
     },
     { status: 201 }
   );
+}
+
+export async function DELETE(req: Request) {
+  const user = await getUserSession();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  let id = searchParams.get("id");
+
+  if (!id) {
+    try {
+      const body = (await req.json()) as Record<string, unknown>;
+      if (typeof body.id === "string") id = body.id;
+      else if (typeof body.loanId === "string") id = body.loanId;
+    } catch {
+      // Body not provided or invalid JSON
+    }
+  }
+
+  if (!id) {
+    return bad("Loan ID is required for deletion.", 400);
+  }
+
+  // Find loan belonging to this user
+  const filter: Record<string, unknown> = { userId: user.id };
+  if (ObjectId.isValid(id)) {
+    filter.$or = [{ _id: new ObjectId(id) }, { loanId: id }];
+  } else {
+    filter.loanId = id;
+  }
+
+  const existing = await db.collection("loans").findOne(filter);
+  if (!existing) {
+    return bad(
+      "Loan record not found or you do not have permission to delete it.",
+      404
+    );
+  }
+
+  await db.collection("loans").deleteOne({ _id: existing._id });
+
+  return NextResponse.json({
+    success: true,
+    message: "Loan application deleted successfully.",
+  });
 }

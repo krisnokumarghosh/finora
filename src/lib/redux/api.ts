@@ -150,6 +150,21 @@ export type Loan = {
   createdAt: string;
 };
 
+export type GetLoansParams = {
+  limit?: number;
+  offset?: number;
+  type?: string;
+  search?: string;
+};
+
+export type LoansResponse = {
+  loans: Loan[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
 export type ApplyLoanBody = {
   accountId: string;
   type: LoanType;
@@ -217,6 +232,31 @@ export const api = createApi({
       query: () => "/loans",
       providesTags: ["Loans"],
     }),
+    getPaginatedLoans: build.query<
+      LoansResponse,
+      GetLoansParams | void
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        queryParams.set("paginated", "true");
+        if (params?.limit) queryParams.set("limit", String(params.limit));
+        if (params?.offset !== undefined) queryParams.set("offset", String(params.offset));
+        if (params?.type && params.type !== "all") {
+          queryParams.set("type", params.type);
+        }
+        if (params?.search) queryParams.set("search", params.search);
+        const qs = queryParams.toString();
+        return `/loans?${qs}`;
+      },
+      providesTags: ["Loans"],
+    }),
+    deleteLoan: build.mutation<{ success: boolean; message: string }, string>({
+      query: (id) => ({
+        url: `/loans?id=${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Loans"],
+    }),
     applyLoan: build.mutation<{ success: boolean; loan: Loan }, ApplyLoanBody>({
       query: (body) => ({
         url: "/loans",
@@ -257,6 +297,8 @@ export const {
   useGetFundRequestsQuery,
   useCreateFundRequestMutation,
   useGetLoansQuery,
+  useGetPaginatedLoansQuery,
   useApplyLoanMutation,
+  useDeleteLoanMutation,
   useGetTransactionsQuery,
 } = api;

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useId } from "react";
-import Link from "next/link";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -13,13 +12,9 @@ import {
   Filter,
   RefreshCw,
   Receipt,
-  Landmark,
-  ArrowLeft,
-  CreditCard,
 } from "lucide-react";
 import {
   useGetTransactionsQuery,
-  type AccountType,
   type UnifiedTransaction,
 } from "@/lib/redux/api";
 
@@ -406,7 +401,7 @@ export default function TransactionsView() {
                   {transactions.map((tx) => (
                     <tr
                       key={tx.id}
-                      className="transition-colors hover:bg-black/[0.015]"
+                      className="transition-colors hover:bg-black/1.5"
                     >
                       {/* 1. Transaction ID & Date */}
                       <td className="py-4 pl-2">
@@ -440,7 +435,7 @@ export default function TransactionsView() {
 
                       {/* 2. Type & Description */}
                       <td className="py-4">
-                        <div className="max-w-[200px]">
+                        <div className="max-w-50">
                           <p className="truncate text-xs font-bold capitalize text-black">
                             {tx.type === "transfer"
                               ? tx.isCredit
@@ -595,7 +590,7 @@ export default function TransactionsView() {
                 type="button"
                 onClick={() => setCurrentLimit((prev) => prev + 15)}
                 disabled={isFetching}
-                className="inline-flex h-12 min-w-[200px] items-center justify-center gap-2 rounded-full bg-[#2C2C2C] px-8 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[#E6FB2D] hover:text-[#2C2C2C] disabled:opacity-50"
+                className="inline-flex h-12 min-w-50 items-center justify-center gap-2 rounded-full bg-[#2C2C2C] px-8 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[#E6FB2D] hover:text-[#2C2C2C] disabled:opacity-50"
               >
                 {isFetching ? (
                   <>

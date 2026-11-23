@@ -592,13 +592,12 @@ export default function CustomerDashboardView({
           <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
             <div className="flex items-center justify-between border-b border-black/5 pb-4">
               <h2 className="text-lg font-bold text-black">Loans</h2>
-              <button
-                type="button"
-                onClick={() => setIsLoanModalOpen(true)}
+              <Link
+                href="/dashboard/customer/loans"
                 className="text-xs font-semibold text-black/50 transition-colors hover:text-black"
               >
                 See all
-              </button>
+              </Link>
             </div>
 
             {/* Loans List (all statuses) */}
@@ -671,7 +670,7 @@ export default function CustomerDashboardView({
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setIsLoanModalOpen(false)}
           />
-          <div className="relative z-10 flex w-full flex-col bg-white shadow-2xl h-[100dvh] rounded-none sm:h-auto sm:max-w-xl sm:rounded-3xl lg:max-w-2xl">
+          <div className="relative z-10 flex w-full flex-col bg-white shadow-2xl h-dvh rounded-none sm:h-auto sm:max-w-xl sm:rounded-3xl lg:max-w-2xl">
             <div className="flex shrink-0 items-center justify-between border-b border-black/5 px-5 py-4 sm:px-7 sm:pt-7 sm:pb-4">
               <div>
                 <h3 className="text-lg font-bold text-black">Apply for Loan</h3>
