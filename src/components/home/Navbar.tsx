@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "@heroui/react";
+import { Button, Spinner } from "@heroui/react";
 import { Logo } from "@/lib/utils/Logo";
 import {
   AccountsIcon,
@@ -88,13 +88,16 @@ function useHideOnScroll(threshold = 8, topOffset = 64) {
 const ids = NAV_ITEMS.map((i) => i.href.slice(1));
 
 const ctaClass =
-  "h-11 min-w-[132px] rounded-full bg-[#2C2C2C] px-7 py-2.5 text-sm font-medium text-white transition-colors duration-200 data-[hovered=true]:bg-[#E6FB2D] data-[hovered=true]:text-[#2C2C2C] hover:bg-[#E6FB2D] hover:text-[#2C2C2C]";
+  "h-11 min-w-[132px] rounded-full bg-[#2C2C2C] px-7 py-2.5 text-sm font-medium text-white transition-colors duration-200 data-[hovered=true]:bg-[#E6FB2D] data-[hovered=true]:text-[#2C2C2C] hover:bg-[#E6FB2D] hover:text-[#2C2C2C] data-[pending=true]:opacity-70";
 
 export default function Navbar() {
   const router = useRouter();
   const active = useActiveSection(ids);
   const { hidden, show } = useHideOnScroll();
   const { data: session, isPending } = authClient.useSession();
+
+  // Navigation cholar shomoy true thake, shesh hole nijei false hoy
+  const [isNavigating, startTransition] = useTransition();
 
   // Mark a tapped item as selected right away; scroll-spy takes over once it arrives.
   const [pending, setPending] = useState<string | null>(null);
@@ -109,14 +112,25 @@ export default function Navbar() {
   const dashboardPath =
     DASHBOARD_BY_ROLE[role ?? "customer"] ?? DASHBOARD_BY_ROLE.customer;
 
+  const handleDashboardBtn = () => {
+    startTransition(() => {
+      router.push(dashboardPath);
+    });
+  };
+
   // Session load howar shomoy same size er placeholder, jate button ta lafay na
   const cta = isPending ? (
     <div className="flex h-11 min-w-33 items-center justify-center rounded-full bg-[#2C2C2C]">
       <span className="h-2.5 w-16 animate-pulse rounded-full bg-white/30" />
     </div>
   ) : session ? (
-    <Button onPress={() => router.push(dashboardPath)} className={ctaClass}>
-      Dashboard
+    <Button
+      onPress={handleDashboardBtn}
+      isDisabled={isNavigating}
+      data-pending={isNavigating}
+      className={ctaClass}
+    >
+      {isNavigating ?  <Spinner color="current" size="sm" /> : "Dashboard"}
     </Button>
   ) : (
     <Button onPress={() => router.push("/login")} className={ctaClass}>
