@@ -106,6 +106,49 @@ export type TransactionsResponse = {
   hasMore: boolean;
 };
 
+export type TransactionFlag = {
+  reason: string;
+  flaggedBy: string;
+  flaggedByName: string;
+  createdAt: string;
+};
+
+export type StaffTransaction = UnifiedTransaction & {
+  customerUserId?: string;
+  flag: TransactionFlag | null;
+};
+
+export type GetStaffTransactionsParams = {
+  limit?: number;
+  offset?: number;
+  type?: string;
+  status?: string;
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  flagged?: string;
+};
+
+export type StaffTransactionsResponse = {
+  transactions: StaffTransaction[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
+export type FlagTransactionBody = {
+  transactionId: string;
+  action: "flag" | "unflag";
+  reason?: string;
+};
+
+export type FlagTransactionResponse = {
+  success: boolean;
+  message: string;
+  flag: TransactionFlag | null;
+};
+
 export type FundRequestType = "deposit" | "withdrawal";
 export type FundRequestStatus = "pending" | "approved" | "rejected";
 
@@ -177,7 +220,13 @@ export type ApplyLoanBody = {
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
-  tagTypes: ["Accounts", "Transactions", "FundRequests", "Loans"],
+  tagTypes: [
+    "Accounts",
+    "Transactions",
+    "FundRequests",
+    "Loans",
+    "StaffTransactions",
+  ],
   refetchOnMountOrArgChange: true, // Always refetch fresh financial data when switching pages / mounting
   refetchOnFocus: true, // Auto refetch when tab is refocused
   refetchOnReconnect: true, // Auto refetch when network reconnects
@@ -285,6 +334,44 @@ export const api = createApi({
       },
       providesTags: ["Transactions", "FundRequests"],
     }),
+    getStaffTransactions: build.query<
+      StaffTransactionsResponse,
+      GetStaffTransactionsParams | void
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.limit) queryParams.set("limit", String(params.limit));
+        if (params?.offset !== undefined) {
+          queryParams.set("offset", String(params.offset));
+        }
+        if (params?.type && params.type !== "all") {
+          queryParams.set("type", params.type);
+        }
+        if (params?.status && params.status !== "all") {
+          queryParams.set("status", params.status);
+        }
+        if (params?.search) queryParams.set("search", params.search);
+        if (params?.dateFrom) queryParams.set("dateFrom", params.dateFrom);
+        if (params?.dateTo) queryParams.set("dateTo", params.dateTo);
+        if (params?.flagged && params.flagged !== "all") {
+          queryParams.set("flagged", params.flagged);
+        }
+        const qs = queryParams.toString();
+        return `/staff/transactions${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["StaffTransactions"],
+    }),
+    flagTransaction: build.mutation<
+      FlagTransactionResponse,
+      FlagTransactionBody
+    >({
+      query: (body) => ({
+        url: "/staff/transactions",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["StaffTransactions", "Transactions"],
+    }),
   }),
 });
 
@@ -301,4 +388,6 @@ export const {
   useApplyLoanMutation,
   useDeleteLoanMutation,
   useGetTransactionsQuery,
+  useGetStaffTransactionsQuery,
+  useFlagTransactionMutation,
 } = api;
