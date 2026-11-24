@@ -17,6 +17,7 @@ import {
   Landmark,
   Trash2,
   AlertTriangle,
+  ClipboardCheck,
 } from "lucide-react";
 import {
   useGetPaginatedLoansQuery,
@@ -122,6 +123,13 @@ export default function LoansView() {
           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold capitalize text-emerald-700">
             <CheckCircle2 size={12} />
             {status}
+          </span>
+        );
+      case "under_review":
+        return (
+          <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-700">
+            <ClipboardCheck size={12} />
+            Under Review
           </span>
         );
       case "pending":
@@ -287,6 +295,7 @@ export default function LoansView() {
                 [
                   { label: "All Status", value: "all" },
                   { label: "Pending", value: "pending" },
+                  { label: "Under Review", value: "under_review" },
                   { label: "Approved", value: "approved" },
                   { label: "Rejected", value: "rejected" },
                 ] as const
@@ -330,7 +339,12 @@ export default function LoansView() {
             )}
             {statusFilter !== "all" && (
               <span className="inline-flex items-center gap-1 rounded-full bg-black/5 px-2.5 py-0.5 font-medium text-black">
-                Status: <strong className="capitalize">{statusFilter}</strong>
+                Status:{" "}
+                <strong className="capitalize">
+                  {statusFilter === "under_review"
+                    ? "Under Review"
+                    : statusFilter}
+                </strong>
                 <button
                   type="button"
                   onClick={() => handleStatusFilterChange("all")}

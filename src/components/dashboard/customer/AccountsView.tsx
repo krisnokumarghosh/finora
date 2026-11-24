@@ -66,7 +66,9 @@ function AccountCard({
                 ? "bg-emerald-500/20 text-emerald-300"
                 : account.status === "pending"
                   ? "bg-amber-500/20 text-amber-300"
-                  : "bg-red-500/20 text-red-300"
+                  : account.status === "under_review"
+                    ? "bg-sky-500/20 text-sky-300"
+                    : "bg-red-500/20 text-red-300"
               }`}
           >
             <span
@@ -74,7 +76,9 @@ function AccountCard({
                   ? "bg-emerald-400"
                   : account.status === "pending"
                     ? "bg-amber-400"
-                    : "bg-red-400"
+                    : account.status === "under_review"
+                      ? "bg-sky-400"
+                      : "bg-red-400"
                 }`}
             />
             {account.status}

@@ -45,10 +45,18 @@ export async function GET(req: Request) {
 
   const sortOrder = { createdAt: -1 as const };
 
+  // Internal notes and forwarding metadata belong to bank staff only.
+  const customerProjection = {
+    internalNotes: 0,
+    forwardedAt: 0,
+    forwardedBy: 0,
+    forwardedByName: 0,
+  };
+
   if (!isPaginated) {
     const rows = await db
       .collection("loans")
-      .find(query)
+      .find(query, { projection: customerProjection })
       .sort(sortOrder)
       .toArray();
 
@@ -76,7 +84,7 @@ export async function GET(req: Request) {
   const total = await db.collection("loans").countDocuments(query);
   const rows = await db
     .collection("loans")
-    .find(query)
+    .find(query, { projection: customerProjection })
     .sort(sortOrder)
     .skip(offset)
     .limit(limit)

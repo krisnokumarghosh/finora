@@ -1,6 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export type AccountType = "savings" | "current" | "business";
+export type AccountStatus =
+  | "pending"
+  | "under_review"
+  | "active"
+  | "frozen"
+  | "rejected";
 
 export type Account = {
   id: string;
@@ -9,7 +15,7 @@ export type Account = {
   mobile: string;
   accountNumber: string;
   balance: number;
-  status: "pending" | "active" | "frozen" | "rejected";
+  status: AccountStatus;
   transactionLimit?: number;
   createdAt: string;
 };
@@ -149,6 +155,138 @@ export type FlagTransactionResponse = {
   flag: TransactionFlag | null;
 };
 
+/* ─── Staff customer operations ─── */
+
+export type StaffCustomerAccount = {
+  id: string;
+  accountNumber: string;
+  type: AccountType;
+  balance: number;
+  status: AccountStatus;
+  transactionLimit?: number;
+  createdAt: string;
+};
+
+export type StaffCustomer = {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  verified: boolean;
+  verifiedAt?: string;
+  verifiedByName?: string;
+  accountCount: number;
+  totalBalance: number;
+  accounts: StaffCustomerAccount[];
+};
+
+export type GetStaffCustomersParams = {
+  limit?: number;
+  offset?: number;
+  search?: string;
+};
+
+export type StaffCustomersResponse = {
+  customers: StaffCustomer[];
+  total: number;
+  verifiedCount: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
+export type RegisterCustomerBody = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export type RegisterCustomerResponse = {
+  success: boolean;
+  message: string;
+  customer: StaffCustomer;
+};
+
+export type VerifyCustomerBody = {
+  userId: string;
+  action: "verify" | "unverify";
+};
+
+export type VerifyCustomerResponse = {
+  success: boolean;
+  message: string;
+  verified: boolean;
+  verifiedAt?: string;
+  verifiedByName?: string;
+};
+
+export type StaffBankAccount = {
+  id: string;
+  userId: string;
+  customerName: string;
+  customerEmail?: string;
+  type: AccountType;
+  name: string;
+  mobile: string;
+  accountNumber: string;
+  balance: number;
+  status: AccountStatus;
+  transactionLimit?: number;
+  createdAt: string;
+  createdByName?: string;
+};
+
+export type GetStaffAccountsParams = {
+  limit?: number;
+  offset?: number;
+  type?: string;
+  status?: string;
+  search?: string;
+};
+
+export type StaffAccountStatusCounts = {
+  pending: number;
+  under_review: number;
+  active: number;
+  frozen: number;
+  rejected: number;
+};
+
+export type StaffAccountsResponse = {
+  accounts: StaffBankAccount[];
+  total: number;
+  statusCounts: StaffAccountStatusCounts;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
+export type CreateCustomerAccountBody = {
+  userId: string;
+  type: AccountType;
+  name: string;
+  mobile: string;
+  nid: string;
+  pin: string;
+};
+
+export type CreateCustomerAccountResponse = {
+  success: boolean;
+  message: string;
+  account: StaffBankAccount;
+};
+
+export type UpdateStaffAccountStatusBody = {
+  accountId: string;
+  status: "under_review" | "pending";
+};
+
+export type UpdateStaffAccountStatusResponse = {
+  success: boolean;
+  message: string;
+  account: StaffBankAccount;
+};
+
 export type FundRequestType = "deposit" | "withdrawal";
 export type FundRequestStatus = "pending" | "approved" | "rejected";
 
@@ -175,7 +313,7 @@ export type CreateFundRequestBody = {
 };
 
 export type LoanType = "home" | "car" | "education" | "personal" | "business";
-export type LoanStatus = "pending" | "approved" | "rejected";
+export type LoanStatus = "pending" | "under_review" | "approved" | "rejected";
 
 export type Loan = {
   id: string;
@@ -217,6 +355,56 @@ export type ApplyLoanBody = {
   pin: string;
 };
 
+export type LoanInternalNote = {
+  id: string;
+  note: string;
+  addedBy: string;
+  addedByName: string;
+  createdAt: string;
+};
+
+export type StaffLoan = Loan & {
+  userId?: string;
+  userName?: string;
+  accountStatus?: string;
+  balance?: number;
+  customer: {
+    name: string;
+    email?: string;
+    mobile?: string;
+  };
+  internalNotes: LoanInternalNote[];
+  forwardedAt?: string;
+  forwardedByName?: string;
+  updatedAt?: string;
+};
+
+export type GetStaffLoansParams = {
+  limit?: number;
+  offset?: number;
+  type?: string;
+  status?: string;
+  search?: string;
+};
+
+export type StaffLoansResponse = {
+  loans: StaffLoan[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
+export type UpdateStaffLoanBody =
+  | { loanId: string; action: "note"; note: string }
+  | { loanId: string; action: "forward" };
+
+export type UpdateStaffLoanResponse = {
+  success: boolean;
+  message: string;
+  loan: StaffLoan;
+};
+
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
@@ -225,7 +413,10 @@ export const api = createApi({
     "Transactions",
     "FundRequests",
     "Loans",
+    "StaffLoans",
     "StaffTransactions",
+    "StaffCustomers",
+    "StaffAccounts",
   ],
   refetchOnMountOrArgChange: true, // Always refetch fresh financial data when switching pages / mounting
   refetchOnFocus: true, // Auto refetch when tab is refocused
@@ -314,6 +505,39 @@ export const api = createApi({
       }),
       invalidatesTags: ["Loans"],
     }),
+    getStaffLoans: build.query<
+      StaffLoansResponse,
+      GetStaffLoansParams | void
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.limit) queryParams.set("limit", String(params.limit));
+        if (params?.offset !== undefined) {
+          queryParams.set("offset", String(params.offset));
+        }
+        if (params?.type && params.type !== "all") {
+          queryParams.set("type", params.type);
+        }
+        if (params?.status && params.status !== "all") {
+          queryParams.set("status", params.status);
+        }
+        if (params?.search) queryParams.set("search", params.search);
+        const qs = queryParams.toString();
+        return `/staff/loans${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["StaffLoans"],
+    }),
+    updateStaffLoan: build.mutation<
+      UpdateStaffLoanResponse,
+      UpdateStaffLoanBody
+    >({
+      query: (body) => ({
+        url: "/staff/loans",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["StaffLoans"],
+    }),
     getTransactions: build.query<
       TransactionsResponse,
       GetTransactionsParams | void
@@ -372,6 +596,88 @@ export const api = createApi({
       }),
       invalidatesTags: ["StaffTransactions", "Transactions"],
     }),
+    getStaffCustomers: build.query<
+      StaffCustomersResponse,
+      GetStaffCustomersParams | void
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.limit) queryParams.set("limit", String(params.limit));
+        if (params?.offset !== undefined) {
+          queryParams.set("offset", String(params.offset));
+        }
+        if (params?.search) queryParams.set("search", params.search);
+        const qs = queryParams.toString();
+        return `/staff/customers${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["StaffCustomers"],
+    }),
+    registerCustomer: build.mutation<
+      RegisterCustomerResponse,
+      RegisterCustomerBody
+    >({
+      query: (body) => ({
+        url: "/staff/customers",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["StaffCustomers"],
+    }),
+    verifyCustomer: build.mutation<
+      VerifyCustomerResponse,
+      VerifyCustomerBody
+    >({
+      query: (body) => ({
+        url: "/staff/customers",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["StaffCustomers"],
+    }),
+    getStaffAccounts: build.query<
+      StaffAccountsResponse,
+      GetStaffAccountsParams | void
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.limit) queryParams.set("limit", String(params.limit));
+        if (params?.offset !== undefined) {
+          queryParams.set("offset", String(params.offset));
+        }
+        if (params?.type && params.type !== "all") {
+          queryParams.set("type", params.type);
+        }
+        if (params?.status && params.status !== "all") {
+          queryParams.set("status", params.status);
+        }
+        if (params?.search) queryParams.set("search", params.search);
+        const qs = queryParams.toString();
+        return `/staff/accounts${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["StaffAccounts"],
+    }),
+    createCustomerAccount: build.mutation<
+      CreateCustomerAccountResponse,
+      CreateCustomerAccountBody
+    >({
+      query: (body) => ({
+        url: "/staff/accounts",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["StaffAccounts", "StaffCustomers", "Accounts"],
+    }),
+    updateStaffAccountStatus: build.mutation<
+      UpdateStaffAccountStatusResponse,
+      UpdateStaffAccountStatusBody
+    >({
+      query: (body) => ({
+        url: "/staff/accounts",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["StaffAccounts", "StaffCustomers", "Accounts"],
+    }),
   }),
 });
 
@@ -387,7 +693,15 @@ export const {
   useGetPaginatedLoansQuery,
   useApplyLoanMutation,
   useDeleteLoanMutation,
+  useGetStaffLoansQuery,
+  useUpdateStaffLoanMutation,
   useGetTransactionsQuery,
   useGetStaffTransactionsQuery,
   useFlagTransactionMutation,
+  useGetStaffCustomersQuery,
+  useRegisterCustomerMutation,
+  useVerifyCustomerMutation,
+  useGetStaffAccountsQuery,
+  useCreateCustomerAccountMutation,
+  useUpdateStaffAccountStatusMutation,
 } = api;
