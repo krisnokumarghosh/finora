@@ -1,5 +1,5 @@
-const AdminAnalyticsPage = () => {
-  return <div></div>;
-};
+import AdminDashboardView from "@/components/dashboard/admin/AdminDashboardView";
 
-export default AdminAnalyticsPage;
+export default function AdminAnalyticsPage() {
+  return <AdminDashboardView />;
+}

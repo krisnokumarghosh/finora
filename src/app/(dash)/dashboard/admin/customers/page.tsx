@@ -1,11 +1,5 @@
-import React from 'react';
+import AdminCustomersView from "@/components/dashboard/admin/AdminCustomersView";
 
-const AllCustomersPage = () => {
-    return (
-        <div>
-            
-        </div>
-    );
-};
-
-export default AllCustomersPage;
+export default function AdminCustomersPage() {
+  return <AdminCustomersView />;
+}

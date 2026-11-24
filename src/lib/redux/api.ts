@@ -405,6 +405,105 @@ export type UpdateStaffLoanResponse = {
   loan: StaffLoan;
 };
 
+/* ─── Admin Analytics ─── */
+
+export type AdminSummary = {
+  totalCustomers: number;
+  totalBankAccounts: number;
+  totalBankBalance: number;
+  totalDeposits: number;
+  totalWithdrawals: number;
+  totalTransactions: number;
+  pendingLoans: number;
+};
+
+export type TransactionChartPoint = {
+  name: string;
+  year: number;
+  month?: number;
+  deposit: number;
+  withdrawal: number;
+  transfer: number;
+};
+
+export type AccountTypeDataPoint = {
+  type: string;
+  count: number;
+  totalBalance: number;
+};
+
+export type AdminAnalyticsResponse = {
+  summary: AdminSummary;
+  monthlyChartData: TransactionChartPoint[];
+  yearlyChartData: TransactionChartPoint[];
+  accountTypeData: AccountTypeDataPoint[];
+};
+
+/* ─── Admin Customer Management ─── */
+
+export type UserStatus = "active" | "inactive" | "blocked";
+
+export type AdminCustomer = StaffCustomer & {
+  status: UserStatus;
+  statusReason?: string;
+  statusUpdatedAt?: string;
+};
+
+export type AdminCustomerStatusCounts = {
+  all: number;
+  active: number;
+  inactive: number;
+  blocked: number;
+};
+
+export type AdminCustomersResponse = {
+  customers: AdminCustomer[];
+  total: number;
+  statusCounts: AdminCustomerStatusCounts;
+  verifiedCount: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
+export type GetAdminCustomersParams = {
+  limit?: number;
+  offset?: number;
+  status?: string;
+  search?: string;
+};
+
+export type UpdateCustomerStatusBody = {
+  userId: string;
+  status: UserStatus;
+  reason?: string;
+};
+
+export type UpdateCustomerStatusResponse = {
+  success: boolean;
+  message: string;
+  customer: AdminCustomer;
+};
+
+export type UpdateAdminAccountStatusBody = {
+  accountId: string;
+  status: AccountStatus;
+  reason?: string;
+};
+
+export type UpdateAdminAccountStatusResponse = {
+  success: boolean;
+  message: string;
+  account: StaffBankAccount;
+};
+
+export type GetCustomerTransactionsParams = {
+  userId: string;
+  limit?: number;
+  offset?: number;
+  type?: string;
+};
+
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
@@ -417,6 +516,8 @@ export const api = createApi({
     "StaffTransactions",
     "StaffCustomers",
     "StaffAccounts",
+    "AdminAnalytics",
+    "AdminCustomers",
   ],
   refetchOnMountOrArgChange: true, // Always refetch fresh financial data when switching pages / mounting
   refetchOnFocus: true, // Auto refetch when tab is refocused
@@ -678,6 +779,70 @@ export const api = createApi({
       }),
       invalidatesTags: ["StaffAccounts", "StaffCustomers", "Accounts"],
     }),
+    getAdminAnalytics: build.query<AdminAnalyticsResponse, void>({
+      query: () => "/admin/analytics",
+      providesTags: ["AdminAnalytics"],
+    }),
+    getAdminCustomers: build.query<AdminCustomersResponse, GetAdminCustomersParams>({
+      query: (params) => {
+        const query = new URLSearchParams();
+        if (params.limit !== undefined) query.set("limit", String(params.limit));
+        if (params.offset !== undefined) query.set("offset", String(params.offset));
+        if (params.status && params.status !== "all") query.set("status", params.status);
+        if (params.search) query.set("search", params.search);
+        const qs = query.toString();
+        return `/admin/customers${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["AdminCustomers", "StaffCustomers"],
+    }),
+    updateCustomerStatus: build.mutation<
+      UpdateCustomerStatusResponse,
+      UpdateCustomerStatusBody
+    >({
+      query: (body) => ({
+        url: "/admin/customers",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [
+        "AdminCustomers",
+        "StaffCustomers",
+        "StaffAccounts",
+        "Accounts",
+        "AdminAnalytics",
+      ],
+    }),
+    updateAdminAccountStatus: build.mutation<
+      UpdateAdminAccountStatusResponse,
+      UpdateAdminAccountStatusBody
+    >({
+      query: (body) => ({
+        url: "/admin/accounts",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [
+        "AdminCustomers",
+        "StaffCustomers",
+        "StaffAccounts",
+        "Accounts",
+        "AdminAnalytics",
+      ],
+    }),
+    getCustomerTransactions: build.query<
+      StaffTransactionsResponse,
+      GetCustomerTransactionsParams
+    >({
+      query: ({ userId, limit = 20, offset = 0, type = "all" }) => {
+        const query = new URLSearchParams();
+        query.set("userId", userId);
+        if (limit) query.set("limit", String(limit));
+        if (offset) query.set("offset", String(offset));
+        if (type && type !== "all") query.set("type", type);
+        return `/admin/customers/transactions?${query.toString()}`;
+      },
+      providesTags: ["Transactions", "StaffTransactions"],
+    }),
   }),
 });
 
@@ -704,4 +869,9 @@ export const {
   useGetStaffAccountsQuery,
   useCreateCustomerAccountMutation,
   useUpdateStaffAccountStatusMutation,
+  useGetAdminAnalyticsQuery,
+  useGetAdminCustomersQuery,
+  useUpdateCustomerStatusMutation,
+  useUpdateAdminAccountStatusMutation,
+  useGetCustomerTransactionsQuery,
 } = api;
