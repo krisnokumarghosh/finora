@@ -33,6 +33,7 @@ import {
   type StaffLoan,
 } from "@/lib/redux/api";
 import { successToast } from "@/lib/utils/toasts";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 /* ─── Format Money Helper (BDT) ─── */
 const formatMoney = (val: number) =>
@@ -308,35 +309,29 @@ export default function StaffLoansView() {
     loanType !== "all" || statusFilter !== "all" || search !== "";
 
   return (
-    <div className="space-y-6">
-      {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
-            Loan Assistance
-          </h1>
-          <p className="mt-1 text-sm text-black/60">
-            Review customer loan applications, add internal notes, and forward
-            them for admin approval.
-          </p>
-        </div>
-
-        {/* Quick action: Refresh */}
-        <button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="inline-flex h-10 items-center gap-2 self-start rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50 sm:self-center"
-        >
-          <RefreshCw
-            size={14}
-            className={isFetching ? "animate-spin text-black" : ""}
-          />
-          <span>Refresh</span>
-        </button>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Bank Staff"
+        title="Loan Assistance"
+        description="Review customer loan applications, add internal notes, and forward them for admin approval."
+        actions={
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
+          >
+            <RefreshCw
+              size={14}
+              className={isFetching ? "animate-spin text-black" : ""}
+            />
+            <span>Refresh</span>
+          </button>
+        }
+      />
 
       {/* ── Filters & Search Bar Card ── */}
-      <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">
+      <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
         <div className="flex flex-col gap-4">
           {/* Top row: Search by Account Number */}
           <div className="relative w-full">

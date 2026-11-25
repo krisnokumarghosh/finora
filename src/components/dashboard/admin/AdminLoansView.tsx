@@ -36,6 +36,7 @@ import {
   type LoanType,
 } from "@/lib/redux/api";
 import { successToast } from "@/lib/utils/toasts";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 /* ─── Format Money Helper (BDT) ─── */
 const formatMoney = (val: number) =>
@@ -350,50 +351,44 @@ export default function AdminLoansView() {
       : reviewTarget?.amount || 0;
 
   return (
-    <div className="space-y-6">
-      {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
-            Loan Management
-          </h1>
-          <p className="mt-1 text-sm text-black/60">
-            Review loan applications needing approval, approve or reject
-            requests, and inspect loan repayment history.
-          </p>
-        </div>
-
-        {/* Quick actions */}
-        <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
-          <button
-            type="button"
-            onClick={handleProcessDueRepayments}
-            disabled={isProcessingRepayments}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C] disabled:opacity-50"
-          >
-            <History
-              size={14}
-              className={isProcessingRepayments ? "animate-spin" : ""}
-            />
-            <span>
-              {isProcessingRepayments
-                ? "Processing..."
-                : "Process Due Repayments"}
-            </span>
-          </button>
-          <button
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
-          >
-            <RefreshCw
-              size={14}
-              className={isFetching ? "animate-spin text-black" : ""}
-            />
-            <span>Refresh</span>
-          </button>
-        </div>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Admin"
+        title="Loan Management"
+        description="Review loan applications needing approval, approve or reject requests, and inspect loan repayment history."
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={handleProcessDueRepayments}
+              disabled={isProcessingRepayments}
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C] disabled:opacity-50"
+            >
+              <History
+                size={14}
+                className={isProcessingRepayments ? "animate-spin" : ""}
+              />
+              <span>
+                {isProcessingRepayments
+                  ? "Processing..."
+                  : "Process Due Repayments"}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
+            >
+              <RefreshCw
+                size={14}
+                className={isFetching ? "animate-spin text-black" : ""}
+              />
+              <span>Refresh</span>
+            </button>
+          </>
+        }
+      />
 
       {/* ── Filters & Search Bar Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">

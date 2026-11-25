@@ -24,6 +24,7 @@ import {
 // TODO: nijer auth-client path onujayi import ta thik koro
 import { authClient } from "@/lib/auth-client";
 import { LogoLight } from "@/lib/utils/Logo";
+import LogoutConfirmModal from "./LogoutConfirmModal";
 
 type Role = "customer" | "admin" | "bank-staff";
 type NavItem = { label: string; short: string; href: string; icon: LucideIcon };
@@ -118,6 +119,9 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
 
   const role = (user.role && user.role in NAV ? user.role : "customer") as Role;
   const items = NAV[role];
@@ -127,10 +131,41 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === href : pathname.startsWith(href);
 
-  const logout = async () => {
-    await authClient.signOut({
-      fetchOptions: { onSuccess: () => router.push("/login") },
-    });
+  const openLogoutModal = () => {
+    setLogoutError("");
+    setLogoutModalOpen(true);
+  };
+
+  const closeLogoutModal = () => {
+    if (isLoggingOut) return;
+    setLogoutModalOpen(false);
+    setLogoutError("");
+  };
+
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true);
+    setLogoutError("");
+
+    try {
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            setLogoutModalOpen(false);
+            setOpen(false);
+            router.push("/login");
+          },
+          onError: (ctx) => {
+            setLogoutError(
+              ctx.error.message || "Failed to log out. Please try again.",
+            );
+            setIsLoggingOut(false);
+          },
+        },
+      });
+    } catch {
+      setLogoutError("Something went wrong while logging out. Please try again.");
+      setIsLoggingOut(false);
+    }
   };
 
   const UserBlock = (
@@ -147,7 +182,8 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
         </div>
       </div>
       <button
-        onClick={logout}
+        type="button"
+        onClick={openLogoutModal}
         className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-white/10 text-sm font-medium text-white transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
       >
         <LogOut size={16} />
@@ -280,6 +316,15 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
 
         {UserBlock}
       </div>
+
+      <LogoutConfirmModal
+        isOpen={logoutModalOpen}
+        isLoggingOut={isLoggingOut}
+        error={logoutError}
+        userEmail={user.email}
+        onClose={closeLogoutModal}
+        onConfirm={handleConfirmLogout}
+      />
     </>
   );
 }

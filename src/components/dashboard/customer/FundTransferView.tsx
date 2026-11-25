@@ -25,6 +25,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/lib/redux/store";
 import { setSelectedAccount } from "@/lib/redux/slices/accountSlice";
 import { successToast } from "@/lib/utils/toasts";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 /* ─── Design Tokens ─── */
 const labelClass = "mb-2 block text-sm font-medium text-black/60";
@@ -253,20 +254,12 @@ export default function FundTransferView() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div>
-        <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-neutral-400">
-          Payments & Transfers
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight text-black">
-          Fund Transfer
-        </h1>
-        <p className="mt-1 text-sm text-black/50">
-          Transfer money instantly between your accounts or to any bank
-          recipient.
-        </p>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Payments & Transfers"
+        title="Fund Transfer"
+        description="Transfer money instantly between your accounts or to any bank recipient."
+      />
 
       {/* Main Grid: Account Selector & Info (Left) + Transfer Form (Right) */}
       <div className="grid gap-8 lg:grid-cols-12">

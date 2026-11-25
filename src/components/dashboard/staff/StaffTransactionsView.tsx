@@ -26,6 +26,7 @@ import {
   type StaffTransaction,
 } from "@/lib/redux/api";
 import { successToast, errorToast } from "@/lib/utils/toasts";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 /* ─── Format Money Helper (BDT) ─── */
 const formatMoney = (val: number) =>
@@ -332,34 +333,29 @@ export default function StaffTransactionsView() {
     flaggedOnly;
 
   return (
-    <div className="space-y-6">
-      {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
-            All Transactions
-          </h1>
-          <p className="mt-1 text-sm text-black/60">
-            Monitor, search, and review transactions across all customer
-            accounts.
-          </p>
-        </div>
-
-        <button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="inline-flex h-10 items-center gap-2 self-start rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50 sm:self-center"
-        >
-          <RefreshCw
-            size={14}
-            className={isFetching ? "animate-spin text-black" : ""}
-          />
-          <span>Refresh</span>
-        </button>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Bank Staff"
+        title="All Transactions"
+        description="Monitor, search, and review transactions across all customer accounts."
+        actions={
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
+          >
+            <RefreshCw
+              size={14}
+              className={isFetching ? "animate-spin text-black" : ""}
+            />
+            <span>Refresh</span>
+          </button>
+        }
+      />
 
       {/* ── Filters & Search Bar Card ── */}
-      <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">
+      <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
         <div className="flex flex-col gap-4">
           {/* Top row: Search by transaction ID */}
           <div className="relative w-full">

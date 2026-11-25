@@ -30,6 +30,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/lib/redux/store";
 import { setSelectedAccount } from "@/lib/redux/slices/accountSlice";
 import { successToast } from "@/lib/utils/toasts";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 /* ─── Design Tokens (Identical to FundTransferView) ─── */
 const labelClass = "mb-2 block text-sm font-medium text-black/60";
@@ -247,20 +248,12 @@ export default function DepositWithdrawalView() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-black/40">
-          Banking Operations
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight text-black">
-          Deposit & Withdrawal
-        </h1>
-        <p className="mt-1 text-sm text-black/50">
-          Submit deposit or withdrawal requests for your active bank accounts.
-          All requests are reviewed with pending status initially.
-        </p>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Banking Operations"
+        title="Deposit & Withdrawal"
+        description="Submit deposit or withdrawal requests for your active bank accounts. All requests are reviewed with pending status initially."
+      />
 
       {/* Main Grid: Form (Left) + Status Definitions (Right) */}
       <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">

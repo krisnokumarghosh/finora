@@ -27,6 +27,7 @@ import {
 } from "@/components/dashboard/staff/staffUi";
 import AdminCustomerDetailModal from "@/components/dashboard/admin/AdminCustomerDetailModal";
 import AdminCustomerTransactionsModal from "@/components/dashboard/admin/AdminCustomerTransactionsModal";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 export default function AdminCustomersView() {
   const router = useRouter();
@@ -67,42 +68,36 @@ export default function AdminCustomersView() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* ── Page header ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
-            Customer Management
-          </h1>
-          <p className="mt-1 text-sm text-black/60">
-            View, search, monitor, activate, deactivate, or block customer
-            accounts.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => router.push("/dashboard/admin/transactions")}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-all hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
-          >
-            <Receipt size={14} />
-            Transactions
-          </button>
-          <button
-            type="button"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
-          >
-            <RefreshCw
-              size={14}
-              className={isFetching ? "animate-spin text-black" : ""}
-            />
-            Refresh
-          </button>
-        </div>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Admin"
+        title="Customer Management"
+        description="View, search, monitor, activate, deactivate, or block customer accounts."
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => router.push("/dashboard/admin/transactions")}
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-all hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
+            >
+              <Receipt size={14} />
+              Transactions
+            </button>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
+            >
+              <RefreshCw
+                size={14}
+                className={isFetching ? "animate-spin text-black" : ""}
+              />
+              Refresh
+            </button>
+          </>
+        }
+      />
 
       {/* ── Search & Filter card ── */}
       <div className="space-y-4 rounded-3xl bg-white p-5 shadow-sm sm:p-6">

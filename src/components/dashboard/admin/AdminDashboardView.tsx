@@ -28,6 +28,7 @@ import {
   type AdminAnalyticsResponse,
 } from "@/lib/redux/api";
 import { authClient } from "@/lib/auth-client";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 /* ─── Format BDT Currency ─── */
 const formatMoney = (val: number) =>
@@ -198,45 +199,46 @@ export default function AdminDashboardView({
   }));
 
   return (
-    <div className="space-y-6">
-      {/* ── Page Header ── */}
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-black/40">
-          ADMIN OVERVIEW
-        </p>
-        <h1 className="mt-1 flex items-center gap-2 text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
-          Hello {userName} <span className="text-3xl">👋</span>
-        </h1>
-        <p className="mt-1 text-sm text-black/60">
-          A complete view of the banking system — customers, accounts, and
-          transactions.
-        </p>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Admin Overview"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <span>Hello {userName}</span>
+            <span aria-hidden="true">👋</span>
+          </span>
+        }
+        description="A complete view of the banking system — customers, accounts, and transactions."
+      />
 
-      {/* ── Financial & System Record (White block like Customer Dashboard) ── */}
-      <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-black">Financial & System Record</h2>
+      {/* ── Financial & System Record ── */}
+      <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-base font-bold text-black sm:text-lg">
+              Financial & System Record
+            </h2>
             <p className="mt-0.5 text-xs text-black/50">
               Overview of key banking indicators and metrics
             </p>
           </div>
-          <span className="rounded-full bg-[#F3F3EE] px-3 py-1 text-xs font-semibold text-black/60">
+          <span className="shrink-0 rounded-full bg-[#F3F3EE] px-3 py-1 text-xs font-semibold text-black/60">
             7 Metrics
           </span>
         </div>
 
-        {/* 7 Dark Metric Cards inside White Container (no middle line) */}
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {metricCards.map((card) => (
+        {/* 7 Dark Metric Cards inside White Container */}
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {metricCards.map((card, idx) => (
             <div
               key={card.label}
-              className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-5 text-white shadow-sm transition-all duration-200 hover:shadow-md"
+              className={`relative flex min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-4 text-white shadow-sm transition-all duration-200 hover:shadow-md sm:p-5 ${
+                idx === metricCards.length - 1 ? "col-span-2 sm:col-span-1" : ""
+              }`}
             >
               {/* Top Row: Label + Icon */}
-              <div className="flex items-start justify-between">
-                <span className="text-xs font-medium text-white/70">
+              <div className="flex items-start justify-between gap-2">
+                <span className="truncate text-[11px] font-medium text-white/70 sm:text-xs">
                   {card.label}
                 </span>
                 <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/10">
@@ -244,12 +246,12 @@ export default function AdminDashboardView({
                 </div>
               </div>
 
-              {/* Value + Badge (clean modern layout without middle line) */}
-              <div className="mt-6 flex items-baseline justify-between gap-2">
-                <span className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+              {/* Value + Badge */}
+              <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2 sm:mt-6">
+                <span className="text-xl font-extrabold tracking-tight text-white sm:text-2xl xl:text-3xl">
                   {card.format(card.value)}
                 </span>
-                <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#E6FB2D]">
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-[#E6FB2D] sm:px-2.5 sm:text-[11px]">
                   {card.badge}
                 </span>
               </div>
@@ -259,9 +261,9 @@ export default function AdminDashboardView({
       </div>
 
       {/* ── Charts Row ── */}
-      <div className="grid gap-6 lg:grid-cols-12">
+      <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
         {/* Area Chart (left, wider) */}
-        <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7 lg:col-span-7 xl:col-span-8">
+        <div className="min-w-0 rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7 lg:col-span-7 xl:col-span-8">
           {/* Chart Header */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>

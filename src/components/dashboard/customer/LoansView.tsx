@@ -28,6 +28,7 @@ import {
   type LoanType,
 } from "@/lib/redux/api";
 import { successToast } from "@/lib/utils/toasts";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 /* ─── Format Money Helper (BDT) ─── */
 const formatMoney = (val: number) =>
@@ -206,31 +207,26 @@ export default function LoansView() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
-            All Loans
-          </h1>
-          <p className="mt-1 text-sm text-black/60">
-            View, filter, search, and manage your complete loan applications and repayment status.
-          </p>
-        </div>
-
-        {/* Quick action: Refresh */}
-        <button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="inline-flex h-10 items-center gap-2 self-start rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50 sm:self-center"
-        >
-          <RefreshCw
-            size={14}
-            className={isFetching ? "animate-spin text-black" : ""}
-          />
-          <span>Refresh</span>
-        </button>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Financing"
+        title="All Loans"
+        description="View, filter, search, and manage your complete loan applications and repayment status."
+        actions={
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
+          >
+            <RefreshCw
+              size={14}
+              className={isFetching ? "animate-spin text-black" : ""}
+            />
+            <span>Refresh</span>
+          </button>
+        }
+      />
 
       {/* ── Filters & Search Bar Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">

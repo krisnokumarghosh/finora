@@ -32,6 +32,7 @@ import StaffRegisterCustomerModal from "@/components/dashboard/staff/StaffRegist
 import StaffCreateAccountModal from "@/components/dashboard/staff/StaffCreateAccountModal";
 import StaffCustomerDetailModal from "@/components/dashboard/staff/StaffCustomerDetailModal";
 import StaffAccountDetailModal from "@/components/dashboard/staff/StaffAccountDetailModal";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 export default function StaffOperationsView() {
   const customersQuery = useGetStaffCustomersQuery({ limit: 5, offset: 0 });
@@ -102,88 +103,96 @@ export default function StaffOperationsView() {
   ];
 
   return (
-    <div className="w-full min-w-0 space-y-6">
-      {/* ── Page header ── */}
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="min-w-0">
-          <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-black/40">
-            Bank Staff
-          </p>
-          <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-4xl">
-            Customer Operations
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-black/60">
-            Register customers, open bank accounts, verify customer information,
-            and review account details from one place.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center">
-          <button
-            type="button"
-            onClick={refresh}
-            disabled={isRefreshing}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
-          >
-            <RefreshCw
-              size={14}
-              className={isRefreshing ? "animate-spin text-black" : ""}
-            />
-            Refresh
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowRegister(true)}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black"
-          >
-            <UserPlus size={14} />
-            <span className="truncate">Register customer</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => openCreateAccount()}
-            className="col-span-2 inline-flex h-10 items-center justify-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C] sm:col-span-1"
-          >
-            <Plus size={14} />
-            Create bank account
-          </button>
-        </div>
-      </div>
-
-      {/* ── Summary cards ── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={stat.label}
-              className="min-w-0 rounded-3xl bg-white p-5 shadow-sm"
+    <div className="w-full min-w-0 space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Bank Staff"
+        title="Customer Operations"
+        description="Register customers, open bank accounts, verify customer information, and review account details from one place."
+        actions={
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-2.5">
+            <button
+              type="button"
+              onClick={refresh}
+              disabled={isRefreshing}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-black/45">
+              <RefreshCw
+                size={14}
+                className={isRefreshing ? "animate-spin text-black" : ""}
+              />
+              Refresh
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRegister(true)}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black"
+            >
+              <UserPlus size={14} />
+              <span className="truncate">Register customer</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => openCreateAccount()}
+              className="col-span-2 inline-flex h-10 items-center justify-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C] sm:col-span-1"
+            >
+              <Plus size={14} />
+              Create bank account
+            </button>
+          </div>
+        }
+      />
+
+      {/* ── Summary cards (Unified Dark Tiles inside White Container) ── */}
+      <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-base font-bold text-black sm:text-lg">
+              Operations Summary
+            </h2>
+            <p className="mt-0.5 text-xs text-black/50">
+              Live customer profiles and account review queue
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full bg-[#F3F3EE] px-3 py-1 text-xs font-semibold text-black/60">
+            4 Metrics
+          </span>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-4 xl:grid-cols-4">
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={stat.label}
+                className="relative flex min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-4 text-white shadow-sm transition-all duration-200 hover:shadow-md sm:p-5"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="truncate text-[11px] font-medium text-white/70 sm:text-xs">
                     {stat.label}
-                  </p>
-                  <p className="mt-2 text-2xl font-extrabold tracking-tight text-black sm:text-3xl">
-                    {stat.value}
-                  </p>
+                  </span>
+                  <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/10">
+                    <Icon size={14} className="text-[#E6FB2D]" />
+                  </div>
                 </div>
-                <div
-                  className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${stat.tone}`}
-                >
-                  <Icon size={18} />
+
+                <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2 sm:mt-6">
+                  <span className="text-xl font-extrabold tracking-tight text-white sm:text-2xl xl:text-3xl">
+                    {stat.value}
+                  </span>
+                  <span className="truncate rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/70 sm:px-2.5 sm:text-[11px]">
+                    {stat.hint}
+                  </span>
                 </div>
               </div>
-              <p className="mt-2 text-[11px] text-black/40">{stat.hint}</p>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* ── Recent customers & accounts ── */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:gap-6">
         {/* Recent customers */}
-        <div className="min-w-0 rounded-3xl bg-white p-4 shadow-sm sm:p-6">
+        <div className="min-w-0 rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
           <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-3">
             <div className="flex min-w-0 items-center gap-2">
               <Users size={18} className="shrink-0 text-black/50" />
@@ -275,7 +284,7 @@ export default function StaffOperationsView() {
                       />
                     </div>
 
-                    <div className="flex shrink-0 items-center justify-between gap-2 pl-[52px] sm:justify-end sm:pl-0">
+                    <div className="flex shrink-0 items-center justify-between gap-2 pl-13 sm:justify-end sm:pl-0">
                       <div className="flex items-center gap-2 sm:block sm:text-right">
                         <p className="text-[11px] font-semibold text-black/55">
                           {customer.accountCount} account
@@ -388,7 +397,7 @@ export default function StaffOperationsView() {
                       />
                     </div>
 
-                    <div className="flex shrink-0 items-center justify-between gap-2 pl-[48px] sm:justify-end sm:pl-0">
+                    <div className="flex shrink-0 items-center justify-between gap-2 pl-12 sm:justify-end sm:pl-0">
                       <div className="flex flex-wrap items-center gap-2 sm:block sm:text-right">
                         <p className="flex items-center gap-1 text-sm font-bold text-black sm:justify-end">
                           <Wallet size={12} className="shrink-0 text-black/35" />

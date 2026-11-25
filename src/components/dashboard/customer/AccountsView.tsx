@@ -14,6 +14,7 @@ import { useGetAccountsQuery, type Account } from "@/lib/redux/api";
 import { useAppDispatch } from "@/lib/redux/store";
 import { setSelectedAccount } from "@/lib/redux/slices/accountSlice";
 import CreateAccountForm from "@/components/dashboard/customer/CreateAccountForm";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 /* ─── Helpers ─── */
 const formatBDT = (amount: number) =>
@@ -202,27 +203,26 @@ export default function AccountsView({ children }: AccountsViewProps) {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header bar combining Server-rendered title with Create button */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          {children}
-          {!isLoading && accounts.length > 0 && (
-            <p className="mt-1.5 text-sm text-neutral-500">
-              Manage your accounts and check balances at a glance.
-            </p>
-          )}
-        </div>
-
-        {accounts.length > 0 && accounts.length < 3 && !showForm && (
-          <Button
-            onPress={() => setShowForm(true)}
-            className="h-11 rounded-full bg-[#2C2C2C] px-6 text-sm font-medium text-white transition-colors duration-200 data-[hovered=true]:bg-[#E6FB2D] data-[hovered=true]:text-[#2C2C2C] hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
-          >
-            + Create account
-          </Button>
-        )}
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Overview"
+        title={children || "My Accounts"}
+        description={
+          !isLoading && accounts.length > 0
+            ? "Manage your accounts and check balances at a glance."
+            : undefined
+        }
+        actions={
+          accounts.length > 0 && accounts.length < 3 && !showForm ? (
+            <Button
+              onPress={() => setShowForm(true)}
+              className="h-10 rounded-full bg-[#2C2C2C] px-5 text-xs font-semibold text-white transition-colors duration-200 data-[hovered=true]:bg-[#E6FB2D] data-[hovered=true]:text-[#2C2C2C] hover:bg-[#E6FB2D] hover:text-[#2C2C2C] sm:h-11 sm:px-6 sm:text-sm"
+            >
+              + Create account
+            </Button>
+          ) : undefined
+        }
+      />
 
 
 

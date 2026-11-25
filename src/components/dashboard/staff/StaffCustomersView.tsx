@@ -23,6 +23,7 @@ import {
 import StaffRegisterCustomerModal from "@/components/dashboard/staff/StaffRegisterCustomerModal";
 import StaffCustomerDetailModal from "@/components/dashboard/staff/StaffCustomerDetailModal";
 import StaffCreateAccountModal from "@/components/dashboard/staff/StaffCreateAccountModal";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 export default function StaffCustomersView() {
   const [search, setSearch] = useState("");
@@ -55,44 +56,39 @@ export default function StaffCustomersView() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* ── Page header ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
-            All Customers
-          </h1>
-          <p className="mt-1 text-sm text-black/60">
-            View registered customer profiles and search by user ID.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
-          >
-            <RefreshCw
-              size={14}
-              className={isFetching ? "animate-spin text-black" : ""}
-            />
-            Refresh
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowRegister(true)}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
-          >
-            <UserPlus size={14} />
-            Register customer
-          </button>
-        </div>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Bank Staff"
+        title="All Customers"
+        description="View registered customer profiles and search by user ID."
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
+            >
+              <RefreshCw
+                size={14}
+                className={isFetching ? "animate-spin text-black" : ""}
+              />
+              Refresh
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRegister(true)}
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
+            >
+              <UserPlus size={14} />
+              Register customer
+            </button>
+          </>
+        }
+      />
 
       {/* ── Search card ── */}
-      <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">
+      <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
         <div className="relative w-full">
           <Search
             size={18}

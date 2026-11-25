@@ -28,6 +28,7 @@ import {
 } from "@/components/dashboard/staff/staffUi";
 import StaffCreateAccountModal from "@/components/dashboard/staff/StaffCreateAccountModal";
 import StaffAccountDetailModal from "@/components/dashboard/staff/StaffAccountDetailModal";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 const ACCOUNT_TYPES = [
   { label: "All Types", value: "all" },
@@ -131,41 +132,36 @@ export default function StaffAccountsView() {
     typeFilter !== "all" || statusFilter !== "all" || search !== "";
 
   return (
-    <div className="space-y-6">
-      {/* ── Page header ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
-            All Bank Accounts
-          </h1>
-          <p className="mt-1 text-sm text-black/60">
-            Search, filter, and review bank accounts across all customers.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
-          >
-            <RefreshCw
-              size={14}
-              className={isFetching ? "animate-spin text-black" : ""}
-            />
-            Refresh
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowCreate(true)}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
-          >
-            <Plus size={14} />
-            Create bank account
-          </button>
-        </div>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Bank Staff"
+        title="All Bank Accounts"
+        description="Search, filter, and review bank accounts across all customers."
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
+            >
+              <RefreshCw
+                size={14}
+                className={isFetching ? "animate-spin text-black" : ""}
+              />
+              Refresh
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowCreate(true)}
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
+            >
+              <Plus size={14} />
+              Create bank account
+            </button>
+          </>
+        }
+      />
 
       {/* ── Filters & search card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">

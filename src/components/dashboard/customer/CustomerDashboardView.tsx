@@ -41,6 +41,7 @@ import {
   type LoanType,
 } from "@/lib/redux/api";
 import { successToast } from "@/lib/utils/toasts";
+import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
 /* ─── Format BDT Currency ─── */
 const formatMoney = (val: number) =>
@@ -282,38 +283,38 @@ export default function CustomerDashboardView({
   };
 
   return (
-    <div className="space-y-6">
-      {/* ── Page Header (Matching Image) ── */}
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-black/40">
-          OVERVIEW
-        </p>
-        <h1 className="mt-1 flex items-center gap-2 text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
-          Hello {user.name || "Steward"} <span className="text-3xl">👋</span>
-        </h1>
-        <p className="mt-1 text-sm text-black/60">
-          Track your income, expenses, savings and loans in one place.
-        </p>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardPageHeader
+        eyebrow="Overview"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <span>Hello {user.name || "Steward"}</span>
+            <span aria-hidden="true">👋</span>
+          </span>
+        }
+        description="Track your income, expenses, savings and loans in one place."
+      />
 
-      {/* ── Main 2-Column Grid Layout (Matching Image) ── */}
-      <div className="grid gap-6 lg:grid-cols-12">
+      {/* ── Main 2-Column Grid Layout ── */}
+      <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
         {/* ════════ LEFT COLUMN (Financial Record + Money Flow Chart) ════════ */}
-        <div className="space-y-6 lg:col-span-7 xl:col-span-8">
+        <div className="min-w-0 space-y-5 sm:space-y-6 lg:col-span-7 xl:col-span-8">
           {/* Card 1: Financial Record */}
-          <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
-            <h2 className="text-lg font-bold text-black">Financial Record</h2>
+          <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7">
+            <h2 className="text-base font-bold text-black sm:text-lg">
+              Financial Record
+            </h2>
 
             {/* 3 Metrics Cards inside */}
-            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-3 sm:gap-4">
               {/* Metric 1: Total Money (Dark #2C2C2C Card with Lime curve) */}
-              <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-5 text-white shadow-sm">
+              <div className="relative flex min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-4 text-white shadow-sm sm:p-5">
                 <span className="text-xs font-medium text-white/70">
                   Total Money
                 </span>
 
                 {/* Decorative SVG Sparkline */}
-                <div className="my-3 h-8 w-full">
+                <div className="my-2.5 h-7 w-full sm:my-3 sm:h-8">
                   <svg
                     viewBox="0 0 100 24"
                     fill="none"
@@ -328,8 +329,8 @@ export default function CustomerDashboardView({
                   </svg>
                 </div>
 
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="text-xl font-extrabold tracking-tight sm:text-2xl xl:text-3xl">
                     {formatMoney(totalMoney)}
                   </span>
                   <span className="text-[11px] font-semibold text-[#E6FB2D]">
@@ -339,13 +340,13 @@ export default function CustomerDashboardView({
               </div>
 
               {/* Metric 2: Total Deposit (Dark #2C2C2C Card with Lime curve) */}
-              <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-5 text-white shadow-sm">
+              <div className="relative flex min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-4 text-white shadow-sm sm:p-5">
                 <span className="text-xs font-medium text-white/70">
                   Total Deposit
                 </span>
 
                 {/* Decorative SVG Sparkline */}
-                <div className="my-3 h-8 w-full">
+                <div className="my-2.5 h-7 w-full sm:my-3 sm:h-8">
                   <svg
                     viewBox="0 0 100 24"
                     fill="none"
@@ -360,8 +361,8 @@ export default function CustomerDashboardView({
                   </svg>
                 </div>
 
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-extrabold tracking-tight sm:text-3xl text-white">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="text-xl font-extrabold tracking-tight text-white sm:text-2xl xl:text-3xl">
                     {formatMoney(totalDepositAmount)}
                   </span>
                   <span className="text-[11px] font-semibold text-[#E6FB2D]">
@@ -371,13 +372,13 @@ export default function CustomerDashboardView({
               </div>
 
               {/* Metric 3: Total Withdrawal (Dark #2C2C2C Card with Lime curve) */}
-              <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-5 text-white shadow-sm">
+              <div className="relative flex min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-4 text-white shadow-sm sm:p-5">
                 <span className="text-xs font-medium text-white/70">
                   Total Withdrawal
                 </span>
 
                 {/* Decorative SVG Sparkline */}
-                <div className="my-3 h-8 w-full">
+                <div className="my-2.5 h-7 w-full sm:my-3 sm:h-8">
                   <svg
                     viewBox="0 0 100 24"
                     fill="none"
@@ -392,8 +393,8 @@ export default function CustomerDashboardView({
                   </svg>
                 </div>
 
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-extrabold tracking-tight sm:text-3xl text-white">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="text-xl font-extrabold tracking-tight text-white sm:text-2xl xl:text-3xl">
                     {formatMoney(totalWithdrawalAmount)}
                   </span>
                   <span className="text-[11px] font-semibold text-[#E6FB2D]">
@@ -405,7 +406,7 @@ export default function CustomerDashboardView({
           </div>
 
           {/* Card 2: Money Flow (Monthly Chart) */}
-          <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
+          <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-lg font-bold text-black">Money Flow</h2>
 
