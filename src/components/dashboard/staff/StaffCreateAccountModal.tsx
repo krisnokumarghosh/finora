@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  useCreateAdminAccountMutation,
   useCreateCustomerAccountMutation,
   useGetStaffCustomersQuery,
   type AccountType,
@@ -36,12 +37,20 @@ export default function StaffCreateAccountModal({
   onClose,
   onCreated,
   presetCustomer,
+  mode = "staff",
 }: {
   onClose: () => void;
   onCreated?: () => void;
   presetCustomer?: StaffCustomer | null;
+  mode?: "staff" | "admin";
 }) {
-  const [createAccount, { isLoading }] = useCreateCustomerAccountMutation();
+  const [createStaffAccount, { isLoading: isCreatingStaff }] =
+    useCreateCustomerAccountMutation();
+  const [createAdminAccount, { isLoading: isCreatingAdmin }] =
+    useCreateAdminAccountMutation();
+  const isLoading = mode === "admin" ? isCreatingAdmin : isCreatingStaff;
+  const isAdmin = mode === "admin";
+
   const { data: customerData, isLoading: isLoadingCustomers } =
     useGetStaffCustomersQuery(
       { limit: 100 },
@@ -57,6 +66,7 @@ export default function StaffCreateAccountModal({
   const [mobile, setMobile] = useState("");
   const [nid, setNid] = useState("");
   const [pin, setPin] = useState("");
+  const [transactionLimit, setTransactionLimit] = useState("100000");
   const [error, setError] = useState("");
 
   const customers = customerData?.customers || [];
@@ -125,15 +135,39 @@ export default function StaffCreateAccountModal({
       return;
     }
 
+    const limitValue = Number(transactionLimit);
+
+    if (
+      isAdmin &&
+      (!Number.isInteger(limitValue) ||
+        limitValue < 1000 ||
+        limitValue > 10000000)
+    ) {
+      setError(
+        "Transaction limit must be a whole number between ৳1,000 and ৳10,000,000."
+      );
+      return;
+    }
+
     try {
-      const response = await createAccount({
-        userId: selectedCustomer.id,
-        type,
-        name: cleanName,
-        mobile,
-        nid,
-        pin,
-      }).unwrap();
+      const response = isAdmin
+        ? await createAdminAccount({
+            userId: selectedCustomer.id,
+            type,
+            name: cleanName,
+            mobile,
+            nid,
+            pin,
+            transactionLimit: limitValue,
+          }).unwrap()
+        : await createStaffAccount({
+            userId: selectedCustomer.id,
+            type,
+            name: cleanName,
+            mobile,
+            nid,
+            pin,
+          }).unwrap();
 
       successToast(response.message || "Customer bank account created.");
       onCreated?.();
@@ -169,10 +203,12 @@ export default function StaffCreateAccountModal({
                 id="create-customer-account-title"
                 className="text-base font-bold text-black"
               >
-                Create customer bank account
+                {isAdmin ? "Create bank account" : "Create customer bank account"}
               </h2>
               <p className="text-[11px] text-black/40">
-                The account starts as pending and can be moved under review.
+                {isAdmin
+                  ? "Admin-created accounts are activated immediately."
+                  : "The account starts as pending and can be moved under review."}
               </p>
             </div>
           </div>
@@ -431,11 +467,35 @@ export default function StaffCreateAccountModal({
                 className={inputClass}
               />
             </div>
+
+            {isAdmin && (
+              <div>
+                <label htmlFor="admin-account-limit" className={labelClass}>
+                  Per-transaction limit (৳)
+                </label>
+                <input
+                  id="admin-account-limit"
+                  type="text"
+                  value={transactionLimit}
+                  onChange={(event) =>
+                    setTransactionLimit(digitsOnly(event.target.value))
+                  }
+                  placeholder="100000"
+                  maxLength={8}
+                  inputMode="numeric"
+                  className={inputClass}
+                />
+                <p className="mt-1 text-[10px] text-black/40">
+                  Between ৳1,000 and ৳10,000,000.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="rounded-2xl bg-[#F9F9F7] p-3.5 text-[11px] leading-relaxed text-black/50">
-            The starting balance is ৳0.00. The customer cannot transact until
-            the account is approved by the bank.
+            {isAdmin
+              ? "The starting balance is ৳0.00. The account is active immediately and can be frozen from the account list."
+              : "The starting balance is ৳0.00. The customer cannot transact until the account is approved by the bank."}
           </div>
 
           {error && (

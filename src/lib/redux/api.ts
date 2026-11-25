@@ -232,6 +232,8 @@ export type StaffBankAccount = {
   balance: number;
   status: AccountStatus;
   transactionLimit?: number;
+  statusReason?: string;
+  freezeReason?: string;
   createdAt: string;
   createdByName?: string;
 };
@@ -497,6 +499,77 @@ export type UpdateAdminAccountStatusResponse = {
   account: StaffBankAccount;
 };
 
+/* ─── Admin Bank Account Management ─── */
+
+export type AdminAccountStatusCounts = {
+  all: number;
+  needs_approval: number;
+  pending: number;
+  under_review: number;
+  active: number;
+  frozen: number;
+  rejected: number;
+};
+
+export type AdminAccountsResponse = {
+  accounts: StaffBankAccount[];
+  total: number;
+  statusCounts: AdminAccountStatusCounts;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
+export type GetAdminAccountsParams = {
+  limit?: number;
+  offset?: number;
+  type?: string;
+  status?: string;
+  search?: string;
+};
+
+export type CreateAdminAccountBody = {
+  userId: string;
+  type: AccountType;
+  name: string;
+  mobile: string;
+  nid: string;
+  pin: string;
+  transactionLimit?: number;
+};
+
+export type CreateAdminAccountResponse = {
+  success: boolean;
+  message: string;
+  account: StaffBankAccount;
+};
+
+export type UpdateAdminAccountBody =
+  | {
+      accountId: string;
+      action: "status";
+      status: AccountStatus;
+      reason?: string;
+    }
+  | {
+      accountId: string;
+      action: "details";
+      name: string;
+      mobile: string;
+      type: AccountType;
+    }
+  | {
+      accountId: string;
+      action: "limit";
+      transactionLimit: number;
+    };
+
+export type UpdateAdminAccountResponse = {
+  success: boolean;
+  message: string;
+  account: StaffBankAccount;
+};
+
 export type GetCustomerTransactionsParams = {
   userId: string;
   limit?: number;
@@ -518,6 +591,7 @@ export const api = createApi({
     "StaffAccounts",
     "AdminAnalytics",
     "AdminCustomers",
+    "AdminAccounts",
   ],
   refetchOnMountOrArgChange: true, // Always refetch fresh financial data when switching pages / mounting
   refetchOnFocus: true, // Auto refetch when tab is refocused
@@ -766,7 +840,12 @@ export const api = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["StaffAccounts", "StaffCustomers", "Accounts"],
+      invalidatesTags: [
+        "StaffAccounts",
+        "StaffCustomers",
+        "AdminAccounts",
+        "Accounts",
+      ],
     }),
     updateStaffAccountStatus: build.mutation<
       UpdateStaffAccountStatusResponse,
@@ -777,7 +856,12 @@ export const api = createApi({
         method: "PATCH",
         body,
       }),
-      invalidatesTags: ["StaffAccounts", "StaffCustomers", "Accounts"],
+      invalidatesTags: [
+        "StaffAccounts",
+        "StaffCustomers",
+        "AdminAccounts",
+        "Accounts",
+      ],
     }),
     getAdminAnalytics: build.query<AdminAnalyticsResponse, void>({
       query: () => "/admin/analytics",
@@ -822,9 +906,68 @@ export const api = createApi({
         body,
       }),
       invalidatesTags: [
+        "AdminAccounts",
         "AdminCustomers",
         "StaffCustomers",
         "StaffAccounts",
+        "Accounts",
+        "AdminAnalytics",
+      ],
+    }),
+    getAdminAccounts: build.query<
+      AdminAccountsResponse,
+      GetAdminAccountsParams | void
+    >({
+      query: (params) => {
+        const query = new URLSearchParams();
+        if (params?.limit) query.set("limit", String(params.limit));
+        if (params?.offset !== undefined) {
+          query.set("offset", String(params.offset));
+        }
+        if (params?.type && params.type !== "all") {
+          query.set("type", params.type);
+        }
+        if (params?.status && params.status !== "all") {
+          query.set("status", params.status);
+        }
+        if (params?.search) query.set("search", params.search);
+        const qs = query.toString();
+        return `/admin/accounts${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["AdminAccounts", "StaffAccounts"],
+    }),
+    createAdminAccount: build.mutation<
+      CreateAdminAccountResponse,
+      CreateAdminAccountBody
+    >({
+      query: (body) => ({
+        url: "/admin/accounts",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [
+        "AdminAccounts",
+        "StaffAccounts",
+        "StaffCustomers",
+        "AdminCustomers",
+        "Accounts",
+        "AdminAnalytics",
+      ],
+    }),
+    updateAdminAccount: build.mutation<
+      UpdateAdminAccountResponse,
+      UpdateAdminAccountBody
+    >({
+      query: (body) => ({
+        url: "/admin/accounts",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [
+        "AdminAccounts",
+        "StaffAccounts",
+        "StaffCustomers",
+        "AdminCustomers",
         "Accounts",
         "AdminAnalytics",
       ],
@@ -873,5 +1016,8 @@ export const {
   useGetAdminCustomersQuery,
   useUpdateCustomerStatusMutation,
   useUpdateAdminAccountStatusMutation,
+  useGetAdminAccountsQuery,
+  useCreateAdminAccountMutation,
+  useUpdateAdminAccountMutation,
   useGetCustomerTransactionsQuery,
 } = api;
