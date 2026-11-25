@@ -18,10 +18,12 @@ import {
   Trash2,
   AlertTriangle,
   ClipboardCheck,
+  History,
 } from "lucide-react";
 import {
   useGetPaginatedLoansQuery,
   useDeleteLoanMutation,
+  useGetLoanPaymentHistoryQuery,
   type Loan,
   type LoanType,
 } from "@/lib/redux/api";
@@ -51,8 +53,19 @@ export default function LoansView() {
   // Deletion modal state
   const [loanToDelete, setLoanToDelete] = useState<Loan | null>(null);
   const [deleteError, setDeleteError] = useState("");
+  const [historyLoan, setHistoryLoan] = useState<Loan | null>(null);
 
   const [deleteLoan, { isLoading: isDeleting }] = useDeleteLoanMutation();
+
+  const {
+    data: historyData,
+    isLoading: isHistoryLoading,
+    isFetching: isHistoryFetching,
+  } = useGetLoanPaymentHistoryQuery(
+    { loanId: historyLoan?.loanId || "" },
+    { skip: !historyLoan }
+  );
+  const paymentHistory = historyData?.history || [];
 
   // Reset limit whenever filter or search changes
   const handleLoanTypeChange = (val: string) => {
@@ -514,9 +527,23 @@ export default function LoansView() {
                         <div>
                           <p className="text-xs font-medium text-black">
                             {loan.termMonths} Months
+                            {typeof loan.monthlyAmount === "number" &&
+                              loan.monthlyAmount > 0 && (
+                                <span className="ml-1 text-black/50">
+                                  ({formatMoney(loan.monthlyAmount)}/mo)
+                                </span>
+                              )}
                           </p>
                           <p className="text-[11px] text-black/40">
-                            Due: {loan.dueDate}
+                            {loan.status === "approved" && loan.nextPaymentDate
+                              ? `Next: ${new Date(
+                                  loan.nextPaymentDate
+                                ).toLocaleDateString("en-US", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })}`
+                              : `Due: ${loan.dueDate}`}
                           </p>
                         </div>
                       </td>
@@ -529,22 +556,42 @@ export default function LoansView() {
                         <span className="text-sm font-bold text-black">
                           {formatMoney(loan.amount)}
                         </span>
+                        {loan.status === "approved" &&
+                          typeof loan.remainingBalance === "number" && (
+                            <p className="text-[11px] text-black/45">
+                              Rem: {formatMoney(loan.remainingBalance)}
+                            </p>
+                          )}
                       </td>
 
-                      {/* 7. Action: Delete */}
+                      {/* 7. Action: Payment History & Delete */}
                       <td className="py-4 pr-2 text-right">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDeleteError("");
-                            setLoanToDelete(loan);
-                          }}
-                          aria-label={`Delete loan ${loan.loanId}`}
-                          title="Delete loan application"
-                          className="inline-flex size-8 items-center justify-center rounded-xl text-black/40 transition-colors hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <div className="inline-flex items-center gap-1">
+                          {loan.status === "approved" && (
+                            <button
+                              type="button"
+                              onClick={() => setHistoryLoan(loan)}
+                              aria-label={`View payment history for ${loan.loanId}`}
+                              title="View monthly payment history"
+                              className="inline-flex h-8 items-center gap-1 rounded-xl bg-[#F3F3EE] px-2.5 text-[11px] font-semibold text-black/75 transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
+                            >
+                              <History size={13} />
+                              <span>History</span>
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDeleteError("");
+                              setLoanToDelete(loan);
+                            }}
+                            aria-label={`Delete loan ${loan.loanId}`}
+                            title="Delete loan application"
+                            className="inline-flex size-8 items-center justify-center rounded-xl text-black/40 transition-colors hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -609,18 +656,30 @@ export default function LoansView() {
                       </span>
                     </div>
 
-                    {/* Mobile Delete Button */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDeleteError("");
-                        setLoanToDelete(loan);
-                      }}
-                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 size={13} />
-                      <span>Delete</span>
-                    </button>
+                    {/* Mobile Actions */}
+                    <div className="flex items-center gap-1.5">
+                      {loan.status === "approved" && (
+                        <button
+                          type="button"
+                          onClick={() => setHistoryLoan(loan)}
+                          className="inline-flex items-center gap-1 rounded-lg bg-black/5 px-2 py-1 text-xs font-semibold text-black/70 hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
+                        >
+                          <History size={13} />
+                          <span>History</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDeleteError("");
+                          setLoanToDelete(loan);
+                        }}
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 size={13} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -749,6 +808,165 @@ export default function LoansView() {
                     <span>Delete Loan</span>
                   </>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── Loan Payment History Modal ── */}
+      {historyLoan && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+          onMouseDown={() => setHistoryLoan(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            onMouseDown={(e) => e.stopPropagation()}
+            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl"
+          >
+            <div className="flex items-center justify-between border-b border-black/5 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-9 items-center justify-center rounded-xl bg-[#F3F3EE] text-[#2C2C2C]">
+                  <History size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-black">
+                    Monthly Payment History
+                  </h3>
+                  <p className="font-mono text-[11px] text-black/45">
+                    {historyLoan.loanId} · {formatAccNo(historyLoan.accountNumber)}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHistoryLoan(null)}
+                aria-label="Close payment history"
+                className="rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-black"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-2xl bg-[#F9F9F7] p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-black/40">
+                  Monthly Amount
+                </p>
+                <p className="mt-0.5 text-sm font-bold text-black">
+                  {formatMoney(
+                    historyLoan.monthlyAmount ??
+                      (historyLoan.termMonths > 0
+                        ? historyLoan.amount / historyLoan.termMonths
+                        : historyLoan.amount)
+                  )}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-[#F9F9F7] p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-black/40">
+                  Total Repaid
+                </p>
+                <p className="mt-0.5 text-sm font-bold text-emerald-700">
+                  {formatMoney(historyLoan.totalRepaid ?? 0)}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-[#F9F9F7] p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-black/40">
+                  Remaining
+                </p>
+                <p className="mt-0.5 text-sm font-bold text-black">
+                  {formatMoney(historyLoan.remainingBalance ?? historyLoan.amount)}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-[#F9F9F7] p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-black/40">
+                  Next Auto Debit
+                </p>
+                <p className="mt-0.5 text-xs font-bold text-black">
+                  {historyLoan.repaymentStatus === "completed"
+                    ? "Paid Off"
+                    : historyLoan.nextPaymentDate
+                    ? new Date(historyLoan.nextPaymentDate).toLocaleDateString(
+                        "en-US",
+                        { day: "2-digit", month: "short", year: "numeric" }
+                      )
+                    : "Scheduled"}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              {isHistoryLoading || isHistoryFetching ? (
+                <div className="flex items-center justify-center py-10 text-xs text-black/50">
+                  <RefreshCw size={15} className="mr-2 animate-spin" />
+                  Loading payment history...
+                </div>
+              ) : paymentHistory.length === 0 ? (
+                <div className="rounded-2xl bg-[#F9F9F7] p-6 text-center text-xs text-black/50">
+                  No monthly installment deductions have occurred yet. The first
+                  monthly installment will be automatically deducted from your
+                  linked bank account on the next due date.
+                </div>
+              ) : (
+                <div className="max-h-72 overflow-y-auto rounded-2xl border border-black/5">
+                  <table className="w-full text-left text-xs">
+                    <thead className="border-b border-black/5 bg-[#F9F9F7] text-[10px] font-bold uppercase tracking-wider text-black/40">
+                      <tr>
+                        <th className="px-3 py-2.5">Installment</th>
+                        <th className="px-3 py-2.5">Paid Date</th>
+                        <th className="px-3 py-2.5">Method</th>
+                        <th className="px-3 py-2.5">Status</th>
+                        <th className="px-3 py-2.5 text-right">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-black/5">
+                      {paymentHistory.map((item) => (
+                        <tr key={item.id}>
+                          <td className="px-3 py-2.5 font-mono font-semibold text-black">
+                            #{item.installmentNumber}
+                          </td>
+                          <td className="px-3 py-2.5 text-black/60">
+                            {new Date(item.paidAt).toLocaleDateString("en-US", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </td>
+                          <td className="px-3 py-2.5 text-black/60">
+                            {item.method}
+                          </td>
+                          <td className="px-3 py-2.5">
+                            <span
+                              className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${
+                                item.status === "paid"
+                                  ? "bg-emerald-50 text-emerald-700"
+                                  : item.status === "late"
+                                  ? "bg-red-50 text-red-700"
+                                  : "bg-amber-50 text-amber-700"
+                              }`}
+                            >
+                              {item.status}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 text-right font-bold text-black">
+                            {formatMoney(item.amount)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setHistoryLoan(null)}
+                className="h-10 rounded-full bg-[#2C2C2C] px-6 text-xs font-semibold text-white transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
+              >
+                Close
               </button>
             </div>
           </div>

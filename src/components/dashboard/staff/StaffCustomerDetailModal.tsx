@@ -121,8 +121,8 @@ export default function StaffCustomerDetailModal({
         className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl sm:p-6"
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-black/5 pb-4">
-          <div className="flex items-center gap-3">
+        <div className="flex items-start justify-between gap-3 border-b border-black/5 pb-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#2C2C2C] text-sm font-bold text-white">
               {initials(current.name)}
             </div>
@@ -144,7 +144,7 @@ export default function StaffCustomerDetailModal({
             onClick={onClose}
             disabled={isVerifying}
             aria-label="Close customer details"
-            className="rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-black disabled:opacity-50"
+            className="shrink-0 rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-black disabled:opacity-50"
           >
             <X size={18} />
           </button>

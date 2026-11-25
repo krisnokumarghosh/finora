@@ -4,6 +4,10 @@ import { ObjectId } from "mongodb";
 import { getUserSession } from "@/lib/core/session";
 import { verifyPin } from "@/lib/core/pin";
 import { db } from "@/lib/db/mongodb";
+import {
+  calculateMonthlyInstallment,
+  processDueLoanRepayments,
+} from "@/lib/server/loanRepayments";
 
 const bad = (message: string, status = 400) =>
   NextResponse.json({ error: message }, { status });
@@ -21,6 +25,10 @@ export async function GET(req: Request) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  await processDueLoanRepayments({ userId: user.id }).catch((err: unknown) => {
+    console.error("Failed to process due loan repayments:", err);
+  });
 
   const { searchParams } = new URL(req.url);
   const isPaginated =
@@ -60,20 +68,44 @@ export async function GET(req: Request) {
       .sort(sortOrder)
       .toArray();
 
-    const loans = rows.map(({ _id, createdAt, dueDate, ...rest }) => ({
-      id: _id.toString(),
-      ...rest,
-      dueDate:
-        typeof dueDate === "string"
-          ? dueDate
-          : dueDate instanceof Date
-          ? dueDate.toISOString().split("T")[0]
-          : new Date().toISOString().split("T")[0],
-      createdAt:
-        createdAt instanceof Date
-          ? createdAt.toISOString()
-          : new Date(createdAt).toISOString(),
-    }));
+    const loans = rows.map(
+      ({ _id, createdAt, dueDate, nextPaymentDate, ...rest }) => {
+        const amt = Number(rest.amount) || 0;
+        const term = Number(rest.termMonths) || 12;
+        return {
+          id: _id.toString(),
+          ...rest,
+          monthlyAmount:
+            typeof rest.monthlyAmount === "number"
+              ? rest.monthlyAmount
+              : calculateMonthlyInstallment(amt, term),
+          paidInstallments:
+            typeof rest.paidInstallments === "number" ? rest.paidInstallments : 0,
+          totalRepaid:
+            typeof rest.totalRepaid === "number" ? rest.totalRepaid : 0,
+          remainingBalance:
+            typeof rest.remainingBalance === "number"
+              ? rest.remainingBalance
+              : amt,
+          nextPaymentDate:
+            nextPaymentDate instanceof Date
+              ? nextPaymentDate.toISOString()
+              : typeof nextPaymentDate === "string"
+              ? nextPaymentDate
+              : undefined,
+          dueDate:
+            typeof dueDate === "string"
+              ? dueDate
+              : dueDate instanceof Date
+              ? dueDate.toISOString().split("T")[0]
+              : new Date().toISOString().split("T")[0],
+          createdAt:
+            createdAt instanceof Date
+              ? createdAt.toISOString()
+              : new Date(createdAt).toISOString(),
+        };
+      }
+    );
 
     return NextResponse.json(loans);
   }
@@ -90,20 +122,44 @@ export async function GET(req: Request) {
     .limit(limit)
     .toArray();
 
-  const loans = rows.map(({ _id, createdAt, dueDate, ...rest }) => ({
-    id: _id.toString(),
-    ...rest,
-    dueDate:
-      typeof dueDate === "string"
-        ? dueDate
-        : dueDate instanceof Date
-        ? dueDate.toISOString().split("T")[0]
-        : new Date().toISOString().split("T")[0],
-    createdAt:
-      createdAt instanceof Date
-        ? createdAt.toISOString()
-        : new Date(createdAt).toISOString(),
-  }));
+  const loans = rows.map(
+    ({ _id, createdAt, dueDate, nextPaymentDate, ...rest }) => {
+      const amt = Number(rest.amount) || 0;
+      const term = Number(rest.termMonths) || 12;
+      return {
+        id: _id.toString(),
+        ...rest,
+        monthlyAmount:
+          typeof rest.monthlyAmount === "number"
+            ? rest.monthlyAmount
+            : calculateMonthlyInstallment(amt, term),
+        paidInstallments:
+          typeof rest.paidInstallments === "number" ? rest.paidInstallments : 0,
+        totalRepaid:
+          typeof rest.totalRepaid === "number" ? rest.totalRepaid : 0,
+        remainingBalance:
+          typeof rest.remainingBalance === "number"
+            ? rest.remainingBalance
+            : amt,
+        nextPaymentDate:
+          nextPaymentDate instanceof Date
+            ? nextPaymentDate.toISOString()
+            : typeof nextPaymentDate === "string"
+            ? nextPaymentDate
+            : undefined,
+        dueDate:
+          typeof dueDate === "string"
+            ? dueDate
+            : dueDate instanceof Date
+            ? dueDate.toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0],
+        createdAt:
+          createdAt instanceof Date
+            ? createdAt.toISOString()
+            : new Date(createdAt).toISOString(),
+      };
+    }
+  );
 
   return NextResponse.json({
     loans,

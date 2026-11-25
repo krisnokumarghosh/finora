@@ -331,6 +331,42 @@ export type Loan = {
   status: LoanStatus;
   dueDate: string;
   createdAt: string;
+  monthlyAmount?: number;
+  paidInstallments?: number;
+  totalRepaid?: number;
+  remainingBalance?: number;
+  nextPaymentDate?: string;
+  repaymentStatus?: string;
+};
+
+export type LoanPaymentHistoryItem = {
+  id: string;
+  paymentId: string;
+  loanId: string;
+  loanObjectId?: string;
+  accountNumber?: string;
+  installmentNumber: number;
+  amount: number;
+  balanceBefore?: number;
+  balanceAfter?: number;
+  remainingLoanBalance?: number;
+  status: "paid" | "late" | "pending";
+  method: string;
+  reference?: string;
+  dueDate?: string;
+  paidAt: string;
+};
+
+export type LoanPaymentHistoryResponse = {
+  history: LoanPaymentHistoryItem[];
+};
+
+export type ProcessRepaymentsResponse = {
+  success: boolean;
+  processedPayments: number;
+  failedPayments: number;
+  loansChecked: number;
+  message: string;
 };
 
 export type GetLoansParams = {
@@ -405,6 +441,48 @@ export type UpdateStaffLoanResponse = {
   success: boolean;
   message: string;
   loan: StaffLoan;
+};
+
+export type LoanRepayment = {
+  id: string;
+  installmentNumber?: number;
+  amount: number;
+  paidAt: string;
+  status: "paid" | "pending" | "late";
+  method?: string;
+  reference?: string;
+};
+
+export type AdminLoan = StaffLoan & {
+  approvedAt?: string;
+  approvedByName?: string;
+  rejectedAt?: string;
+  rejectedByName?: string;
+  rejectionReason?: string;
+  repayments: LoanRepayment[];
+  totalRepaid: number;
+  remainingBalance: number;
+};
+
+export type GetAdminLoansParams = GetStaffLoansParams;
+
+export type AdminLoansResponse = {
+  loans: AdminLoan[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
+export type UpdateAdminLoanBody =
+  | { loanId: string; action: "note"; note: string }
+  | { loanId: string; action: "approve" }
+  | { loanId: string; action: "reject"; reason?: string };
+
+export type UpdateAdminLoanResponse = {
+  success: boolean;
+  message: string;
+  loan: AdminLoan;
 };
 
 /* ─── Admin Analytics ─── */
@@ -623,6 +701,7 @@ export const api = createApi({
     "AdminAnalytics",
     "AdminCustomers",
     "AdminAccounts",
+    "AdminLoans",
   ],
   refetchOnMountOrArgChange: true, // Always refetch fresh financial data when switching pages / mounting
   refetchOnFocus: true, // Auto refetch when tab is refocused
@@ -710,6 +789,34 @@ export const api = createApi({
         body,
       }),
       invalidatesTags: ["Loans"],
+    }),
+    getLoanPaymentHistory: build.query<
+      LoanPaymentHistoryResponse,
+      { loanId?: string } | void
+    >({
+      query: (params) => {
+        const qs = params?.loanId
+          ? `?loanId=${encodeURIComponent(params.loanId)}`
+          : "";
+        return `/loans/payment-history${qs}`;
+      },
+      providesTags: ["Loans", "AdminLoans"],
+    }),
+    processDueLoanRepayments: build.mutation<ProcessRepaymentsResponse, void>({
+      query: () => ({
+        url: "/loans/process-repayments",
+        method: "POST",
+      }),
+      invalidatesTags: [
+        "AdminLoans",
+        "StaffLoans",
+        "Loans",
+        "Accounts",
+        "Transactions",
+        "AdminAccounts",
+        "StaffAccounts",
+        "AdminAnalytics",
+      ],
     }),
     getStaffLoans: build.query<
       StaffLoansResponse,
@@ -1058,6 +1165,48 @@ export const api = createApi({
         "AdminCustomers",
       ],
     }),
+    getAdminLoans: build.query<AdminLoansResponse, GetAdminLoansParams | void>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.limit) queryParams.set("limit", String(params.limit));
+        if (params?.offset !== undefined) {
+          queryParams.set("offset", String(params.offset));
+        }
+        if (params?.type && params.type !== "all") {
+          queryParams.set("type", params.type);
+        }
+        if (params?.status && params.status !== "all") {
+          queryParams.set("status", params.status);
+        } else if (params?.status === "all") {
+          queryParams.set("status", "all");
+        }
+        if (params?.search) queryParams.set("search", params.search);
+        const qs = queryParams.toString();
+        return `/admin/loans${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["AdminLoans", "StaffLoans"],
+    }),
+    updateAdminLoan: build.mutation<
+      UpdateAdminLoanResponse,
+      UpdateAdminLoanBody
+    >({
+      query: (body) => ({
+        url: "/admin/loans",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [
+        "AdminLoans",
+        "StaffLoans",
+        "Loans",
+        "Accounts",
+        "Transactions",
+        "AdminAccounts",
+        "StaffAccounts",
+        "AdminCustomers",
+        "AdminAnalytics",
+      ],
+    }),
   }),
 });
 
@@ -1073,6 +1222,8 @@ export const {
   useGetPaginatedLoansQuery,
   useApplyLoanMutation,
   useDeleteLoanMutation,
+  useGetLoanPaymentHistoryQuery,
+  useProcessDueLoanRepaymentsMutation,
   useGetStaffLoansQuery,
   useUpdateStaffLoanMutation,
   useGetTransactionsQuery,
@@ -1094,4 +1245,6 @@ export const {
   useGetCustomerTransactionsQuery,
   useGetAdminTransactionsQuery,
   useUpdateAdminTransactionStatusMutation,
+  useGetAdminLoansQuery,
+  useUpdateAdminLoanMutation,
 } = api;

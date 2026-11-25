@@ -102,14 +102,14 @@ export default function StaffOperationsView() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="w-full min-w-0 space-y-6">
       {/* ── Page header ── */}
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div>
+        <div className="min-w-0">
           <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-black/40">
             Bank Staff
           </p>
-          <h1 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
+          <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-4xl">
             Customer Operations
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-black/60">
@@ -118,12 +118,12 @@ export default function StaffOperationsView() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center">
           <button
             type="button"
             onClick={refresh}
             disabled={isRefreshing}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black disabled:opacity-50"
           >
             <RefreshCw
               size={14}
@@ -134,15 +134,15 @@ export default function StaffOperationsView() {
           <button
             type="button"
             onClick={() => setShowRegister(true)}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-4 text-xs font-semibold text-black/70 shadow-sm transition-all hover:border-black/20 hover:text-black"
           >
             <UserPlus size={14} />
-            Register customer
+            <span className="truncate">Register customer</span>
           </button>
           <button
             type="button"
             onClick={() => openCreateAccount()}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
+            className="col-span-2 inline-flex h-10 items-center justify-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#E6FB2D] hover:text-[#2C2C2C] sm:col-span-1"
           >
             <Plus size={14} />
             Create bank account
@@ -151,20 +151,20 @@ export default function StaffOperationsView() {
       </div>
 
       {/* ── Summary cards ── */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
             <div
               key={stat.label}
-              className="rounded-3xl bg-white p-5 shadow-sm"
+              className="min-w-0 rounded-3xl bg-white p-5 shadow-sm"
             >
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs font-semibold text-black/45">
                     {stat.label}
                   </p>
-                  <p className="mt-2 text-3xl font-extrabold tracking-tight text-black">
+                  <p className="mt-2 text-2xl font-extrabold tracking-tight text-black sm:text-3xl">
                     {stat.value}
                   </p>
                 </div>
@@ -181,24 +181,24 @@ export default function StaffOperationsView() {
       </div>
 
       {/* ── Recent customers & accounts ── */}
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {/* Recent customers */}
-        <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex items-center justify-between border-b border-black/5 pb-3">
-            <div className="flex items-center gap-2">
-              <Users size={18} className="text-black/50" />
-              <div>
-                <h2 className="text-base font-bold text-black">
+        <div className="min-w-0 rounded-3xl bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <Users size={18} className="shrink-0 text-black/50" />
+              <div className="min-w-0">
+                <h2 className="truncate text-base font-bold text-black">
                   Recent customers
                 </h2>
-                <p className="text-[11px] text-black/40">
+                <p className="truncate text-[11px] text-black/40">
                   Newest customer profiles
                 </p>
               </div>
             </div>
             <Link
               href="/dashboard/bank-staff/operations/customers"
-              className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-semibold text-black/60 transition-colors hover:border-black/20 hover:text-black"
+              className="inline-flex shrink-0 items-center gap-1 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-semibold text-black/60 transition-colors hover:border-black/20 hover:text-black"
             >
               See all
               <ArrowRight size={12} />
@@ -210,16 +210,16 @@ export default function StaffOperationsView() {
               {[1, 2, 3, 4].map((item) => (
                 <div
                   key={item}
-                  className="flex animate-pulse items-center justify-between py-3.5"
+                  className="flex animate-pulse items-center justify-between gap-3 py-3.5"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-full bg-black/5" />
-                    <div className="space-y-1.5">
-                      <div className="h-3.5 w-32 rounded bg-black/5" />
-                      <div className="h-3 w-44 rounded bg-black/5" />
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="size-10 shrink-0 rounded-full bg-black/5" />
+                    <div className="min-w-0 space-y-1.5">
+                      <div className="h-3.5 w-24 rounded bg-black/5 sm:w-32" />
+                      <div className="h-3 w-32 rounded bg-black/5 sm:w-44" />
                     </div>
                   </div>
-                  <div className="h-5 w-16 rounded-full bg-black/5" />
+                  <div className="h-5 w-16 shrink-0 rounded-full bg-black/5" />
                 </div>
               ))}
             </div>
@@ -250,38 +250,44 @@ export default function StaffOperationsView() {
                   <button
                     type="button"
                     onClick={() => setSelectedCustomer(customer)}
-                    className="group flex w-full items-center justify-between gap-3 py-3.5 text-left"
+                    className="group flex w-full flex-col gap-2 py-3.5 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                   >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#2C2C2C] text-[11px] font-bold text-white">
-                        {initials(customer.name)}
+                    <div className="flex w-full min-w-0 items-center justify-between gap-3 sm:w-auto sm:flex-1">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#2C2C2C] text-[11px] font-bold text-white">
+                          {initials(customer.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-bold text-black">
+                            {customer.name}
+                          </p>
+                          <p className="truncate text-[11px] text-black/45">
+                            {customer.email}
+                          </p>
+                          <p className="truncate font-mono text-[10px] text-black/35">
+                            {customer.id}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-black">
-                          {customer.name}
-                        </p>
-                        <p className="truncate text-[11px] text-black/45">
-                          {customer.email}
-                        </p>
-                        <p className="truncate font-mono text-[10px] text-black/35">
-                          {customer.id}
-                        </p>
-                      </div>
+                      <ChevronRight
+                        size={16}
+                        className="shrink-0 text-black/25 transition-colors group-hover:text-black/60 sm:hidden"
+                      />
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-2">
-                      <div className="text-right">
+                    <div className="flex shrink-0 items-center justify-between gap-2 pl-[52px] sm:justify-end sm:pl-0">
+                      <div className="flex items-center gap-2 sm:block sm:text-right">
                         <p className="text-[11px] font-semibold text-black/55">
                           {customer.accountCount} account
                           {customer.accountCount === 1 ? "" : "s"}
                         </p>
-                        <div className="mt-0.5">
+                        <div className="sm:mt-0.5">
                           <VerificationBadge verified={customer.verified} />
                         </div>
                       </div>
                       <ChevronRight
                         size={16}
-                        className="text-black/25 transition-colors group-hover:text-black/60"
+                        className="hidden text-black/25 transition-colors group-hover:text-black/60 sm:block"
                       />
                     </div>
                   </button>
@@ -292,22 +298,22 @@ export default function StaffOperationsView() {
         </div>
 
         {/* Recent accounts */}
-        <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex items-center justify-between border-b border-black/5 pb-3">
-            <div className="flex items-center gap-2">
-              <Landmark size={18} className="text-black/50" />
-              <div>
-                <h2 className="text-base font-bold text-black">
+        <div className="min-w-0 rounded-3xl bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <Landmark size={18} className="shrink-0 text-black/50" />
+              <div className="min-w-0">
+                <h2 className="truncate text-base font-bold text-black">
                   Recent bank accounts
                 </h2>
-                <p className="text-[11px] text-black/40">
+                <p className="truncate text-[11px] text-black/40">
                   Newest customer accounts
                 </p>
               </div>
             </div>
             <Link
               href="/dashboard/bank-staff/operations/accounts"
-              className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-semibold text-black/60 transition-colors hover:border-black/20 hover:text-black"
+              className="inline-flex shrink-0 items-center gap-1 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-semibold text-black/60 transition-colors hover:border-black/20 hover:text-black"
             >
               See all
               <ArrowRight size={12} />
@@ -319,16 +325,16 @@ export default function StaffOperationsView() {
               {[1, 2, 3, 4].map((item) => (
                 <div
                   key={item}
-                  className="flex animate-pulse items-center justify-between py-3.5"
+                  className="flex animate-pulse items-center justify-between gap-3 py-3.5"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-xl bg-black/5" />
-                    <div className="space-y-1.5">
-                      <div className="h-3.5 w-36 rounded bg-black/5" />
-                      <div className="h-3 w-28 rounded bg-black/5" />
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="size-9 shrink-0 rounded-xl bg-black/5" />
+                    <div className="min-w-0 space-y-1.5">
+                      <div className="h-3.5 w-28 rounded bg-black/5 sm:w-36" />
+                      <div className="h-3 w-24 rounded bg-black/5 sm:w-28" />
                     </div>
                   </div>
-                  <div className="h-5 w-20 rounded-full bg-black/5" />
+                  <div className="h-5 w-16 shrink-0 rounded-full bg-black/5 sm:w-20" />
                 </div>
               ))}
             </div>
@@ -359,36 +365,42 @@ export default function StaffOperationsView() {
                   <button
                     type="button"
                     onClick={() => setSelectedAccount(account)}
-                    className="group flex w-full items-center justify-between gap-3 py-3.5 text-left"
+                    className="group flex w-full flex-col gap-2 py-3.5 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                   >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <AccountTypeIcon type={account.type} />
-                      <div className="min-w-0">
-                        <p className="truncate font-mono text-xs font-bold text-black">
-                          {formatAccNo(account.accountNumber)}
-                        </p>
-                        <p className="truncate text-[11px] text-black/45">
-                          {account.customerName}
-                        </p>
-                        <p className="truncate font-mono text-[10px] text-black/35">
-                          {account.userId}
-                        </p>
+                    <div className="flex w-full min-w-0 items-center justify-between gap-3 sm:w-auto sm:flex-1">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <AccountTypeIcon type={account.type} />
+                        <div className="min-w-0">
+                          <p className="truncate font-mono text-xs font-bold text-black">
+                            {formatAccNo(account.accountNumber)}
+                          </p>
+                          <p className="truncate text-[11px] text-black/45">
+                            {account.customerName}
+                          </p>
+                          <p className="truncate font-mono text-[10px] text-black/35">
+                            {account.userId}
+                          </p>
+                        </div>
                       </div>
+                      <ChevronRight
+                        size={16}
+                        className="shrink-0 text-black/25 transition-colors group-hover:text-black/60 sm:hidden"
+                      />
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-2">
-                      <div className="text-right">
-                        <p className="flex items-center justify-end gap-1 text-sm font-bold text-black">
-                          <Wallet size={12} className="text-black/35" />
+                    <div className="flex shrink-0 items-center justify-between gap-2 pl-[48px] sm:justify-end sm:pl-0">
+                      <div className="flex flex-wrap items-center gap-2 sm:block sm:text-right">
+                        <p className="flex items-center gap-1 text-sm font-bold text-black sm:justify-end">
+                          <Wallet size={12} className="shrink-0 text-black/35" />
                           {formatMoney(account.balance)}
                         </p>
-                        <div className="mt-0.5">
+                        <div className="sm:mt-0.5">
                           <AccountStatusBadge status={account.status} />
                         </div>
                       </div>
                       <ChevronRight
                         size={16}
-                        className="text-black/25 transition-colors group-hover:text-black/60"
+                        className="hidden text-black/25 transition-colors group-hover:text-black/60 sm:block"
                       />
                     </div>
                   </button>

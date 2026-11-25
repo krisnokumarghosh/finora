@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUserSession } from "@/lib/core/session";
 import { db } from "@/lib/db/mongodb";
+import { processDueLoanRepayments } from "@/lib/server/loanRepayments";
 import type { AccountType } from "@/lib/redux/api";
 
 export async function GET(req: Request) {
@@ -9,6 +10,10 @@ export async function GET(req: Request) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  await processDueLoanRepayments({ userId: user.id }).catch((err: unknown) => {
+    console.error("Failed to process due loan repayments:", err);
+  });
 
   // 2. Parse query parameters
   const { searchParams } = new URL(req.url);

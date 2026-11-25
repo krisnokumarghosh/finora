@@ -153,7 +153,7 @@ export default function StaffAccountDetailModal({
               <AccountStatusBadge status={current.status} />
             </div>
             <div className="mt-1 flex items-center justify-between gap-3">
-              <p className="font-mono text-base font-bold tracking-wider text-black">
+              <p className="min-w-0 break-all font-mono text-sm font-bold tracking-wider text-black sm:text-base">
                 {formatAccNo(current.accountNumber)}
               </p>
               <button
@@ -176,12 +176,12 @@ export default function StaffAccountDetailModal({
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-black/5 p-3.5">
+            <div className="min-w-0 rounded-2xl border border-black/5 p-3.5">
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/40">
                 <UserRound size={12} />
                 Account holder
               </div>
-              <div className="mt-1.5 flex items-center gap-2">
+              <div className="mt-1.5 flex min-w-0 items-center gap-2">
                 <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#2C2C2C] text-[9px] font-bold text-white">
                   {initials(current.name)}
                 </div>
@@ -196,7 +196,7 @@ export default function StaffAccountDetailModal({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-black/5 p-3.5">
+            <div className="min-w-0 rounded-2xl border border-black/5 p-3.5">
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/40">
                 <Landmark size={12} />
                 Customer user ID

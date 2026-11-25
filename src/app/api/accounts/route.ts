@@ -3,6 +3,7 @@ import { randomInt } from "crypto";
 import { getUserSession } from "@/lib/core/session";
 import { hashPin } from "@/lib/core/pin";
 import { db } from "@/lib/db/mongodb";
+import { processDueLoanRepayments } from "@/lib/server/loanRepayments";
 
 const ACCOUNT_TYPES = ["savings", "current", "business"];
 const bad = (message: string) => NextResponse.json({ error: message }, { status: 400 });
@@ -10,6 +11,10 @@ const bad = (message: string) => NextResponse.json({ error: message }, { status:
 export async function GET() {
   const user = await getUserSession();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  await processDueLoanRepayments({ userId: user.id }).catch((err: unknown) => {
+    console.error("Failed to process due loan repayments:", err);
+  });
 
   // pinHash ar nid kokhono frontend-e pathabo na
   const rows = await db
