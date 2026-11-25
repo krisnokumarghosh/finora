@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CheckCircle2,
   Eye,
@@ -28,6 +29,7 @@ import AdminCustomerDetailModal from "@/components/dashboard/admin/AdminCustomer
 import AdminCustomerTransactionsModal from "@/components/dashboard/admin/AdminCustomerTransactionsModal";
 
 export default function AdminCustomersView() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [currentLimit, setCurrentLimit] = useState(15);
@@ -79,6 +81,14 @@ export default function AdminCustomersView() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard/admin/transactions")}
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2C2C2C] px-4 text-xs font-semibold text-white shadow-sm transition-all hover:bg-[#E6FB2D] hover:text-[#2C2C2C]"
+          >
+            <Receipt size={14} />
+            Transactions
+          </button>
           <button
             type="button"
             onClick={() => refetch()}

@@ -173,11 +173,10 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
               <Link
                 key={href}
                 href={href}
-                className={`group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-white/10 text-[#E6FB2D]"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                }`}
+                className={`group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-colors ${active
+                  ? "bg-white/10 text-[#E6FB2D]"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
+                  }`}
               >
                 <Icon
                   size={18}
@@ -206,11 +205,10 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
               <Link
                 key={href}
                 href={href}
-                className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  active
-                    ? "flex-2 bg-white/10 px-4 text-[#E6FB2D]"
-                    : "flex-1 text-white/60"
-                }`}
+                className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-medium transition-all duration-300 ${active
+                  ? "flex-2 bg-white/10 px-4 text-[#E6FB2D]"
+                  : "flex-1 text-white/60"
+                  }`}
               >
                 <Icon size={18} />
                 {active && <span className="truncate">{short}</span>}
@@ -230,14 +228,12 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
       {/* ===== Mobile drawer ===== */}
       <div
         onClick={() => setOpen(false)}
-        className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity md:hidden ${
-          open ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
+        className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity md:hidden ${open ? "opacity-100" : "pointer-events-none opacity-0"
+          }`}
       />
       <div
-        className={`fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#1C1C1C] p-5 pb-8 transition-transform duration-300 md:hidden ${
-          open ? "translate-y-0" : "translate-y-full"
-        }`}
+        className={`fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#1C1C1C] p-5 pb-8 transition-transform duration-300 md:hidden ${open ? "translate-y-0" : "translate-y-full"
+          }`}
       >
         <div className="mb-4 flex items-center justify-between">
           <Link href="/" onClick={() => setOpen(false)} aria-label="Go to home">
@@ -260,9 +256,8 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium ${
-                  active ? "bg-white/10 text-[#E6FB2D]" : "text-white/70"
-                }`}
+                className={`flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium ${active ? "bg-white/10 text-[#E6FB2D]" : "text-white/70"
+                  }`}
               >
                 <Icon
                   size={18}

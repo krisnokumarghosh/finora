@@ -577,6 +577,37 @@ export type GetCustomerTransactionsParams = {
   type?: string;
 };
 
+export type GetAdminTransactionsParams = {
+  limit?: number;
+  offset?: number;
+  type?: string;
+  status?: string;
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  flagged?: string;
+};
+
+export type AdminTransactionsResponse = {
+  transactions: StaffTransaction[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
+export type UpdateAdminTransactionStatusBody = {
+  transactionId: string;
+  status: "pending" | "approved" | "rejected" | "completed";
+};
+
+export type UpdateAdminTransactionStatusResponse = {
+  success: boolean;
+  message: string;
+  transactionId: string;
+  status: string;
+};
+
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
@@ -986,6 +1017,47 @@ export const api = createApi({
       },
       providesTags: ["Transactions", "StaffTransactions"],
     }),
+    getAdminTransactions: build.query<
+      AdminTransactionsResponse,
+      GetAdminTransactionsParams | void
+    >({
+      query: (params) => {
+        const query = new URLSearchParams();
+        if (params?.limit) query.set("limit", String(params.limit));
+        if (params?.offset !== undefined)
+          query.set("offset", String(params.offset));
+        if (params?.type && params.type !== "all")
+          query.set("type", params.type);
+        if (params?.status && params.status !== "all")
+          query.set("status", params.status);
+        if (params?.search) query.set("search", params.search);
+        if (params?.dateFrom) query.set("dateFrom", params.dateFrom);
+        if (params?.dateTo) query.set("dateTo", params.dateTo);
+        if (params?.flagged && params.flagged !== "all")
+          query.set("flagged", params.flagged);
+        const qs = query.toString();
+        return `/admin/transactions${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["StaffTransactions", "Transactions"],
+    }),
+    updateAdminTransactionStatus: build.mutation<
+      UpdateAdminTransactionStatusResponse,
+      UpdateAdminTransactionStatusBody
+    >({
+      query: (body) => ({
+        url: "/admin/transactions",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [
+        "StaffTransactions",
+        "Transactions",
+        "AdminAnalytics",
+        "Accounts",
+        "FundRequests",
+        "AdminCustomers",
+      ],
+    }),
   }),
 });
 
@@ -1020,4 +1092,6 @@ export const {
   useCreateAdminAccountMutation,
   useUpdateAdminAccountMutation,
   useGetCustomerTransactionsQuery,
+  useGetAdminTransactionsQuery,
+  useUpdateAdminTransactionStatusMutation,
 } = api;
