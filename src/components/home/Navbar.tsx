@@ -15,7 +15,7 @@ import { authClient } from "@/lib/auth-client";
 
 const NAV_ITEMS = [
   { label: "Home", href: "#home", Icon: FeaturesIcon },
-  { label: "Accounts", href: "#accounts", Icon: AccountsIcon },
+  { label: "Features", href: "#features", Icon: AccountsIcon },
   { label: "Security", href: "#security", Icon: SecurityIcon },
   { label: "Pricing", href: "#pricing", Icon: PricingIcon },
 ] as const;

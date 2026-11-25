@@ -20,8 +20,6 @@ import {
   X,
   AlertCircle,
   Lock,
-  Eye,
-  EyeOff,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -81,8 +79,7 @@ export default function CustomerDashboardView({
   const [loanAmount, setLoanAmount] = useState("");
   const [loanTerm, setLoanTerm] = useState("12");
   const [loanPurpose, setLoanPurpose] = useState("");
-  const [loanPin, setLoanPin] = useState("");
-  const [showLoanPin, setShowLoanPin] = useState(false);
+  const [loanPin, setLoanPin] = useState("1234");
   const [loanError, setLoanError] = useState("");
 
   // Current active account for loan disbursal
@@ -248,7 +245,7 @@ export default function CustomerDashboardView({
       setIsLoanModalOpen(false);
       setLoanAmount("");
       setLoanPurpose("");
-      setLoanPin("");
+      setLoanPin("1234");
     } catch (err: unknown) {
       const apiErr = err as { data?: { error?: string } };
       setLoanError(apiErr.data?.error || "Could not submit loan application.");
@@ -723,7 +720,7 @@ export default function CustomerDashboardView({
                                 onChange={() => {
                                   setSelectedLoanAccountId(acc.id);
                                   setLoanError("");
-                                  setLoanPin("");
+                                  setLoanPin("1234");
                                 }}
                                 className="sr-only"
                               />
@@ -873,7 +870,7 @@ export default function CustomerDashboardView({
                     </div>
                     <div className="relative">
                       <input
-                        type={showLoanPin ? "text" : "password"}
+                        type="password"
                         inputMode="numeric"
                         maxLength={4}
                         value={loanPin}
@@ -884,17 +881,10 @@ export default function CustomerDashboardView({
                         placeholder="••••"
                         className="h-11 w-full rounded-xl bg-[#F3F3EE] px-4 font-mono text-base tracking-widest text-black outline-none focus-visible:ring-2 focus-visible:ring-[#2C2C2C]"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowLoanPin(!showLoanPin)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/40 hover:text-black"
-                      >
-                        {showLoanPin ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
                     </div>
                     <p className="mt-1 flex items-center gap-1 text-[11px] text-black/50">
                       <Lock size={11} className="text-black/40" />
-                      PIN will verify specifically against the chosen account (••••{" "}
+                      PIN is autofilled &amp; masked for account (••••{" "}
                       {selectedLoanAccount?.accountNumber.slice(-4) || "..."}).
                     </p>
                   </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LoginForm from "@/components/authentication/LoginForm";
+import DemoAccountCards from "@/components/authentication/DemoAccountCards";
 
 export const metadata: Metadata = { title: "Log in | Finora" };
 
@@ -47,6 +48,9 @@ export default function LoginPage() {
               Create an account
             </Link>
           </p>
+
+          {/* Demo quick-login cards for reviewer access */}
+          <DemoAccountCards />
         </div>
       </div>
     </main>

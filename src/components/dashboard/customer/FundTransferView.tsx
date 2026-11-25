@@ -13,8 +13,6 @@ import {
   Copy,
   Check,
   AlertCircle,
-  Eye,
-  EyeOff,
   ShieldAlert,
 } from "lucide-react";
 import {
@@ -86,8 +84,7 @@ export default function FundTransferView() {
   const [recipientNumber, setRecipientNumber] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [pin, setPin] = useState("");
-  const [showPin, setShowPin] = useState(false);
+  const [pin, setPin] = useState("1234");
   const [formError, setFormError] = useState("");
 
   const [copiedAcc, setCopiedAcc] = useState(false);
@@ -96,7 +93,7 @@ export default function FundTransferView() {
   const handleSwitchAccount = (accId: string) => {
     dispatch(setSelectedAccount(accId));
     setFormError("");
-    setPin(""); // Reset PIN when switching to another account
+    setPin("1234");
   };
 
   // Quick Amount preset handler
@@ -192,7 +189,7 @@ export default function FundTransferView() {
       setRecipientNumber("");
       setAmount("");
       setDescription("");
-      setPin("");
+      setPin("1234");
     } catch (err: unknown) {
       const apiErr = err as { data?: { error?: string } };
       setFormError(
@@ -567,7 +564,7 @@ export default function FundTransferView() {
               </TextField>
 
               {/* Field 4: Transaction PIN */}
-              <TextField isRequired name="pin" type={showPin ? "text" : "password"}>
+              <TextField isRequired name="pin" type="password">
                 <Label className={labelClass}>
                   Transaction PIN ({activeAccount ? `${activeAccount.type} •••• ${activeAccount.accountNumber.slice(-4)}` : "4 digits"})
                 </Label>
@@ -581,16 +578,9 @@ export default function FundTransferView() {
                     inputMode="numeric"
                     disabled={!isSenderActive}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPin(!showPin)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-black/40 hover:text-black"
-                  >
-                    {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
                 </div>
                 <p className="mt-1.5 text-xs text-black/40">
-                  Enter the 4-digit security PIN set for this specific account.
+                  4-digit security PIN for this specific account (autofilled &amp; masked).
                 </p>
               </TextField>
 

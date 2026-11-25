@@ -12,8 +12,6 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   AlertCircle,
-  Eye,
-  EyeOff,
   Landmark,
   CreditCard,
   Lock,
@@ -94,8 +92,7 @@ export default function DepositWithdrawalView() {
   );
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [pin, setPin] = useState("");
-  const [showPin, setShowPin] = useState(false);
+  const [pin, setPin] = useState("1234");
   const [formError, setFormError] = useState("");
 
   // Account number derives from user typing or defaults to the active account number
@@ -109,7 +106,7 @@ export default function DepositWithdrawalView() {
     dispatch(setSelectedAccount(acc.id));
     setTypedAccountNumber(acc.accountNumber);
     setFormError("");
-    setPin("");
+    setPin("1234");
   };
 
   // Find the account matching the current typed/selected account number
@@ -189,7 +186,7 @@ export default function DepositWithdrawalView() {
       setTypedAccountNumber(null);
       setAmount("");
       setDescription("");
-      setPin("");
+      setPin("1234");
     } catch (err: unknown) {
       const apiErr = err as { data?: { error?: string } };
       setFormError(
@@ -573,7 +570,7 @@ export default function DepositWithdrawalView() {
             <TextField
               isRequired
               name="pin"
-              type={showPin ? "text" : "password"}
+              type="password"
             >
               <Label className={labelClass}>
                 Bank Account PIN{" "}
@@ -593,17 +590,10 @@ export default function DepositWithdrawalView() {
                   maxLength={4}
                   inputMode="numeric"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPin(!showPin)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-black/40 hover:text-black"
-                >
-                  {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
               </div>
               <p className="mt-1.5 flex items-center gap-1.5 text-xs text-black/40">
                 <Lock size={12} className="text-black/40" />
-                PIN is verified directly against account{" "}
+                PIN is autofilled &amp; masked for account{" "}
                 <strong>{accountNumber || "specified"}</strong>.
               </p>
             </TextField>
