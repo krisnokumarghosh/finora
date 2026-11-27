@@ -33,9 +33,9 @@ export const SecurityIcon = (p: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const PricingIcon = (p: SVGProps<SVGSVGElement>) => (
+export const TestimonialsIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base} {...p}>
-    <path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.1 6.1a2 2 0 0 1-2.8 0L4.1 13.6a2 2 0 0 1-.6-1.4Z" />
-    <circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none" />
+    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5v-8Z" />
+    <path d="M8.5 8h7M8.5 11.5h4" />
   </svg>
 );

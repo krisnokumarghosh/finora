@@ -1,9 +1,5 @@
 import type { ReactNode } from "react";
 
-/* Device mockups for the Finora hero. Screens use the brand lime #E6FB2D.
-   Each screen has three "scenes" (Overview → Spending → Card).
-   Hero.tsx (GSAP) cross-fades between them as the page scrolls:
-   [data-scene] = a scene, [data-item] = staggered pieces, [data-bar] / [data-fill] = grow-in. */
 
 const TRANSACTIONS = [
   { label: "Salary", amount: "+$4,200.00", kind: "in" },
@@ -14,7 +10,6 @@ const TRANSACTIONS = [
 const BARS = [48, 72, 40, 88, 64, 100, 56];
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
 
-/* ───────────── small pieces ───────────── */
 
 const ico = {
   viewBox: "0 0 24 24",
@@ -56,7 +51,6 @@ function StatusIcons() {
   );
 }
 
-/** One scene of the screen. The first is visible, the others wait for Hero.tsx. */
 function Scene({
   i,
   className = "",
@@ -184,9 +178,7 @@ function Limit({ className = "" }: { className?: string }) {
   );
 }
 
-/* ───────────── phone ───────────── */
 
-/** Small devices */
 export function PhoneMockup() {
   return (
     <div
@@ -194,7 +186,6 @@ export function PhoneMockup() {
       aria-label="Finora mobile app showing balance, spending and card"
       className="relative mx-auto w-[min(300px,82vw)]"
     >
-      {/* side buttons */}
       <span className="absolute -left-1.25 top-23 h-7 w-0.75 rounded-l bg-[#C9C6BB]" />
       <span className="absolute -left-1.25 top-35 h-12 w-0.75 rounded-l bg-[#C9C6BB]" />
       <span className="absolute -left-1.25 top-50 h-12 w-0.75 rounded-l bg-[#C9C6BB]" />
@@ -202,14 +193,12 @@ export function PhoneMockup() {
 
       <div className="rounded-[3.2rem] border-[3px] border-[#D8D5CA] bg-black p-2.5">
         <div className="relative h-135 overflow-hidden rounded-[2.4rem] bg-[#E6FB2D] text-[#2C2C2C]">
-          {/* dynamic island */}
           <div className="absolute left-1/2 top-2.25 z-30 h-6.5 w-22 -translate-x-1/2 rounded-full bg-black">
             <span className="absolute right-2.25 top-1/2 size-2.25 -translate-y-1/2 rounded-full bg-[#0d1018] ring-1 ring-[#1c2231]">
               <span className="absolute left-0.5 top-0.5 size-0.5 rounded-full bg-[#3b4a72]" />
             </span>
           </div>
 
-          {/* status bar */}
           <div className="flex h-12 items-center justify-between pl-8 pr-7 pt-0.5">
             <span className="text-[14px] font-semibold">9:41</span>
             <StatusIcons />
@@ -240,7 +229,6 @@ export function PhoneMockup() {
             </Scene>
           </div>
 
-          {/* home indicator */}
           <span className="absolute bottom-2 left-1/2 z-30 h-1 w-[34%] -translate-x-1/2 rounded-full bg-black/80" />
         </div>
       </div>
@@ -248,9 +236,7 @@ export function PhoneMockup() {
   );
 }
 
-/* ───────────── desktop ───────────── */
 
-/** Large devices (complete monitor with stand) */
 export function DesktopMockup() {
   return (
     <div
@@ -259,11 +245,9 @@ export function DesktopMockup() {
       className="mx-auto w-full max-w-4xl"
     >
       <div className="relative rounded-[1.75rem] border-[3px] border-[#D8D5CA] bg-black p-3 pt-4">
-        {/* camera */}
         <span className="absolute left-1/2 top-1.5 size-1.5 -translate-x-1/2 rounded-full bg-[#2C2C2C]" />
 
         <div className="relative h-115 overflow-hidden rounded-xl bg-[#E6FB2D] text-[#2C2C2C]">
-          {/* top bar */}
           <div className="flex items-center justify-between px-10 pt-7">
             <span className="text-sm font-semibold tracking-tight">Finora</span>
             <span className="flex size-8 items-center justify-center rounded-full bg-[#2C2C2C] text-xs font-semibold text-[#E6FB2D]">
@@ -300,7 +284,6 @@ export function DesktopMockup() {
         </div>
       </div>
 
-      {/* stand */}
       <div className="mx-auto h-9 w-24 bg-linear-to-b from-[#CFCCC1] to-[#E7E5DC]" />
       <div className="mx-auto h-2.5 w-56 rounded-full bg-[#D8D5CA]" />
     </div>

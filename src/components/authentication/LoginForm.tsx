@@ -63,7 +63,6 @@ export default function LoginForm() {
       const role = (data.user as { role?: string }).role ?? "customer";
       const destination = DASHBOARD_BY_ROLE[role] ?? DASHBOARD_BY_ROLE.customer;
       
-      // router.replace smoothly moves to the dashboard without blocking on current page reload
       router.replace(destination);
     } catch (err) {
       console.error("Login error:", err);

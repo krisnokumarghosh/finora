@@ -21,7 +21,6 @@ import {
   Home,
   type LucideIcon,
 } from "lucide-react";
-// TODO: nijer auth-client path onujayi import ta thik koro
 import { authClient } from "@/lib/auth-client";
 import { LogoLight } from "@/lib/utils/Logo";
 import LogoutConfirmModal from "./LogoutConfirmModal";
@@ -29,7 +28,6 @@ import LogoutConfirmModal from "./LogoutConfirmModal";
 type Role = "customer" | "admin" | "bank-staff";
 type NavItem = { label: string; short: string; href: string; icon: LucideIcon };
 
-// TODO: href gulo nijer real route onujayi bodle nio
 const NAV: Record<Role, NavItem[]> = {
   customer: [
     {
@@ -194,14 +192,11 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
 
   return (
     <>
-      {/* ===== Desktop sidebar (full height) ===== */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-70 flex-col border-r border-white/10 bg-[#1C1C1C] p-4 md:flex">
-        {/* Logo */}
         <Link href="/" className="mb-8  px-2 pt-2">
           <LogoLight />
         </Link>
 
-        {/* Nav */}
         <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto">
           {items.map(({ label, href, icon: Icon }) => {
             const active = isActive(href);
@@ -228,11 +223,9 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
           })}
         </nav>
 
-        {/* User + logout */}
         <div className="pt-4">{UserBlock}</div>
       </aside>
 
-      {/* ===== Mobile capsule ===== */}
       <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 md:hidden">
         <nav className="flex w-full max-w-sm items-center justify-between gap-1 rounded-full border border-white/10 bg-[#1C1C1C]/90 p-1.5 shadow-xl backdrop-blur-xl">
           {capsuleItems.map(({ short, href, icon: Icon }) => {
@@ -261,7 +254,6 @@ export default function DashboardSidebar({ user }: { user: SidebarUser }) {
         </nav>
       </div>
 
-      {/* ===== Mobile drawer ===== */}
       <div
         onClick={() => setOpen(false)}
         className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity md:hidden ${open ? "opacity-100" : "pointer-events-none opacity-0"

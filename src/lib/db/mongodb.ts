@@ -12,18 +12,14 @@ if (!dbName) {
 }
 
 const mongoOptions: MongoClientOptions = {
-  // Keep pool small in serverless so concurrent instances do not exhaust Atlas limits.
   maxPoolSize: 10,
   minPoolSize: 0,
-  // Close idle connections before Vercel/Atlas drops them silently.
   maxIdleTimeMS: 30000,
-  // Fail fast on unreachable primary instead of hanging for 30s.
   serverSelectionTimeoutMS: 10000,
   connectTimeoutMS: 10000,
   socketTimeoutMS: 45000,
 };
 
-// Dev e hot reload hole bar bar notun client na khule, global e rakhi.
 const globalForMongo = globalThis as unknown as {
   _mongoClient?: MongoClient;
   _mongoListenersAttached?: boolean;
@@ -34,9 +30,6 @@ export const client = (globalForMongo._mongoClient ??= new MongoClient(
   mongoOptions
 ));
 
-// In mongodb v7, if initial autoConnect fails, topology.close() leaves client.topology
-// non-null in a closed state, causing every future query to throw MongoTopologyClosedError.
-// Clearing it on topologyClosed lets the next operation reconnect cleanly.
 if (!globalForMongo._mongoListenersAttached) {
   globalForMongo._mongoListenersAttached = true;
   client.on("topologyClosed", () => {

@@ -3,7 +3,6 @@ import { getUserSession } from "@/lib/core/session";
 import StaffCustomersView from "@/components/dashboard/staff/StaffCustomersView";
 
 export default async function BankStaffAllCustomersPage() {
-  // Server-side protection: only Bank Staff and Admin can view all customers.
   const user = await getUserSession();
   if (!user) redirect("/login");
 

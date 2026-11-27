@@ -1,7 +1,6 @@
 export default function Loading() {
   return (
     <div className="space-y-6 animate-pulse">
-      {/* ── Page Header ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="h-9 w-56 rounded-2xl bg-black/10 sm:h-10 sm:w-68" />
@@ -10,7 +9,6 @@ export default function Loading() {
         <div className="h-10 w-28 rounded-full bg-black/5" />
       </div>
 
-      {/* ── Filter & Search Bar Card ── */}
       <div className="space-y-4 rounded-3xl bg-white p-5 shadow-sm sm:p-6">
         <div className="h-12 w-full rounded-2xl bg-[#F3F3EE]" />
 
@@ -29,7 +27,6 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* ── Transactions List Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
         <div className="flex items-center justify-between border-b border-black/5 pb-4">
           <div className="h-5 w-44 rounded-xl bg-black/10" />

@@ -52,7 +52,6 @@ const ACCOUNT_STATUSES: {
 ];
 
 export default function AdminBankAccountsView() {
-  // Accounts that need admin approval are shown first by default.
   const [statusFilter, setStatusFilter] =
     useState<keyof AdminAccountStatusCounts>("needs_approval");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -157,7 +156,6 @@ export default function AdminBankAccountsView() {
         }
       />
 
-      {/* ── Filters & search card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4">
           <div className="relative w-full">
@@ -305,7 +303,6 @@ export default function AdminBankAccountsView() {
         )}
       </div>
 
-      {/* ── Accounts list card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-4 flex flex-col gap-2 border-b border-black/5 pb-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
@@ -378,7 +375,6 @@ export default function AdminBankAccountsView() {
           </div>
         ) : (
           <div>
-            {/* Desktop table */}
             <div className="hidden overflow-x-auto lg:block">
               <table className="w-full text-left">
                 <thead>
@@ -546,7 +542,6 @@ export default function AdminBankAccountsView() {
               </table>
             </div>
 
-            {/* Mobile cards */}
             <div className="space-y-3 lg:hidden">
               {accounts.map((account) => {
                 const created = formatDateTime(account.createdAt);
@@ -670,7 +665,6 @@ export default function AdminBankAccountsView() {
           </div>
         )}
 
-        {/* Load more */}
         <div className="mt-8 flex flex-col items-center justify-center border-t border-black/5 pt-6 text-center">
           {hasMore ? (
             <div className="flex flex-col items-center gap-2">
@@ -701,14 +695,11 @@ export default function AdminBankAccountsView() {
         </div>
       </div>
 
-      {/* ── Modals ── */}
       {showCreate && (
         <StaffCreateAccountModal
           mode="admin"
           onClose={() => setShowCreate(false)}
           onCreated={() => {
-            // Admin-created accounts are active immediately, so show all
-            // accounts to keep the new account visible.
             setStatusFilter("all");
             setCurrentLimit(15);
           }}

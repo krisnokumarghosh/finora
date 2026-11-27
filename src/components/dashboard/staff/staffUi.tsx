@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import type { AccountStatus } from "@/lib/redux/api";
 
-/* ─── Formatting helpers ─── */
 
 export const formatMoney = (value: number) =>
   `৳${value.toLocaleString("en-BD", {
@@ -59,7 +58,6 @@ export const initials = (name: string) =>
     .map((part) => part[0]?.toUpperCase())
     .join("") || "C";
 
-/* ─── Status badges ─── */
 
 export function AccountStatusBadge({ status }: { status: AccountStatus }) {
   switch (status) {
@@ -121,7 +119,6 @@ export function VerificationBadge({ verified }: { verified: boolean }) {
   );
 }
 
-/* ─── Account type icon wrapper ─── */
 
 export function AccountTypeIcon({ type }: { type: string }) {
   const styles: Record<string, string> = {

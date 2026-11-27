@@ -155,7 +155,6 @@ export type FlagTransactionResponse = {
   flag: TransactionFlag | null;
 };
 
-/* ─── Staff customer operations ─── */
 
 export type StaffCustomerAccount = {
   id: string;
@@ -485,7 +484,6 @@ export type UpdateAdminLoanResponse = {
   loan: AdminLoan;
 };
 
-/* ─── Admin Analytics ─── */
 
 export type AdminSummary = {
   totalCustomers: number;
@@ -519,7 +517,6 @@ export type AdminAnalyticsResponse = {
   accountTypeData: AccountTypeDataPoint[];
 };
 
-/* ─── Admin Customer Management ─── */
 
 export type UserStatus = "active" | "inactive" | "blocked";
 
@@ -577,7 +574,6 @@ export type UpdateAdminAccountStatusResponse = {
   account: StaffBankAccount;
 };
 
-/* ─── Admin Bank Account Management ─── */
 
 export type AdminAccountStatusCounts = {
   all: number;
@@ -703,9 +699,9 @@ export const api = createApi({
     "AdminAccounts",
     "AdminLoans",
   ],
-  refetchOnMountOrArgChange: true, // Always refetch fresh financial data when switching pages / mounting
-  refetchOnFocus: true, // Auto refetch when tab is refocused
-  refetchOnReconnect: true, // Auto refetch when network reconnects
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
   endpoints: (build) => ({
     getAccounts: build.query<Account[], void>({
       query: () => "/accounts",

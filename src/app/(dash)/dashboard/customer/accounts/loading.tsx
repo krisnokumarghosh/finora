@@ -1,7 +1,6 @@
 export default function Loading() {
   return (
     <div className="space-y-8 animate-pulse">
-      {/* ── Header Bar ── */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="h-3 w-20 rounded-md bg-black/10" />
@@ -11,7 +10,6 @@ export default function Loading() {
         <div className="h-11 w-36 rounded-full bg-black/5" />
       </div>
 
-      {/* ── Account Cards Grid Skeleton ── */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3].map((n) => (
           <div

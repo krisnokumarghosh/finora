@@ -224,7 +224,6 @@ export default function StaffCreateAccountModal({
         </div>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-5">
-          {/* Customer selection */}
           {selectedCustomer ? (
             <div>
               <div className="mb-1.5 flex items-center justify-between">
@@ -308,7 +307,6 @@ export default function StaffCreateAccountModal({
                 )}
               </div>
 
-              {/* Show matching results ONLY when a search query is typed */}
               {customerSearch.trim() ? (
                 <div className="mt-2 max-h-44 overflow-y-auto rounded-2xl border border-black/5">
                   {isLoadingCustomers ? (
@@ -369,7 +367,6 @@ export default function StaffCreateAccountModal({
             </div>
           )}
 
-          {/* Account type */}
           <div>
             <p className={labelClass}>Account type</p>
             <div className="grid gap-2 sm:grid-cols-3">
@@ -403,7 +400,6 @@ export default function StaffCreateAccountModal({
             </div>
           </div>
 
-          {/* Account holder details */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="staff-account-name" className={labelClass}>

@@ -142,7 +142,6 @@ export default function StaffOperationsView() {
         }
       />
 
-      {/* ── Summary cards (Unified Dark Tiles inside White Container) ── */}
       <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -189,9 +188,7 @@ export default function StaffOperationsView() {
         </div>
       </div>
 
-      {/* ── Recent customers & accounts ── */}
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:gap-6">
-        {/* Recent customers */}
         <div className="min-w-0 rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
           <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-3">
             <div className="flex min-w-0 items-center gap-2">
@@ -306,7 +303,6 @@ export default function StaffOperationsView() {
           )}
         </div>
 
-        {/* Recent accounts */}
         <div className="min-w-0 rounded-3xl bg-white p-4 shadow-sm sm:p-6">
           <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-3">
             <div className="flex min-w-0 items-center gap-2">
@@ -420,7 +416,6 @@ export default function StaffOperationsView() {
         </div>
       </div>
 
-      {/* ── Modals ── */}
       {showRegister && (
         <StaffRegisterCustomerModal onClose={() => setShowRegister(false)} />
       )}

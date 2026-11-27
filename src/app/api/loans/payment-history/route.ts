@@ -33,7 +33,6 @@ export async function GET(req: Request) {
     role: (user as SessionRole).role,
   });
 
-  // Process any due repayments for this customer (or all if staff/admin) first.
   await processDueLoanRepayments(
     staffOrAdmin ? undefined : { userId: user.id }
   ).catch((err: unknown) => {

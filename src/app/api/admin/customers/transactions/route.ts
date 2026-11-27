@@ -15,7 +15,6 @@ const toIsoString = (value: unknown) => {
 };
 
 export async function GET(req: Request) {
-  // 1. Authorize: Staff or Admin
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -34,7 +33,6 @@ export async function GET(req: Request) {
     );
   }
 
-  // 2. Read query parameters
   const { searchParams } = new URL(req.url);
   const userId = (searchParams.get("userId") || "").trim();
   const limitParam = Number(searchParams.get("limit")) || 20;
@@ -51,7 +49,6 @@ export async function GET(req: Request) {
   const limit = Math.max(1, Math.min(100, limitParam));
   const offset = Math.max(0, offsetParam);
 
-  // 3. Find customer's bank accounts
   const customerAccounts = await db
     .collection("bankacc")
     .find({ userId }, { projection: { accountNumber: 1, type: 1, name: 1 } })
@@ -74,7 +71,6 @@ export async function GET(req: Request) {
     }
   }
 
-  // 4. Query transfers and fund requests for this customer
   const includeTransfers = typeParam === "all" || typeParam === "transfer";
   const includeRequests =
     typeParam === "all" ||
@@ -115,7 +111,6 @@ export async function GET(req: Request) {
       : Promise.resolve([]),
   ]);
 
-  // Load flags for transactions
   const txIds = txRows.map((t) => t.transactionId).filter(Boolean);
   const flags = txIds.length
     ? await db
@@ -126,7 +121,6 @@ export async function GET(req: Request) {
 
   const flagMap = new Map(flags.map((f) => [f.transactionId, f]));
 
-  // 5. Map transfers (deduplicate by transactionId so customer sees their side of the transfer)
   const mappedTransfers: StaffTransaction[] = txRows.map((tx) => {
     const isCredit =
       tx.direction === "credit" ||
@@ -173,7 +167,6 @@ export async function GET(req: Request) {
     };
   });
 
-  // 6. Map deposit/withdrawal requests
   const mappedRequests: StaffTransaction[] = reqRows.map((req) => {
     const isDeposit = req.type === "deposit";
     const accInfo = accountInfoMap.get(req.accountNumber);
@@ -203,7 +196,6 @@ export async function GET(req: Request) {
     };
   });
 
-  // 7. Combine, sort, and slice
   const all = [...mappedTransfers, ...mappedRequests].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );

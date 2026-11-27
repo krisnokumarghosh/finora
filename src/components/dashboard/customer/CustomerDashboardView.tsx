@@ -41,7 +41,6 @@ import {
 import { successToast } from "@/lib/utils/toasts";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Format BDT Currency ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 0,
@@ -65,7 +64,6 @@ export default function CustomerDashboardView({
   );
   const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
 
-  // RTK Queries
   const { data: accounts = [] } = useGetAccountsQuery();
   const { data: fundRequests = [] } = useGetFundRequestsQuery();
   const { data: recentTransfers = [] } = useGetRecentTransfersQuery();
@@ -73,7 +71,6 @@ export default function CustomerDashboardView({
 
   const [applyLoan, { isLoading: isApplyingLoan }] = useApplyLoanMutation();
 
-  // Loan Modal Form State
   const [selectedLoanAccountId, setSelectedLoanAccountId] = useState("");
   const [loanType, setLoanType] = useState<LoanType>("home");
   const [loanAmount, setLoanAmount] = useState("");
@@ -82,7 +79,6 @@ export default function CustomerDashboardView({
   const [loanPin, setLoanPin] = useState("1234");
   const [loanError, setLoanError] = useState("");
 
-  // Current active account for loan disbursal
   const activeLoanAccountId =
     selectedLoanAccountId ||
     accounts.find((a) => a.status === "active")?.id ||
@@ -93,31 +89,25 @@ export default function CustomerDashboardView({
     return accounts.find((a) => a.id === activeLoanAccountId);
   }, [accounts, activeLoanAccountId]);
 
-  /* ── 1. Calculate Financial Records ── */
-  // Total Money: Sum of user's active accounts balance
   const totalMoney = useMemo(() => {
     return accounts.reduce((sum, acc) => {
       return sum + (acc.status === "active" ? acc.balance : 0);
     }, 0);
   }, [accounts]);
 
-  // Total Approved Deposits only
   const totalDepositAmount = useMemo(() => {
     return fundRequests
       .filter((req) => req.type === "deposit" && req.status === "approved")
       .reduce((sum, req) => sum + req.amount, 0);
   }, [fundRequests]);
 
-  // Total Approved Withdrawals only
   const totalWithdrawalAmount = useMemo(() => {
     return fundRequests
       .filter((req) => req.type === "withdrawal" && req.status === "approved")
       .reduce((sum, req) => sum + req.amount, 0);
   }, [fundRequests]);
 
-  /* ── 2. Unified Recent Transactions (Approved, Pending, Rejected) ── */
   const allRecentTransactions = useMemo(() => {
-    // Combine fund requests (deposit/withdrawal) and direct transfers
     const reqList = fundRequests.map((req) => ({
       id: req.id,
       title: req.description || `${req.type === "deposit" ? "Deposit" : "Withdrawal"} Request`,
@@ -125,7 +115,7 @@ export default function CustomerDashboardView({
       date: new Date(req.createdAt).getTime(),
       amount: req.amount,
       type: req.type,
-      status: req.status, // "pending" | "approved" | "rejected"
+      status: req.status,
       isCredit: req.type === "deposit",
     }));
 
@@ -145,13 +135,11 @@ export default function CustomerDashboardView({
     return combined.slice(0, 3);
   }, [fundRequests, recentTransfers]);
 
-  /* ── 3. Monthly Transaction Chart Data ── */
   const chartData = useMemo(() => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const now = new Date();
     const currentMonthIdx = now.getMonth();
 
-    // Generate last 6-7 intervals ending with current month
     type IntervalItem = {
       monthName: string;
       yearMonth: string;
@@ -170,7 +158,6 @@ export default function CustomerDashboardView({
       });
     }
 
-    // Accumulate actual transaction data
     fundRequests.forEach((req) => {
       const dStr = req.createdAt.slice(0, 7);
       const match = pastIntervals.find((p) => p.yearMonth === dStr);
@@ -189,7 +176,6 @@ export default function CustomerDashboardView({
       }
     });
 
-    // Provide pleasant smooth baseline points so the chart spline renders gracefully
     return pastIntervals.map((item, idx) => {
       const baseDep = [1800, 1100, 1600, 2289, 1400, 2400, 1950][idx] || 1500;
       const baseWith = [1200, 1450, 1750, 1600, 1550, 2050, 1700][idx] || 1200;
@@ -201,7 +187,6 @@ export default function CustomerDashboardView({
     });
   }, [fundRequests, recentTransfers]);
 
-  // Handle Apply Loan submit
   const handleLoanSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoanError("");
@@ -252,7 +237,6 @@ export default function CustomerDashboardView({
     }
   };
 
-  // Helper to pick loan icon
   const getLoanIcon = (type: string) => {
     switch (type) {
       case "home":
@@ -292,25 +276,19 @@ export default function CustomerDashboardView({
         description="Track your income, expenses, savings and loans in one place."
       />
 
-      {/* ── Main 2-Column Grid Layout ── */}
       <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        {/* ════════ LEFT COLUMN (Financial Record + Money Flow Chart) ════════ */}
         <div className="min-w-0 space-y-5 sm:space-y-6 lg:col-span-7 xl:col-span-8">
-          {/* Card 1: Financial Record */}
           <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7">
             <h2 className="text-base font-bold text-black sm:text-lg">
               Financial Record
             </h2>
 
-            {/* 3 Metrics Cards inside */}
             <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-3 sm:gap-4">
-              {/* Metric 1: Total Money (Dark #2C2C2C Card with Lime curve) */}
               <div className="relative flex min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-4 text-white shadow-sm sm:p-5">
                 <span className="text-xs font-medium text-white/70">
                   Total Money
                 </span>
 
-                {/* Decorative SVG Sparkline */}
                 <div className="my-2.5 h-7 w-full sm:my-3 sm:h-8">
                   <svg
                     viewBox="0 0 100 24"
@@ -336,13 +314,11 @@ export default function CustomerDashboardView({
                 </div>
               </div>
 
-              {/* Metric 2: Total Deposit (Dark #2C2C2C Card with Lime curve) */}
               <div className="relative flex min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-4 text-white shadow-sm sm:p-5">
                 <span className="text-xs font-medium text-white/70">
                   Total Deposit
                 </span>
 
-                {/* Decorative SVG Sparkline */}
                 <div className="my-2.5 h-7 w-full sm:my-3 sm:h-8">
                   <svg
                     viewBox="0 0 100 24"
@@ -368,13 +344,11 @@ export default function CustomerDashboardView({
                 </div>
               </div>
 
-              {/* Metric 3: Total Withdrawal (Dark #2C2C2C Card with Lime curve) */}
               <div className="relative flex min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-[#2C2C2C] p-4 text-white shadow-sm sm:p-5">
                 <span className="text-xs font-medium text-white/70">
                   Total Withdrawal
                 </span>
 
-                {/* Decorative SVG Sparkline */}
                 <div className="my-2.5 h-7 w-full sm:my-3 sm:h-8">
                   <svg
                     viewBox="0 0 100 24"
@@ -402,12 +376,10 @@ export default function CustomerDashboardView({
             </div>
           </div>
 
-          {/* Card 2: Money Flow (Monthly Chart) */}
           <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-lg font-bold text-black">Money Flow</h2>
 
-              {/* Legend matching image */}
               <div className="flex items-center gap-4 text-xs font-medium">
                 <span className="flex items-center gap-1.5 text-black">
                   <span className="size-2 rounded-full bg-[#2C2C2C]" />
@@ -420,7 +392,6 @@ export default function CustomerDashboardView({
               </div>
             </div>
 
-            {/* Recharts Area / Line Chart with smooth spline */}
             <div className="mt-6 h-70 w-full">
               {isClient && (
                 <ResponsiveContainer width="100%" height="100%">
@@ -459,7 +430,6 @@ export default function CustomerDashboardView({
                         return null;
                       }}
                     />
-                    {/* Primary Curve (Black Line) */}
                     <Line
                       type="monotone"
                       dataKey="deposits"
@@ -473,7 +443,6 @@ export default function CustomerDashboardView({
                         strokeWidth: 3,
                       }}
                     />
-                    {/* Secondary Curve (Golden/Lime Dashed Line) */}
                     <Line
                       type="monotone"
                       dataKey="withdrawals"
@@ -495,9 +464,7 @@ export default function CustomerDashboardView({
           </div>
         </div>
 
-        {/* ════════ RIGHT COLUMN (Transactions + Loans) ════════ */}
         <div className="space-y-6 lg:col-span-5 xl:col-span-4">
-          {/* Card 1: Transactions */}
           <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
             <div className="flex items-center justify-between border-b border-black/5 pb-4">
               <h2 className="text-lg font-bold text-black">Transactions</h2>
@@ -509,7 +476,6 @@ export default function CustomerDashboardView({
               </Link>
             </div>
 
-            {/* Transactions List */}
             <div className="mt-4 divide-y divide-black/5">
               {allRecentTransactions.length === 0 ? (
                 <div className="py-8 text-center text-xs text-black/40">
@@ -522,7 +488,6 @@ export default function CustomerDashboardView({
                     className="flex items-center justify-between py-3.5"
                   >
                     <div className="flex items-center gap-3">
-                      {/* Icon */}
                       <div
                         className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${
                           tx.status === "rejected"
@@ -545,7 +510,6 @@ export default function CustomerDashboardView({
                         )}
                       </div>
 
-                      {/* Info */}
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="max-w-32.5 truncate text-sm font-semibold text-black sm:max-w-40">
@@ -567,7 +531,6 @@ export default function CustomerDashboardView({
                       </div>
                     </div>
 
-                    {/* Amount */}
                     <span
                       className={`text-sm font-bold ${
                         tx.status === "rejected"
@@ -586,7 +549,6 @@ export default function CustomerDashboardView({
             </div>
           </div>
 
-          {/* Card 2: Loans (Under the transaction part) */}
           <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
             <div className="flex items-center justify-between border-b border-black/5 pb-4">
               <h2 className="text-lg font-bold text-black">Loans</h2>
@@ -598,7 +560,6 @@ export default function CustomerDashboardView({
               </Link>
             </div>
 
-            {/* Loans List (all statuses) */}
             <div className="mt-4 divide-y divide-black/5">
               {loans.length === 0 ? (
                 <div className="py-6 text-center text-xs text-black/40">
@@ -649,7 +610,6 @@ export default function CustomerDashboardView({
               )}
             </div>
 
-            {/* Apply for Loan Button (Black Pill Button matching image) */}
             <Button
               type="button"
               onClick={() => setIsLoanModalOpen(true)}
@@ -661,7 +621,6 @@ export default function CustomerDashboardView({
         </div>
       </div>
 
-      {/* ── Apply for Loan Modal Dialog ── */}
       {isLoanModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
           <div
@@ -686,9 +645,7 @@ export default function CustomerDashboardView({
             </div>
 
             <form onSubmit={handleLoanSubmit} className="flex-1 overflow-y-auto px-5 py-5 sm:px-7 sm:pb-7">
-              {/* Two-column layout on large screens */}
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5">
-                {/* LEFT: Account Selection */}
                 <div>
                   <label className="mb-2 block text-xs font-semibold text-black/70">
                     Select Disbursal Bank Account
@@ -777,9 +734,7 @@ export default function CustomerDashboardView({
                   )}
                 </div>
 
-                {/* RIGHT: Remaining fields */}
                 <div className="flex flex-col gap-4">
-                  {/* Loan Category */}
                   <div>
                     <label className="mb-1.5 block text-xs font-semibold text-black/70">
                       Loan Category
@@ -804,7 +759,6 @@ export default function CustomerDashboardView({
                     </div>
                   </div>
 
-                  {/* Amount */}
                   <TextField isRequired name="loanAmount">
                     <Label className="mb-1.5 block text-xs font-semibold text-black/70">
                       Desired Amount (BDT)
@@ -824,7 +778,6 @@ export default function CustomerDashboardView({
                     </div>
                   </TextField>
 
-                  {/* Repayment Term */}
                   <div>
                     <label className="mb-1.5 block text-xs font-semibold text-black/70">
                       Repayment Term
@@ -847,7 +800,6 @@ export default function CustomerDashboardView({
                     </div>
                   </div>
 
-                  {/* Purpose */}
                   <TextField name="purpose">
                     <Label className="mb-1.5 block text-xs font-semibold text-black/70">
                       Purpose / Notes
@@ -860,7 +812,6 @@ export default function CustomerDashboardView({
                     />
                   </TextField>
 
-                  {/* PIN */}
                   <div>
                     <div className="flex items-center justify-between">
                       <label className="mb-1.5 block text-xs font-semibold text-black/70">
@@ -891,7 +842,6 @@ export default function CustomerDashboardView({
                 </div>
               </div>
 
-              {/* Error + Submit full width */}
               {loanError && (
                 <div className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-600">
                   <AlertCircle size={14} className="shrink-0" />

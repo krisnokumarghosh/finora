@@ -39,7 +39,6 @@ export async function GET(req: Request) {
     );
   }
 
-  // Mask or reveal name for confirmation
   return NextResponse.json({
     found: true,
     accountNumber: account.accountNumber,

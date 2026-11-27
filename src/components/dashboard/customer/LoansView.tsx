@@ -30,28 +30,24 @@ import {
 import { successToast } from "@/lib/utils/toasts";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Format Money Helper (BDT) ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 
-/* ─── Format Account Number Helper ─── */
 const formatAccNo = (no?: string) => {
   if (!no) return "—";
   return no.replace(/(\d{4})/g, "$1 ").trim();
 };
 
 export default function LoansView() {
-  // Filters & Search state
   const [loanType, setLoanType] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [currentLimit, setCurrentLimit] = useState(15);
   const searchInputId = useId();
 
-  // Deletion modal state
   const [loanToDelete, setLoanToDelete] = useState<Loan | null>(null);
   const [deleteError, setDeleteError] = useState("");
   const [historyLoan, setHistoryLoan] = useState<Loan | null>(null);
@@ -68,7 +64,6 @@ export default function LoansView() {
   );
   const paymentHistory = historyData?.history || [];
 
-  // Reset limit whenever filter or search changes
   const handleLoanTypeChange = (val: string) => {
     setLoanType(val);
     setCurrentLimit(15);
@@ -91,7 +86,6 @@ export default function LoansView() {
     setCurrentLimit(15);
   };
 
-  // RTK Query: fetch loans with current limit & filters
   const { data, isLoading, isFetching, refetch } = useGetPaginatedLoansQuery({
     limit: currentLimit,
     offset: 0,
@@ -100,7 +94,6 @@ export default function LoansView() {
   });
 
   const rawLoans = data?.loans || [];
-  // Client-side status filter (if user selects a specific status)
   const loans =
     statusFilter === "all"
       ? rawLoans
@@ -112,7 +105,6 @@ export default function LoansView() {
       : loans.length;
   const hasMore = statusFilter === "all" ? data?.hasMore || false : false;
 
-  // Handle Delete Confirmation
   const confirmDelete = async () => {
     if (!loanToDelete) return;
     setDeleteError("");
@@ -129,7 +121,6 @@ export default function LoansView() {
     }
   };
 
-  // Status badge styling helper
   const renderStatusBadge = (status: Loan["status"]) => {
     switch (status) {
       case "approved":
@@ -169,7 +160,6 @@ export default function LoansView() {
     }
   };
 
-  // Loan type icon helper
   const renderTypeIcon = (type: LoanType) => {
     switch (type) {
       case "home":
@@ -228,10 +218,8 @@ export default function LoansView() {
         }
       />
 
-      {/* ── Filters & Search Bar Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4">
-          {/* Top row: Search by Account Number */}
           <div className="relative w-full">
             <Search
               size={18}
@@ -260,9 +248,7 @@ export default function LoansView() {
             )}
           </div>
 
-          {/* Bottom row: Filter selectors */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            {/* Filter 1: Loan Type */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
                 Loan Type:
@@ -295,7 +281,6 @@ export default function LoansView() {
               })}
             </div>
 
-            {/* Filter 2: Loan Status */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
                 Status:
@@ -329,7 +314,6 @@ export default function LoansView() {
           </div>
         </div>
 
-        {/* Active Filters Display & Clear Action */}
         {(loanType !== "all" || statusFilter !== "all" || search) && (
           <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 text-xs">
             <span className="text-black/50">Active filters:</span>
@@ -388,9 +372,7 @@ export default function LoansView() {
         )}
       </div>
 
-      {/* ── Loans List Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
-        {/* Results summary bar */}
         <div className="mb-4 flex items-center justify-between border-b border-black/5 pb-3">
           <div className="flex items-center gap-2">
             <HandCoins size={18} className="text-black/50" />
@@ -405,7 +387,6 @@ export default function LoansView() {
           </span>
         </div>
 
-        {/* Loading Skeleton */}
         {isLoading ? (
           <div className="divide-y divide-black/5">
             {[1, 2, 3, 4, 5].map((idx) => (
@@ -425,7 +406,6 @@ export default function LoansView() {
             ))}
           </div>
         ) : loans.length === 0 ? (
-          /* Empty State */
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="flex size-14 items-center justify-center rounded-2xl bg-[#F3F3EE] text-black/40">
               <Filter size={24} />
@@ -448,9 +428,7 @@ export default function LoansView() {
             )}
           </div>
         ) : (
-          /* Responsive Loans Display */
           <div>
-            {/* Desktop Table View */}
             <div className="hidden lg:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -470,7 +448,6 @@ export default function LoansView() {
                       key={loan.id}
                       className="transition-colors hover:bg-black/1.5"
                     >
-                      {/* 1. Loan ID & Application Date */}
                       <td className="py-4 pl-2">
                         <div className="flex items-center gap-3">
                           {renderTypeIcon(loan.type)}
@@ -492,7 +469,6 @@ export default function LoansView() {
                         </div>
                       </td>
 
-                      {/* 2. Type & Purpose */}
                       <td className="py-4">
                         <div className="max-w-50">
                           <p className="truncate text-xs font-bold capitalize text-black">
@@ -504,7 +480,6 @@ export default function LoansView() {
                         </div>
                       </td>
 
-                      {/* 3. Account Number & Type */}
                       <td className="py-4">
                         <div>
                           <p className="font-mono text-xs font-medium text-black">
@@ -518,7 +493,6 @@ export default function LoansView() {
                         </div>
                       </td>
 
-                      {/* 4. Term & Due Date */}
                       <td className="py-4">
                         <div>
                           <p className="text-xs font-medium text-black">
@@ -544,10 +518,8 @@ export default function LoansView() {
                         </div>
                       </td>
 
-                      {/* 5. Status Badge */}
                       <td className="py-4">{renderStatusBadge(loan.status)}</td>
 
-                      {/* 6. Amount */}
                       <td className="py-4 text-right">
                         <span className="text-sm font-bold text-black">
                           {formatMoney(loan.amount)}
@@ -560,7 +532,6 @@ export default function LoansView() {
                           )}
                       </td>
 
-                      {/* 7. Action: Payment History & Delete */}
                       <td className="py-4 pr-2 text-right">
                         <div className="inline-flex items-center gap-1">
                           {loan.status === "approved" && (
@@ -595,7 +566,6 @@ export default function LoansView() {
               </table>
             </div>
 
-            {/* Mobile / Tablet Card View */}
             <div className="space-y-3 lg:hidden">
               {loans.map((loan) => (
                 <div
@@ -652,7 +622,6 @@ export default function LoansView() {
                       </span>
                     </div>
 
-                    {/* Mobile Actions */}
                     <div className="flex items-center gap-1.5">
                       {loan.status === "approved" && (
                         <button
@@ -683,7 +652,6 @@ export default function LoansView() {
           </div>
         )}
 
-        {/* ── Load More Section ── */}
         <div className="mt-8 flex flex-col items-center justify-center border-t border-black/5 pt-6 text-center">
           {hasMore ? (
             <div className="flex flex-col items-center gap-2">
@@ -714,7 +682,6 @@ export default function LoansView() {
         </div>
       </div>
 
-      {/* ── Delete Confirmation Modal ── */}
       {loanToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
@@ -809,7 +776,6 @@ export default function LoansView() {
           </div>
         </div>
       )}
-      {/* ── Loan Payment History Modal ── */}
       {historyLoan && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"

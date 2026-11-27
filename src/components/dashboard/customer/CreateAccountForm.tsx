@@ -13,12 +13,10 @@ import {
   type AccountType,
 } from "@/lib/redux/api";
 
-/* ─── Design tokens ─── */
 const labelClass = "mb-2 block text-sm text-black/50";
 const inputClass =
   "h-[52px] w-full rounded-full bg-[#F3F3EE] px-5 text-base text-black outline-none placeholder:text-black/40 focus-visible:ring-[#E6FB2D] shadow-none";
 
-/* ─── Account type options ─── */
 const ACCOUNT_TYPES: { value: AccountType; label: string; desc: string }[] = [
   {
     value: "savings",
@@ -37,7 +35,6 @@ const ACCOUNT_TYPES: { value: AccountType; label: string; desc: string }[] = [
   },
 ];
 
-/* ─── Account Type Radio Group ─── */
 function AccountTypeRadio({
   value,
   onChange,
@@ -49,7 +46,6 @@ function AccountTypeRadio({
     <div>
       <p className={labelClass}>Account type</p>
 
-      {/* Mobile: stacked rows | sm+: 3-column cards */}
       <div className="flex flex-col gap-2.5 sm:grid sm:grid-cols-3 sm:gap-3">
         {ACCOUNT_TYPES.map((opt) => {
           const selected = value === opt.value;
@@ -73,7 +69,6 @@ function AccountTypeRadio({
                 className="sr-only"
               />
 
-              {/* Text block — grows on mobile to push dot right */}
               <div className="flex-1 sm:flex-none">
                 <span
                   className={`block text-sm font-semibold ${
@@ -91,7 +86,6 @@ function AccountTypeRadio({
                 </span>
               </div>
 
-              {/* Radio dot — right side on mobile, top-right on sm+ */}
               <span
                 className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-all
                   sm:absolute sm:right-4 sm:top-4
@@ -113,7 +107,6 @@ function AccountTypeRadio({
   );
 }
 
-/* ─── Create Account Form Component ─── */
 export default function CreateAccountForm({ onClose }: { onClose: () => void }) {
   const [createAccount, { isLoading }] = useCreateAccountMutation();
   const [error, setError] = useState("");
@@ -143,7 +136,6 @@ export default function CreateAccountForm({ onClose }: { onClose: () => void }) 
 
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
-      {/* Header */}
       <div className="mb-7">
         <h2 className="text-xl font-semibold text-black">
           Create bank account
@@ -154,13 +146,11 @@ export default function CreateAccountForm({ onClose }: { onClose: () => void }) 
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Account type radio */}
         <AccountTypeRadio
           value={form.type}
           onChange={(v) => setForm({ ...form, type: v })}
         />
 
-        {/* Other fields */}
         <div className="grid gap-5 sm:grid-cols-2">
           <TextField isRequired name="name" type="text">
             <Label className={labelClass}>Full name</Label>
@@ -221,7 +211,6 @@ export default function CreateAccountForm({ onClose }: { onClose: () => void }) 
           </TextField>
         </div>
 
-        {/* Error */}
         {error && (
           <p
             role="alert"
@@ -231,7 +220,6 @@ export default function CreateAccountForm({ onClose }: { onClose: () => void }) 
           </p>
         )}
 
-        {/* Actions */}
         <div className="flex gap-3 pt-1">
           <Button
             type="submit"

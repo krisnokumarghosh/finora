@@ -120,7 +120,6 @@ export default function StaffCustomerDetailModal({
         onMouseDown={(event) => event.stopPropagation()}
         className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl sm:p-6"
       >
-        {/* Header */}
         <div className="flex items-start justify-between gap-3 border-b border-black/5 pb-4">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#2C2C2C] text-sm font-bold text-white">
@@ -151,7 +150,6 @@ export default function StaffCustomerDetailModal({
         </div>
 
         <div className="mt-4 space-y-4">
-          {/* User ID */}
           <div className="rounded-2xl bg-[#F9F9F7] p-4">
             <p className="text-[11px] font-bold uppercase tracking-wider text-black/40">
               User ID
@@ -175,7 +173,6 @@ export default function StaffCustomerDetailModal({
             </div>
           </div>
 
-          {/* Summary */}
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-black/5 p-3.5">
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/40">
@@ -207,7 +204,6 @@ export default function StaffCustomerDetailModal({
             </div>
           </div>
 
-          {/* Verification */}
           <div
             className={`rounded-2xl border p-4 ${
               current.verified
@@ -270,7 +266,6 @@ export default function StaffCustomerDetailModal({
             </div>
           </div>
 
-          {/* Accounts */}
           <div>
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-sm font-bold text-black">Bank accounts</h3>
@@ -329,7 +324,6 @@ export default function StaffCustomerDetailModal({
           </div>
         </div>
 
-        {/* Footer */}
         <div className="mt-6 flex flex-col-reverse gap-3 border-t border-black/5 pt-4 sm:flex-row sm:items-center sm:justify-end">
           <button
             type="button"

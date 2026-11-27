@@ -9,18 +9,15 @@ const bad = (message: string, status = 400) =>
   NextResponse.json({ error: message }, { status });
 
 export async function POST(req: Request) {
-  // 1. Session verification
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 2. Request payload parsing
   const body = (await req.json()) as Record<string, unknown>;
   const { senderAccountId, recipientAccountNumber, amount, description, pin } =
     body;
 
-  // Validate sender account id
   if (
     typeof senderAccountId !== "string" ||
     !ObjectId.isValid(senderAccountId)
@@ -28,7 +25,6 @@ export async function POST(req: Request) {
     return bad("Please select a valid sender account.");
   }
 
-  // Validate recipient account number (12 digits)
   if (
     typeof recipientAccountNumber !== "string" ||
     !/^\d{12}$/.test(recipientAccountNumber.trim())
@@ -36,7 +32,6 @@ export async function POST(req: Request) {
     return bad("Recipient account number must be 12 digits.");
   }
 
-  // Validate amount
   const parsedAmount = Number(amount);
   if (
     typeof amount !== "number" &&
@@ -49,15 +44,12 @@ export async function POST(req: Request) {
     return bad("Transfer amount must be greater than 0.");
   }
 
-  // Round to 2 decimal places to prevent floating point inaccuracies
   const transferAmount = Math.round(parsedAmount * 100) / 100;
 
-  // Validate PIN (4 digits)
   if (typeof pin !== "string" || !/^\d{4}$/.test(pin)) {
     return bad("Transaction PIN must be 4 digits.");
   }
 
-  // 3. Retrieve sender account from DB
   const senderAccount = await db.collection("bankacc").findOne({
     _id: new ObjectId(senderAccountId),
     userId: user.id,
@@ -67,20 +59,17 @@ export async function POST(req: Request) {
     return bad("Sender account not found or does not belong to you.", 404);
   }
 
-  // 4. Validate sender account status (must be active)
   if (senderAccount.status !== "active") {
     return bad(
       `Transactions are only available on active accounts. Your selected account is currently "${senderAccount.status}".`
     );
   }
 
-  // 5. Validate transaction PIN
   const isPinValid = verifyPin(pin, senderAccount.pinHash);
   if (!isPinValid) {
     return bad("Invalid transaction PIN.");
   }
 
-  // 6. Retrieve recipient account from DB
   const cleanRecipientAccountNumber = recipientAccountNumber.trim();
   const recipientAccount = await db.collection("bankacc").findOne({
     accountNumber: cleanRecipientAccountNumber,
@@ -93,19 +82,16 @@ export async function POST(req: Request) {
     );
   }
 
-  // Prevent transfer to self's exact same account
   if (recipientAccount._id.toString() === senderAccount._id.toString()) {
     return bad("Cannot transfer funds to the same account.");
   }
 
-  // 7. Validate recipient account status (must also be active)
   if (recipientAccount.status !== "active") {
     return bad(
       `Recipient account is currently "${recipientAccount.status}" and cannot receive transfers. Transfers are only available on active accounts.`
     );
   }
 
-  // 8. Validate transaction limits
   const transactionLimit =
     typeof senderAccount.transactionLimit === "number"
       ? senderAccount.transactionLimit
@@ -119,7 +105,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // 9. Validate sufficient balance
   if (senderAccount.balance < transferAmount) {
     return bad(
       `Insufficient balance. Your available balance is ৳${senderAccount.balance.toLocaleString(
@@ -129,7 +114,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // 10. Generate unique transaction ID
   const timestamp = Date.now().toString(36).toUpperCase();
   const randomSuffix = randomInt(1000, 9999);
   const transactionId = `TXN${timestamp}${randomSuffix}`;
@@ -141,9 +125,6 @@ export async function POST(req: Request) {
 
   const transactionDate = new Date();
 
-  // 11. Atomic Transfer Execution
-  // Try using MongoDB session transaction for full ACID guarantees.
-  // If running in a MongoDB environment that does not support transactions, fallback to atomic conditional updates.
   const session = client.startSession();
   let usedTransaction = false;
 
@@ -151,7 +132,6 @@ export async function POST(req: Request) {
     session.startTransaction();
     usedTransaction = true;
 
-    // Deduct sender balance with atomic condition (balance >= transferAmount)
     const debitRes = await db.collection("bankacc").updateOne(
       {
         _id: senderAccount._id,
@@ -171,7 +151,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Credit recipient balance
     const creditRes = await db.collection("bankacc").updateOne(
       {
         _id: recipientAccount._id,
@@ -190,7 +169,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Insert sender transaction record (debit)
     const senderTxRecord = {
       transactionId,
       userId: user.id,
@@ -209,7 +187,6 @@ export async function POST(req: Request) {
       createdAt: transactionDate,
     };
 
-    // Insert receiver transaction record (credit)
     const receiverTxRecord = {
       transactionId,
       userId: recipientAccount.userId,
@@ -241,9 +218,7 @@ export async function POST(req: Request) {
     const errorMessage =
       err instanceof Error ? err.message : "Transfer processing failed";
 
-    // If transactions are not supported on the mongo cluster (e.g., standalone local dev without replica set)
     if (errorMessage.includes("Transaction numbers are only allowed on a replica set member")) {
-      // Fallback: safe atomic sequential operations with rollback
       const debitRes = await db.collection("bankacc").updateOne(
         {
           _id: senderAccount._id,
@@ -274,7 +249,6 @@ export async function POST(req: Request) {
       );
 
       if (creditRes.matchedCount === 0) {
-        // Rollback sender debit
         await db
           .collection("bankacc")
           .updateOne(
@@ -284,7 +258,6 @@ export async function POST(req: Request) {
         return bad("Recipient account is not active. Transfer cancelled.");
       }
 
-      // Record both transactions
       const senderTxRecord = {
         transactionId,
         userId: user.id,

@@ -84,7 +84,6 @@ const mapAccount = (doc: AccountDoc): StaffCustomerAccount => ({
 });
 
 export async function GET(req: Request) {
-  // 1. Authorize: Only Admin can access this endpoint
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -97,7 +96,6 @@ export async function GET(req: Request) {
     );
   }
 
-  // 2. Read query parameters
   const { searchParams } = new URL(req.url);
   const limitParam = Number(searchParams.get("limit")) || 15;
   const offsetParam = Number(searchParams.get("offset")) || 0;
@@ -107,7 +105,6 @@ export async function GET(req: Request) {
   const limit = Math.max(1, Math.min(100, limitParam));
   const offset = Math.max(0, offsetParam);
 
-  // 3. Build query for customers
   const query: Record<string, unknown> = { role: "customer" };
 
   if (statusParam === "active") {
@@ -139,7 +136,6 @@ export async function GET(req: Request) {
     ];
 
     if (query.$or) {
-      // Both status condition and search condition exist
       query.$and = [{ $or: query.$or }, { $or: searchConditions }];
       delete query.$or;
     } else {
@@ -147,7 +143,6 @@ export async function GET(req: Request) {
     }
   }
 
-  // 4. Fetch status counts across all customers
   const [
     total,
     activeCount,
@@ -195,7 +190,6 @@ export async function GET(req: Request) {
 
   const userIds = rows.map((row) => row._id.toString());
 
-  // 5. Load bank accounts and verification for this page's customers
   const [accountRows, verificationRows] = await Promise.all([
     userIds.length
       ? db
@@ -279,7 +273,6 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  // 1. Authorize: Only Admin can update customer status
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -292,7 +285,6 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // 2. Validate payload
   const body = (await req.json()) as Record<string, unknown>;
   const userId = typeof body.userId === "string" ? body.userId.trim() : "";
   const status = body.status;
@@ -306,7 +298,6 @@ export async function PATCH(req: Request) {
     return bad("Invalid status. Must be 'active', 'inactive', or 'blocked'.");
   }
 
-  // 3. Find customer
   const customer = await db.collection<UserDoc>("user").findOne({
     _id: new ObjectId(userId),
     role: "customer",
@@ -325,7 +316,6 @@ export async function PATCH(req: Request) {
       ? "Account deactivated by administrator"
       : "Account activated by administrator");
 
-  // 4. Update user status in database
   await db.collection<UserDoc>("user").updateOne(
     { _id: new ObjectId(userId) },
     {
@@ -337,7 +327,6 @@ export async function PATCH(req: Request) {
     }
   );
 
-  // If customer is blocked for suspicious activity, freeze all their bank accounts to protect funds
   if (status === "blocked") {
     await db.collection("bankacc").updateMany(
       { userId, status: { $in: ["active", "pending", "under_review"] } },
@@ -350,7 +339,6 @@ export async function PATCH(req: Request) {
       }
     );
   } else if (status === "active") {
-    // If reactivating customer, we can unfreeze accounts that were frozen due to user blocking
     await db.collection("bankacc").updateMany(
       { userId, freezeReason: /suspicious|blocked/i },
       {
@@ -365,7 +353,6 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // 5. Fetch updated customer details to return
   const [updatedUser, accounts, verification] = await Promise.all([
     db.collection<UserDoc>("user").findOne({ _id: new ObjectId(userId) }),
     db

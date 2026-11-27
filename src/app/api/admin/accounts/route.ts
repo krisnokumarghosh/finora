@@ -106,8 +106,6 @@ const mapAccount = (
   createdByName: doc.createdByName,
 });
 
-// A random 12 digit account number, checked against the database so two
-// customers can never receive the same account number.
 const generateAccountNumber = async () => {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const accountNumber = String(randomInt(100000000000, 1000000000000));
@@ -129,9 +127,6 @@ const getCustomer = async (userId?: string) => {
     .findOne({ _id: new ObjectId(userId) });
 };
 
-// Accounts without a status were created before the approval flow existed.
-// They are treated as pending everywhere in the UI, so the filters must
-// include them as pending too.
 const pendingStatusCondition = {
   $or: [
     { status: "pending" },
@@ -141,7 +136,6 @@ const pendingStatusCondition = {
 };
 
 export async function GET(req: Request) {
-  // 1. Authorize: only admins can manage bank accounts.
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -154,7 +148,6 @@ export async function GET(req: Request) {
     );
   }
 
-  // 2. Read and validate the query parameters.
   const { searchParams } = new URL(req.url);
   const limitParam = Number(searchParams.get("limit")) || 15;
   const offsetParam = Number(searchParams.get("offset")) || 0;
@@ -169,7 +162,6 @@ export async function GET(req: Request) {
     console.error("Failed to create admin bank account indexes:", error);
   });
 
-  // 3. Build the filters. Search is by account number only.
   const conditions: Record<string, unknown>[] = [];
 
   if (typeParam !== "all" && isAccountType(typeParam)) {
@@ -199,7 +191,6 @@ export async function GET(req: Request) {
 
   const query = conditions.length ? { $and: conditions } : {};
 
-  // 4. Fetch the page plus the status counts used by the filter chips.
   const [total, rows, statusRows] = await Promise.all([
     db.collection("bankacc").countDocuments(query),
     db
@@ -241,7 +232,6 @@ export async function GET(req: Request) {
   statusCounts.needs_approval =
     statusCounts.pending + statusCounts.under_review;
 
-  // 5. Load customer names/emails for the accounts on this page.
   const userIds = [
     ...new Set(rows.map((row) => row.userId).filter(Boolean)),
   ] as string[];
@@ -278,7 +268,6 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // 1. Authorize: only admins can create bank accounts here.
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -291,7 +280,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // 2. Validate the request body.
   const body = (await req.json()) as Record<string, unknown>;
   const userId = typeof body.userId === "string" ? body.userId.trim() : "";
   const type = body.type;
@@ -338,7 +326,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // 3. The account must belong to an existing customer.
   const customer = await db.collection<UserDoc>("user").findOne({
     _id: new ObjectId(userId),
     role: "customer",
@@ -348,7 +335,6 @@ export async function POST(req: Request) {
     return bad("Customer not found.", 404);
   }
 
-  // 4. Reuse the same banking limits as customer self-service creation.
   const [userAccountCount, nidCount, mobileCount] = await Promise.all([
     db.collection("bankacc").countDocuments({ userId }),
     db.collection("bankacc").countDocuments({ nid }),
@@ -379,7 +365,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // 5. The admin is the final approver, so admin-created accounts start active.
   const now = new Date();
   const doc = {
     userId,
@@ -414,7 +399,6 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  // 1. Authorize: only admins can update bank accounts.
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -427,12 +411,9 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // 2. Validate the common payload.
   const body = (await req.json()) as Record<string, unknown>;
   const accountId =
     typeof body.accountId === "string" ? body.accountId.trim() : "";
-  // The older admin customer screen sends only a status; treat that as the
-  // "status" action so both callers keep working.
   const action = body.action ?? (body.status ? "status" : undefined);
 
   if (!ObjectId.isValid(accountId)) {
@@ -451,7 +432,6 @@ export async function PATCH(req: Request) {
   const now = new Date();
   const updatedByName = user.name || "Administrator";
 
-  /* ── Change the account status (freeze, unfreeze, approve, reject) ── */
   if (action === "status") {
     const status = body.status;
     const reason = typeof body.reason === "string" ? body.reason.trim() : "";
@@ -493,7 +473,6 @@ export async function PATCH(req: Request) {
     if (status === "frozen") {
       update.freezeReason = reason || "Frozen by administrator";
     } else if (status === "active") {
-      // Unfreezing clears the old freeze reason.
       unset.freezeReason = "";
     }
 
@@ -524,7 +503,6 @@ export async function PATCH(req: Request) {
     });
   }
 
-  /* ── Update editable account information ── */
   if (action === "details") {
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const mobile = typeof body.mobile === "string" ? body.mobile.trim() : "";
@@ -566,7 +544,6 @@ export async function PATCH(req: Request) {
     });
   }
 
-  /* ── Set the per-transaction limit ── */
   if (action === "limit") {
     const transactionLimit = Number(body.transactionLimit);
 

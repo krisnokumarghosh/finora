@@ -5,7 +5,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DesktopMockup, PhoneMockup } from "@/lib/utils/Devices";
 
-/* Underline colour taken from the reference image */
 const UNDERLINE = "#E6FB2D";
 
 export default function Hero() {
@@ -15,10 +14,6 @@ export default function Hero() {
   const deviceRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
-  /* Pinned scroll story, driven by GSAP ScrollTrigger (scrubbed timeline):
-     1. the device rises from the bottom to the centre,
-     2. the headline fades away,
-     3. the screen content changes: Overview -> Spending -> Card. */
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
@@ -55,7 +50,6 @@ export default function Hero() {
         },
       });
 
-      // device rises to the centre
       tl.fromTo(
         device,
         { y: () => m.startY, scale: () => m.fit * 0.9, transformOrigin: "50% 0%" },
@@ -63,17 +57,14 @@ export default function Hero() {
         0,
       );
 
-      // headline leaves
       tl.to(
         text,
         { opacity: 0, y: -56, scale: 0.95, ease: "power1.out", duration: 0.4 },
         0.04,
       );
 
-      // glow brightens
       tl.fromTo(glow, { opacity: 0.2 }, { opacity: 0.65, duration: 0.7 }, 0);
 
-      // screen scenes: Overview -> Spending -> Card (each device has its own set)
       device.querySelectorAll<HTMLElement>("[data-device]").forEach((dev) => {
         const scene = (i: number) => dev.querySelector<HTMLElement>(`[data-scene="${i}"]`);
         const s0 = scene(0);
@@ -112,7 +103,6 @@ export default function Hero() {
         enter(s2, 0.62);
       });
 
-      // pad the timeline to exactly 1 so it maps to the full scroll distance
       tl.to({}, { duration: 0.001 }, 0.999);
     });
 
@@ -181,7 +171,6 @@ export default function Hero() {
           </p>
         </div>
 
-        {/* Device: starts peeking from the bottom, rises to the centre */}
         <div
           ref={deviceRef}
           className="hero-device absolute left-0 top-0 z-10 w-full px-4"
@@ -191,7 +180,6 @@ export default function Hero() {
             willChange: "transform",
           }}
         >
-          {/* soft lime glow behind the device */}
           <div
             ref={glowRef}
             aria-hidden="true"

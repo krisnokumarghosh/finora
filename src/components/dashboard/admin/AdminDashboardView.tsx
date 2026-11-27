@@ -30,7 +30,6 @@ import {
 import { authClient } from "@/lib/auth-client";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Format BDT Currency ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 0,
@@ -46,11 +45,9 @@ const formatCompact = (val: number) => {
 
 
 
-/* ─── Pie chart colors ─── */
 const PIE_COLORS = ["#2C2C2C", "#E6FB2D", "#6B7280"];
 const PIE_LABEL_COLORS = ["#ffffff", "#2C2C2C", "#ffffff"];
 
-/* ─── Transaction type toggle options ─── */
 type TxType = "all" | "deposit" | "withdrawal" | "transfer";
 
 interface AdminDashboardViewProps {
@@ -78,7 +75,6 @@ export default function AdminDashboardView({
     () => false
   );
 
-  /* ── Toggles ── */
   const [period, setPeriod] = useState<"monthly" | "yearly">("monthly");
   const [txType, setTxType] = useState<TxType>("all");
 
@@ -108,7 +104,6 @@ export default function AdminDashboardView({
   const rawChartData =
     period === "monthly" ? monthlyChartData : yearlyChartData;
 
-  /* ── Filter chart data by transaction type ── */
   const chartData = rawChartData.map((point) => {
     if (txType === "all") {
       return {
@@ -124,7 +119,6 @@ export default function AdminDashboardView({
     };
   });
 
-  /* ── Metric cards config ── */
   const metricCards = [
     {
       label: "Total Customers",
@@ -177,7 +171,6 @@ export default function AdminDashboardView({
     },
   ];
 
-  /* ── Area chart active keys ── */
   const areaKeys =
     txType === "all"
       ? [
@@ -191,7 +184,6 @@ export default function AdminDashboardView({
       ? [{ key: "withdrawal", label: "Withdrawals", color: "#C5DA00" }]
       : [{ key: "transfer", label: "Transfers", color: "#6B7280" }];
 
-  /* ── Pie chart data ── */
   const pieData = accountTypeData.map((item) => ({
     name: item.type.charAt(0).toUpperCase() + item.type.slice(1),
     value: item.count,
@@ -211,7 +203,6 @@ export default function AdminDashboardView({
         description="A complete view of the banking system — customers, accounts, and transactions."
       />
 
-      {/* ── Financial & System Record ── */}
       <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -227,7 +218,6 @@ export default function AdminDashboardView({
           </span>
         </div>
 
-        {/* 7 Dark Metric Cards inside White Container */}
         <div className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           {metricCards.map((card, idx) => (
             <div
@@ -236,7 +226,6 @@ export default function AdminDashboardView({
                 idx === metricCards.length - 1 ? "col-span-2 sm:col-span-1" : ""
               }`}
             >
-              {/* Top Row: Label + Icon */}
               <div className="flex items-start justify-between gap-2">
                 <span className="truncate text-[11px] font-medium text-white/70 sm:text-xs">
                   {card.label}
@@ -246,7 +235,6 @@ export default function AdminDashboardView({
                 </div>
               </div>
 
-              {/* Value + Badge */}
               <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2 sm:mt-6">
                 <span className="text-xl font-extrabold tracking-tight text-white sm:text-2xl xl:text-3xl">
                   {card.format(card.value)}
@@ -260,11 +248,8 @@ export default function AdminDashboardView({
         </div>
       </div>
 
-      {/* ── Charts Row ── */}
       <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        {/* Area Chart (left, wider) */}
         <div className="min-w-0 rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-7 lg:col-span-7 xl:col-span-8">
-          {/* Chart Header */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 className="text-lg font-bold text-black">
@@ -277,9 +262,7 @@ export default function AdminDashboardView({
               </p>
             </div>
 
-            {/* Controls */}
             <div className="flex flex-wrap items-center gap-2">
-              {/* Period toggle */}
               <div className="flex items-center rounded-xl border border-black/10 bg-[#F3F3EE] p-1">
                 {(["monthly", "yearly"] as const).map((p) => (
                   <button
@@ -296,7 +279,6 @@ export default function AdminDashboardView({
                 ))}
               </div>
 
-              {/* Transaction type toggle */}
               <div className="flex items-center rounded-xl border border-black/10 bg-[#F3F3EE] p-1">
                 {(
                   [
@@ -322,7 +304,6 @@ export default function AdminDashboardView({
             </div>
           </div>
 
-          {/* Legend */}
           <div className="mt-3 flex flex-wrap items-center gap-4 text-xs font-medium">
             {areaKeys.map((k) => (
               <span
@@ -338,7 +319,6 @@ export default function AdminDashboardView({
             ))}
           </div>
 
-          {/* Chart */}
           <div className="mt-5 h-72 w-full">
             {isClient && (
               <ResponsiveContainer width="100%" height="100%">
@@ -475,7 +455,6 @@ export default function AdminDashboardView({
           </div>
         </div>
 
-        {/* Pie Chart (right, narrower) */}
         <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7 lg:col-span-5 xl:col-span-4">
           <div>
             <h2 className="text-lg font-bold text-black">Account Types</h2>
@@ -484,7 +463,6 @@ export default function AdminDashboardView({
             </p>
           </div>
 
-          {/* Pie Chart */}
           <div className="mt-5 h-56 w-full">
             {pieData.length === 0 ? (
               <div className="flex h-full w-full items-center justify-center text-sm text-black/40">
@@ -586,7 +564,6 @@ export default function AdminDashboardView({
             ) : null}
           </div>
 
-          {/* Account type breakdown table */}
           <div className="mt-4 divide-y divide-black/5">
             {pieData.map((item, idx) => (
               <div

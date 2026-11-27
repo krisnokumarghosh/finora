@@ -28,7 +28,6 @@ import {
 import { successToast, errorToast } from "@/lib/utils/toasts";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Helpers ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 2,
@@ -149,7 +148,6 @@ export default function AdminTransactionsView() {
   const total = data?.total || 0;
   const hasMore = data?.hasMore || false;
 
-  /* ── Keyboard / scroll-lock effects ── */
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
@@ -169,7 +167,6 @@ export default function AdminTransactionsView() {
     };
   }, [reviewTarget, changeStatusTarget]);
 
-  /* ── Open / close the status-change modal ── */
   const openChangeStatus = (tx: StaffTransaction) => {
     setChangeStatusTarget(tx);
     setSelectedNewStatus(tx.status as AllowedStatus);
@@ -198,7 +195,6 @@ export default function AdminTransactionsView() {
     }
   };
 
-  /* ── Render helpers ── */
   const renderStatusBadge = (status: StaffTransaction["status"]) => {
     switch (status) {
       case "approved":
@@ -300,10 +296,8 @@ export default function AdminTransactionsView() {
         }
       />
 
-      {/* ── Filters & Search ── */}
       <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
         <div className="flex flex-col gap-4">
-          {/* Search */}
           <div className="relative w-full">
             <Search
               size={18}
@@ -332,7 +326,6 @@ export default function AdminTransactionsView() {
             )}
           </div>
 
-          {/* Type & Status filters */}
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
@@ -396,7 +389,6 @@ export default function AdminTransactionsView() {
             </div>
           </div>
 
-          {/* Date range */}
           <div className="grid gap-3 border-t border-black/5 pt-4 sm:grid-cols-2">
             <div>
               <label
@@ -443,7 +435,6 @@ export default function AdminTransactionsView() {
           )}
         </div>
 
-        {/* Active filters */}
         {hasActiveFilters && (
           <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 text-xs">
             <span className="text-black/50">Active filters:</span>
@@ -523,7 +514,6 @@ export default function AdminTransactionsView() {
         )}
       </div>
 
-      {/* ── Transactions List ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-4 flex items-center justify-between border-b border-black/5 pb-3">
           <div className="flex items-center gap-2">
@@ -592,7 +582,6 @@ export default function AdminTransactionsView() {
           </div>
         ) : (
           <div>
-            {/* Desktop table */}
             <div className="hidden overflow-x-auto lg:block">
               <table className="w-full text-left">
                 <thead>
@@ -718,7 +707,6 @@ export default function AdminTransactionsView() {
               </table>
             </div>
 
-            {/* Mobile cards */}
             <div className="space-y-3 lg:hidden">
               {transactions.map((tx) => {
                 const when = formatDateTime(tx.createdAt);
@@ -812,7 +800,6 @@ export default function AdminTransactionsView() {
           </div>
         )}
 
-        {/* Load More */}
         <div className="mt-8 flex flex-col items-center justify-center border-t border-black/5 pt-6 text-center">
           {hasMore ? (
             <div className="flex flex-col items-center gap-2">
@@ -843,7 +830,6 @@ export default function AdminTransactionsView() {
         </div>
       </div>
 
-      {/* ── Transaction Review Modal ── */}
       {reviewTarget && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
@@ -1003,7 +989,6 @@ export default function AdminTransactionsView() {
         </div>
       )}
 
-      {/* ── Change Status Modal ── */}
       {changeStatusTarget && (
         <div
           className="fixed inset-0 z-60 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
@@ -1125,7 +1110,6 @@ export default function AdminTransactionsView() {
   );
 }
 
-/* ─── Detail row helper ─── */
 function DetailRow({
   icon,
   label,

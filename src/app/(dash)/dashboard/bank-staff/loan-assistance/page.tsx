@@ -3,7 +3,6 @@ import { getUserSession } from "@/lib/core/session";
 import StaffLoansView from "@/components/dashboard/staff/StaffLoansView";
 
 export default async function BankStaffLoanAssistancePage() {
-  // Server-side protection: customers must not reach the staff loan page.
   const user = await getUserSession();
   if (!user) redirect("/login");
 

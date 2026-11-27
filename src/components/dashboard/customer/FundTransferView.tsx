@@ -25,12 +25,10 @@ import { setSelectedAccount } from "@/lib/redux/slices/accountSlice";
 import { successToast } from "@/lib/utils/toasts";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Design Tokens ─── */
 const labelClass = "mb-2 block text-sm font-medium text-black/60";
 const inputClass =
   "h-[52px] w-full rounded-2xl bg-[#F3F3EE] px-5 text-base text-black outline-none placeholder:text-black/40 focus-visible:ring-[#E6FB2D] shadow-none";
 
-/* ─── Helper for formatting money ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 2,
@@ -43,7 +41,6 @@ export default function FundTransferView() {
     (state) => state.account.selectedAccountId
   );
 
-  // RTK Queries & Mutations
   const {
     data: accounts = [],
     isLoading: isAccountsLoading,
@@ -53,7 +50,6 @@ export default function FundTransferView() {
   const [transferFunds, { isLoading: isTransferring }] =
     useTransferFundsMutation();
 
-  // 1. Sort accounts chronologically by creation date: First created account comes first!
   const sortedAccounts = useMemo(() => {
     return [...accounts].sort(
       (a, b) =>
@@ -61,7 +57,6 @@ export default function FundTransferView() {
     );
   }, [accounts]);
 
-  // 2. Active sender account selection (defaults to users first created account)
   const activeAccount: Account | undefined = useMemo(() => {
     if (sortedAccounts.length === 0) return undefined;
     if (reduxSelectedAccountId) {
@@ -70,17 +65,15 @@ export default function FundTransferView() {
       );
       if (found) return found;
     }
-    return sortedAccounts[0]; // Initially show first created account
+    return sortedAccounts[0];
   }, [sortedAccounts, reduxSelectedAccountId]);
 
-  // Sync initial selection to Redux if not already set
   useEffect(() => {
     if (sortedAccounts.length > 0 && !reduxSelectedAccountId) {
       dispatch(setSelectedAccount(sortedAccounts[0].id));
     }
   }, [sortedAccounts, reduxSelectedAccountId, dispatch]);
 
-  // Form State
   const [recipientNumber, setRecipientNumber] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -89,27 +82,23 @@ export default function FundTransferView() {
 
   const [copiedAcc, setCopiedAcc] = useState(false);
 
-  // Handle Account Switch
   const handleSwitchAccount = (accId: string) => {
     dispatch(setSelectedAccount(accId));
     setFormError("");
     setPin("1234");
   };
 
-  // Quick Amount preset handler
   const handleQuickAmount = (val: number) => {
     setAmount(String(val));
     setFormError("");
   };
 
-  // Copy account number to clipboard
   const handleCopyAccNumber = (num: string) => {
     navigator.clipboard.writeText(num);
     setCopiedAcc(true);
     setTimeout(() => setCopiedAcc(false), 2000);
   };
 
-  // Derived validation checks
   const isSenderActive = activeAccount?.status === "active";
   const numAmount = Number(amount) || 0;
   const currentLimit = activeAccount?.transactionLimit ?? 100000;
@@ -117,7 +106,6 @@ export default function FundTransferView() {
     activeAccount ? numAmount > activeAccount.balance : false;
   const isAmountOverLimit = numAmount > currentLimit;
 
-  // Form submit handler
   const handleTransferSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError("");
@@ -180,7 +168,6 @@ export default function FundTransferView() {
         pin: pin.trim(),
       }).unwrap();
 
-      // Show toast notification & reset form
       successToast(
         `Fund transfer successful! ৳${numAmount.toLocaleString("en-BD", {
           minimumFractionDigits: 2,
@@ -199,7 +186,6 @@ export default function FundTransferView() {
     }
   };
 
-  /* ─── Loading State ─── */
   if (isAccountsLoading) {
     return (
       <div className="space-y-6">
@@ -212,7 +198,6 @@ export default function FundTransferView() {
     );
   }
 
-  /* ─── Error State ─── */
   if (isAccountsError) {
     return (
       <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center">
@@ -226,7 +211,6 @@ export default function FundTransferView() {
     );
   }
 
-  /* ─── Empty State: No Accounts ─── */
   if (sortedAccounts.length === 0) {
     return (
       <div className="rounded-3xl border border-dashed border-black/15 bg-white/80 p-10 text-center">
@@ -258,11 +242,8 @@ export default function FundTransferView() {
         description="Transfer money instantly between your accounts or to any bank recipient."
       />
 
-      {/* Main Grid: Account Selector & Info (Left) + Transfer Form (Right) */}
       <div className="grid gap-8 lg:grid-cols-12">
-        {/* ── Left Column: Sender Account Switcher & Details ── */}
         <div className="space-y-6 lg:col-span-5">
-          {/* Account Switcher Bar (when user has multiple accounts) */}
           {sortedAccounts.length > 1 && (
             <div className="rounded-2xl bg-white p-4 shadow-sm">
               <div className="mb-3 flex items-center justify-between">
@@ -348,10 +329,8 @@ export default function FundTransferView() {
             </div>
           )}
 
-          {/* Active Account Info Card */}
           {activeAccount && (
             <div className="relative overflow-hidden rounded-3xl bg-[#2C2C2C] p-6 text-white shadow-md sm:p-7">
-              {/* Card Header */}
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-xs font-semibold uppercase tracking-wider text-white/50">
@@ -375,7 +354,6 @@ export default function FundTransferView() {
                 </span>
               </div>
 
-              {/* Account Number with Copy */}
               <div className="mt-6 flex items-center justify-between rounded-xl bg-white/5 px-4 py-2.5">
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-white/40">
@@ -399,7 +377,6 @@ export default function FundTransferView() {
                 </button>
               </div>
 
-              {/* Available Balance */}
               <div className="mt-6 border-t border-white/10 pt-4">
                 <p className="text-xs font-medium uppercase tracking-wider text-white/50">
                   Available Balance
@@ -409,7 +386,6 @@ export default function FundTransferView() {
                 </p>
               </div>
 
-              {/* Account Holder & Limit Footer */}
               <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-4 text-xs text-white/60">
                 <span className="truncate max-w-40">
                   Holder: {activeAccount.name}
@@ -419,12 +395,10 @@ export default function FundTransferView() {
                 </span>
               </div>
 
-              {/* Decorative Accent Dot */}
               <span className="absolute right-6 top-6 size-2.5 rounded-full bg-[#E6FB2D]" />
             </div>
           )}
 
-          {/* Warning Banner if Account is NOT active */}
           {!isSenderActive && activeAccount && (
             <div className="flex items-start gap-3 rounded-2xl border border-amber-300/40 bg-amber-50 p-4 text-amber-900">
               <ShieldAlert className="size-5 shrink-0 text-amber-600" />
@@ -444,7 +418,6 @@ export default function FundTransferView() {
           )}
         </div>
 
-        {/* ── Right Column: Fund Transfer Form ── */}
         <div className="lg:col-span-7">
           <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
             <div className="mb-6 flex items-center justify-between border-b border-black/5 pb-4">
@@ -462,7 +435,6 @@ export default function FundTransferView() {
             </div>
 
             <form onSubmit={handleTransferSubmit} className="space-y-6">
-              {/* Field 1: Recipient Account Number */}
               <TextField isRequired name="recipientAccountNumber">
                 <Label className={labelClass}>
                   Recipient Account Number (12 digits)
@@ -480,7 +452,6 @@ export default function FundTransferView() {
                 />
               </TextField>
 
-              {/* Field 2: Transfer Amount */}
               <div>
                 <TextField isRequired name="amount">
                   <Label className={labelClass}>Transfer Amount (BDT)</Label>
@@ -502,7 +473,6 @@ export default function FundTransferView() {
                   </div>
                 </TextField>
 
-                {/* Quick amount chips */}
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   {[500, 1000, 5000, 10000].map((preset) => (
                     <button
@@ -531,7 +501,6 @@ export default function FundTransferView() {
                   )}
                 </div>
 
-                {/* Amount validation hints */}
                 <div className="mt-2 flex items-center justify-between text-xs">
                   <span
                     className={
@@ -550,7 +519,6 @@ export default function FundTransferView() {
                 </div>
               </div>
 
-              {/* Field 3: Description */}
               <TextField name="description">
                 <Label className={labelClass}>Description / Purpose</Label>
                 <Input
@@ -563,7 +531,6 @@ export default function FundTransferView() {
                 />
               </TextField>
 
-              {/* Field 4: Transaction PIN */}
               <TextField isRequired name="pin" type="password">
                 <Label className={labelClass}>
                   Transaction PIN ({activeAccount ? `${activeAccount.type} •••• ${activeAccount.accountNumber.slice(-4)}` : "4 digits"})
@@ -584,7 +551,6 @@ export default function FundTransferView() {
                 </p>
               </TextField>
 
-              {/* Form Error Alert */}
               {formError && (
                 <div className="flex items-start gap-2.5 rounded-2xl bg-red-50 p-4 text-xs font-medium text-red-700">
                   <AlertCircle className="size-4 shrink-0 text-red-600" />
@@ -592,7 +558,6 @@ export default function FundTransferView() {
                 </div>
               )}
 
-              {/* Submit Button */}
               <Button
                 type="submit"
                 isDisabled={

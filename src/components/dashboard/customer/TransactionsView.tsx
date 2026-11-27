@@ -19,28 +19,24 @@ import {
 } from "@/lib/redux/api";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Format Money Helper (BDT) ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 
-/* ─── Format Account Number Helper ─── */
 const formatAccNo = (no?: string) => {
   if (!no) return "—";
   return no.replace(/(\d{4})/g, "$1 ").trim();
 };
 
 export default function TransactionsView() {
-  // Filters & Search state
   const [accountType, setAccountType] = useState<string>("all");
   const [transactionType, setTransactionType] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [currentLimit, setCurrentLimit] = useState(15);
   const searchInputId = useId();
 
-  // Reset limit whenever filter or search changes
   const handleAccountTypeChange = (val: string) => {
     setAccountType(val);
     setCurrentLimit(15);
@@ -63,7 +59,6 @@ export default function TransactionsView() {
     setCurrentLimit(15);
   };
 
-  // RTK Query: fetch transactions with current limit & filters
   const { data, isLoading, isFetching, refetch } = useGetTransactionsQuery({
     limit: currentLimit,
     offset: 0,
@@ -76,7 +71,6 @@ export default function TransactionsView() {
   const total = data?.total || 0;
   const hasMore = data?.hasMore || false;
 
-  // Status badge styling helper
   const renderStatusBadge = (status: UnifiedTransaction["status"]) => {
     switch (status) {
       case "approved":
@@ -110,7 +104,6 @@ export default function TransactionsView() {
     }
   };
 
-  // Transaction type icon & badge
   const renderTypeIcon = (tx: UnifiedTransaction) => {
     if (tx.status === "rejected") {
       return (
@@ -162,10 +155,8 @@ export default function TransactionsView() {
         }
       />
 
-      {/* ── Filters & Search Bar Card ── */}
       <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
         <div className="flex flex-col gap-4">
-          {/* Top row: Search by Account Number */}
           <div className="relative w-full">
             <Search
               size={18}
@@ -194,9 +185,7 @@ export default function TransactionsView() {
             )}
           </div>
 
-          {/* Bottom row: Filter selectors */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            {/* Filter 1: Account Type */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
                 Account:
@@ -227,7 +216,6 @@ export default function TransactionsView() {
               })}
             </div>
 
-            {/* Filter 2: Transaction Type */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
                 Type:
@@ -260,7 +248,6 @@ export default function TransactionsView() {
           </div>
         </div>
 
-        {/* Active Filters Display & Clear Action */}
         {(accountType !== "all" || transactionType !== "all" || search) && (
           <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 text-xs">
             <span className="text-black/50">Active filters:</span>
@@ -314,9 +301,7 @@ export default function TransactionsView() {
         )}
       </div>
 
-      {/* ── Transactions List Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
-        {/* Results summary bar */}
         <div className="mb-4 flex items-center justify-between border-b border-black/5 pb-3">
           <div className="flex items-center gap-2">
             <Receipt size={18} className="text-black/50" />
@@ -331,7 +316,6 @@ export default function TransactionsView() {
           </span>
         </div>
 
-        {/* Loading Skeleton */}
         {isLoading ? (
           <div className="divide-y divide-black/5">
             {[1, 2, 3, 4, 5].map((idx) => (
@@ -351,7 +335,6 @@ export default function TransactionsView() {
             ))}
           </div>
         ) : transactions.length === 0 ? (
-          /* Empty State */
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="flex size-14 items-center justify-center rounded-2xl bg-[#F3F3EE] text-black/40">
               <Filter size={24} />
@@ -376,9 +359,7 @@ export default function TransactionsView() {
             )}
           </div>
         ) : (
-          /* Responsive Transactions Display */
           <div>
-            {/* Desktop Table View */}
             <div className="hidden lg:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -397,7 +378,6 @@ export default function TransactionsView() {
                       key={tx.id}
                       className="transition-colors hover:bg-black/1.5"
                     >
-                      {/* 1. Transaction ID & Date */}
                       <td className="py-4 pl-2">
                         <div className="flex items-center gap-3">
                           {renderTypeIcon(tx)}
@@ -427,7 +407,6 @@ export default function TransactionsView() {
                         </div>
                       </td>
 
-                      {/* 2. Type & Description */}
                       <td className="py-4">
                         <div className="max-w-50">
                           <p className="truncate text-xs font-bold capitalize text-black">
@@ -443,7 +422,6 @@ export default function TransactionsView() {
                         </div>
                       </td>
 
-                      {/* 3. Account Number & Type */}
                       <td className="py-4">
                         <div>
                           <p className="font-mono text-xs font-medium text-black">
@@ -455,7 +433,6 @@ export default function TransactionsView() {
                         </div>
                       </td>
 
-                      {/* 4. Counterpart */}
                       <td className="py-4">
                         {tx.counterpartAccountNumber ? (
                           <div>
@@ -471,10 +448,8 @@ export default function TransactionsView() {
                         )}
                       </td>
 
-                      {/* 5. Status Badge */}
                       <td className="py-4">{renderStatusBadge(tx.status)}</td>
 
-                      {/* 6. Amount */}
                       <td className="py-4 pr-2 text-right">
                         <span
                           className={`text-sm font-bold ${
@@ -500,7 +475,6 @@ export default function TransactionsView() {
               </table>
             </div>
 
-            {/* Mobile / Tablet Card View */}
             <div className="space-y-3 lg:hidden">
               {transactions.map((tx) => (
                 <div
@@ -576,7 +550,6 @@ export default function TransactionsView() {
           </div>
         )}
 
-        {/* ── Load More Section ── */}
         <div className="mt-8 flex flex-col items-center justify-center border-t border-black/5 pt-6 text-center">
           {hasMore ? (
             <div className="flex flex-col items-center gap-2">

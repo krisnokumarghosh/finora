@@ -87,7 +87,6 @@ export default function StaffCustomersView() {
         }
       />
 
-      {/* ── Search card ── */}
       <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
         <div className="relative w-full">
           <Search
@@ -130,7 +129,6 @@ export default function StaffCustomersView() {
         </div>
       </div>
 
-      {/* ── Customer list card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-4 flex items-center justify-between border-b border-black/5 pb-3">
           <div className="flex items-center gap-2">
@@ -196,7 +194,6 @@ export default function StaffCustomersView() {
           </div>
         ) : (
           <div>
-            {/* Desktop table */}
             <div className="hidden overflow-x-auto lg:block">
               <table className="w-full text-left">
                 <thead>
@@ -279,7 +276,6 @@ export default function StaffCustomersView() {
               </table>
             </div>
 
-            {/* Mobile cards */}
             <div className="space-y-3 lg:hidden">
               {customers.map((customer) => {
                 const joined = formatDateTime(customer.createdAt);
@@ -347,7 +343,6 @@ export default function StaffCustomersView() {
           </div>
         )}
 
-        {/* Load more */}
         <div className="mt-8 flex flex-col items-center justify-center border-t border-black/5 pt-6 text-center">
           {hasMore ? (
             <div className="flex flex-col items-center gap-2">
@@ -378,7 +373,6 @@ export default function StaffCustomersView() {
         </div>
       </div>
 
-      {/* ── Modals ── */}
       {showRegister && (
         <StaffRegisterCustomerModal onClose={() => setShowRegister(false)} />
       )}

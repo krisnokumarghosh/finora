@@ -4,10 +4,6 @@ import type {
   TransactionChartPoint,
 } from "@/lib/redux/api";
 
-/**
- * Fetches all admin analytics data directly from MongoDB.
- * Called only from server components / server actions.
- */
 export async function getAdminAnalytics(): Promise<AdminAnalyticsResponse> {
   const [
     totalCustomers,
@@ -58,7 +54,6 @@ export async function getAdminAnalytics(): Promise<AdminAnalyticsResponse> {
 
     db.collection("loans").countDocuments({ status: "pending" }),
 
-    // Monthly: last 12 months
     (async () => {
       const now = new Date();
       const twelveMonthsAgo = new Date(
@@ -124,7 +119,6 @@ export async function getAdminAnalytics(): Promise<AdminAnalyticsResponse> {
       return [...transferData, ...fundData];
     })(),
 
-    // Account type distribution
     db
       .collection("bankacc")
       .aggregate<{ _id: string; count: number; totalBalance: number }>([
@@ -138,7 +132,6 @@ export async function getAdminAnalytics(): Promise<AdminAnalyticsResponse> {
       ])
       .toArray(),
 
-    // Yearly: last 5 years
     (async () => {
       const now = new Date();
       const fiveYearsAgo = new Date(now.getFullYear() - 4, 0, 1);
@@ -193,7 +186,6 @@ export async function getAdminAnalytics(): Promise<AdminAnalyticsResponse> {
     })(),
   ]);
 
-  // Build monthly chart data (last 12 months)
   const months = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -226,7 +218,6 @@ export async function getAdminAnalytics(): Promise<AdminAnalyticsResponse> {
     else if (type === "transfer") slot.transfer += row.total;
   }
 
-  // Build yearly chart data (last 5 years)
   const yearlyChartData: TransactionChartPoint[] = Array.from(
     { length: 5 },
     (_, i) => {

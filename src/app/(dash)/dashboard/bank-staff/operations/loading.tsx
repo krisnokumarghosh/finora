@@ -1,7 +1,6 @@
 export default function Loading() {
   return (
     <div className="space-y-6 animate-pulse">
-      {/* Header */}
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
           <div className="h-3 w-20 rounded bg-black/10" />
@@ -15,7 +14,6 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* Summary cards */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[1, 2, 3, 4].map((item) => (
           <div key={item} className="rounded-3xl bg-white p-5 shadow-sm">
@@ -31,7 +29,6 @@ export default function Loading() {
         ))}
       </div>
 
-      {/* Recent lists */}
       <div className="grid gap-6 xl:grid-cols-2">
         {[1, 2].map((card) => (
           <div

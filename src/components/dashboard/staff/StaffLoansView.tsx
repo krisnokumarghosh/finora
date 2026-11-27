@@ -35,14 +35,12 @@ import {
 import { successToast } from "@/lib/utils/toasts";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Format Money Helper (BDT) ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 
-/* ─── Format Account Number Helper ─── */
 const formatAccNo = (no?: string) => {
   if (!no) return "—";
   return no.replace(/(\d{4})/g, "$1 ").trim();
@@ -78,14 +76,12 @@ const getApiError = (err: unknown, fallback: string) => {
 };
 
 export default function StaffLoansView() {
-  // Filters & search state
   const [loanType, setLoanType] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [currentLimit, setCurrentLimit] = useState(15);
   const searchInputId = useId();
 
-  // Review / forward modal state
   const [reviewTarget, setReviewTarget] = useState<StaffLoan | null>(null);
   const [forwardTarget, setForwardTarget] = useState<StaffLoan | null>(null);
   const [noteText, setNoteText] = useState("");
@@ -95,7 +91,6 @@ export default function StaffLoansView() {
   const [updateStaffLoan, { isLoading: isSaving }] =
     useUpdateStaffLoanMutation();
 
-  // Reset limit whenever a filter or search changes
   const handleLoanTypeChange = (val: string) => {
     setLoanType(val);
     setCurrentLimit(15);
@@ -118,7 +113,6 @@ export default function StaffLoansView() {
     setCurrentLimit(15);
   };
 
-  // RTK Query: fetch every customer's loan applications with active filters
   const { data, isLoading, isFetching, refetch } = useGetStaffLoansQuery({
     limit: currentLimit,
     offset: 0,
@@ -131,7 +125,6 @@ export default function StaffLoansView() {
   const total = data?.total || 0;
   const hasMore = data?.hasMore || false;
 
-  // Close modal on Escape and lock page scroll while a modal is open
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || isSaving) return;
@@ -228,7 +221,6 @@ export default function StaffLoansView() {
     }
   };
 
-  // Status badge styling helper
   const renderStatusBadge = (status: StaffLoan["status"]) => {
     switch (status) {
       case "approved":
@@ -268,7 +260,6 @@ export default function StaffLoansView() {
     }
   };
 
-  // Loan type icon helper
   const renderTypeIcon = (type: LoanType) => {
     switch (type) {
       case "home":
@@ -330,10 +321,8 @@ export default function StaffLoansView() {
         }
       />
 
-      {/* ── Filters & Search Bar Card ── */}
       <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
         <div className="flex flex-col gap-4">
-          {/* Top row: Search by Account Number */}
           <div className="relative w-full">
             <Search
               size={18}
@@ -362,9 +351,7 @@ export default function StaffLoansView() {
             )}
           </div>
 
-          {/* Bottom row: Filter selectors */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            {/* Filter 1: Loan Type */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
                 Loan Type:
@@ -397,7 +384,6 @@ export default function StaffLoansView() {
               })}
             </div>
 
-            {/* Filter 2: Loan Status */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
                 Status:
@@ -431,7 +417,6 @@ export default function StaffLoansView() {
           </div>
         </div>
 
-        {/* Active Filters Display & Clear Action */}
         {hasActiveFilters && (
           <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 text-xs">
             <span className="text-black/50">Active filters:</span>
@@ -490,9 +475,7 @@ export default function StaffLoansView() {
         )}
       </div>
 
-      {/* ── Loans List Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
-        {/* Results summary bar */}
         <div className="mb-4 flex items-center justify-between border-b border-black/5 pb-3">
           <div className="flex items-center gap-2">
             <HandCoins size={18} className="text-black/50" />
@@ -526,7 +509,6 @@ export default function StaffLoansView() {
           </div>
         )}
 
-        {/* Loading Skeleton */}
         {isLoading ? (
           <div className="divide-y divide-black/5">
             {[1, 2, 3, 4, 5].map((idx) => (
@@ -546,7 +528,6 @@ export default function StaffLoansView() {
             ))}
           </div>
         ) : loans.length === 0 ? (
-          /* Empty State */
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="flex size-14 items-center justify-center rounded-2xl bg-[#F3F3EE] text-black/40">
               <Filter size={24} />
@@ -569,9 +550,7 @@ export default function StaffLoansView() {
             )}
           </div>
         ) : (
-          /* Responsive Loans Display */
           <div>
-            {/* Desktop Table View */}
             <div className="hidden overflow-x-auto lg:block">
               <table className="w-full text-left">
                 <thead>
@@ -591,7 +570,6 @@ export default function StaffLoansView() {
                       key={loan.id}
                       className="transition-colors hover:bg-black/2"
                     >
-                      {/* 1. Loan ID & Application Date */}
                       <td className="py-4 pl-2">
                         <div className="flex items-center gap-3">
                           {renderTypeIcon(loan.type)}
@@ -606,7 +584,6 @@ export default function StaffLoansView() {
                         </div>
                       </td>
 
-                      {/* 2. Customer & Account */}
                       <td className="py-4">
                         <div className="max-w-44">
                           <p className="truncate text-xs font-semibold text-black">
@@ -626,7 +603,6 @@ export default function StaffLoansView() {
                         </div>
                       </td>
 
-                      {/* 3. Type & Purpose */}
                       <td className="py-4">
                         <div className="max-w-50">
                           <p className="truncate text-xs font-bold capitalize text-black">
@@ -638,7 +614,6 @@ export default function StaffLoansView() {
                         </div>
                       </td>
 
-                      {/* 4. Term & Due Date */}
                       <td className="py-4">
                         <div>
                           <p className="text-xs font-medium text-black">
@@ -650,17 +625,14 @@ export default function StaffLoansView() {
                         </div>
                       </td>
 
-                      {/* 5. Status Badge */}
                       <td className="py-4">{renderStatusBadge(loan.status)}</td>
 
-                      {/* 6. Amount */}
                       <td className="py-4 text-right">
                         <span className="text-sm font-bold text-black">
                           {formatMoney(loan.amount)}
                         </span>
                       </td>
 
-                      {/* 7. Action: Review */}
                       <td className="py-4 pr-2 text-right">
                         <button
                           type="button"
@@ -678,7 +650,6 @@ export default function StaffLoansView() {
               </table>
             </div>
 
-            {/* Mobile / Tablet Card View */}
             <div className="space-y-3 lg:hidden">
               {loans.map((loan) => (
                 <div
@@ -756,7 +727,6 @@ export default function StaffLoansView() {
           </div>
         )}
 
-        {/* ── Load More Section ── */}
         <div className="mt-8 flex flex-col items-center justify-center border-t border-black/5 pt-6 text-center">
           {hasMore ? (
             <div className="flex flex-col items-center gap-2">
@@ -787,7 +757,6 @@ export default function StaffLoansView() {
         </div>
       </div>
 
-      {/* ── Loan Review Modal ── */}
       {reviewTarget && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
@@ -876,7 +845,6 @@ export default function StaffLoansView() {
               )}
 
               <div className="grid gap-4 md:grid-cols-2">
-                {/* Customer information */}
                 <div className="rounded-2xl bg-[#F9F9F7] p-4">
                   <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-black/50">
                     <User size={13} />
@@ -926,7 +894,6 @@ export default function StaffLoansView() {
                   </div>
                 </div>
 
-                {/* Loan details */}
                 <div className="rounded-2xl bg-[#F9F9F7] p-4">
                   <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-black/50">
                     <FileText size={13} />
@@ -984,7 +951,6 @@ export default function StaffLoansView() {
                 </div>
               </div>
 
-              {/* Internal notes */}
               <div className="rounded-2xl border border-black/5 p-4">
                 <div className="flex items-center justify-between">
                   <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-black/50">
@@ -1123,7 +1089,6 @@ export default function StaffLoansView() {
         </div>
       )}
 
-      {/* ── Forward Confirmation Modal ── */}
       {forwardTarget && (
         <div
           className="fixed inset-0 z-60 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
@@ -1245,7 +1210,6 @@ export default function StaffLoansView() {
   );
 }
 
-/* ─── Small label/value row used inside the review modal ─── */
 function DetailRow({
   icon,
   label,

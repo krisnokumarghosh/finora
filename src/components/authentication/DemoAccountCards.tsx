@@ -64,7 +64,6 @@ export default function DemoAccountCards() {
 
   return (
     <div className="mt-10">
-      {/* Section label */}
       <div className="mb-4 flex items-center gap-3">
         <span className="h-px flex-1 bg-black/10" />
         <span className="text-xs font-medium tracking-widest text-black/40 uppercase">
@@ -73,7 +72,6 @@ export default function DemoAccountCards() {
         <span className="h-px flex-1 bg-black/10" />
       </div>
 
-      {/* 3 role cards stacked vertically to match the narrow single-column layout */}
       <div className="flex flex-col gap-3">
         {DEMO_ACCOUNTS.map(({ role, email, password }) => {
           const isLoading = loadingRole === role;
@@ -86,17 +84,13 @@ export default function DemoAccountCards() {
               className="group flex w-full items-center justify-between rounded-2xl bg-white px-5 py-4 text-left transition-colors duration-200 hover:bg-[#E6FB2D] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <div className="flex flex-col gap-0.5">
-                {/* Role name */}
                 <span className="text-sm font-semibold text-black">{role}</span>
-                {/* Email */}
                 <span className="text-xs text-black/50">{email}</span>
-                {/* Password — shown as bullet dots */}
                 <span className="mt-0.5 text-xs tracking-widest text-black/30">
                   {"•".repeat(password.length)}
                 </span>
               </div>
 
-              {/* Arrow or spinner */}
               <span className="ml-4 flex size-8 shrink-0 items-center justify-center rounded-full bg-black/5 transition-colors duration-200 group-hover:bg-[#2C2C2C]">
                 {isLoading ? (
                   <svg

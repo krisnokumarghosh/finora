@@ -1,17 +1,13 @@
 export default function Loading() {
   return (
     <div className="space-y-6 animate-pulse">
-      {/* ── Page Header ── */}
       <div>
         <div className="h-9 w-60 rounded-2xl bg-black/10 sm:h-10 sm:w-72" />
         <div className="mt-2 h-4 w-72 rounded-xl bg-black/5 sm:w-96" />
       </div>
 
-      {/* ── 2-Column Deposit/Withdrawal Layout ── */}
       <div className="grid gap-6 lg:grid-cols-12">
-        {/* Left Column: Request Type Toggle & Active Card */}
         <div className="space-y-6 lg:col-span-5">
-          {/* Request Type Selector */}
           <div className="rounded-3xl bg-white p-6 shadow-sm">
             <div className="h-5 w-40 rounded-xl bg-black/10" />
             <div className="mt-4 grid grid-cols-2 gap-3">
@@ -20,7 +16,6 @@ export default function Loading() {
             </div>
           </div>
 
-          {/* Active Card Preview */}
           <div className="rounded-3xl bg-[#2C2C2C] p-6 text-white shadow-md space-y-5">
             <div className="flex justify-between">
               <div className="space-y-1">
@@ -37,7 +32,6 @@ export default function Loading() {
           </div>
         </div>
 
-        {/* Right Column: Request Form */}
         <div className="lg:col-span-7">
           <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-sm space-y-5">
             <div className="border-b border-black/5 pb-4">

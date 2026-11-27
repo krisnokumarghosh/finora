@@ -78,7 +78,6 @@ export default function AdminCustomerTransactionsModal({
         onMouseDown={(event) => event.stopPropagation()}
         className="flex max-h-[92vh] w-full max-w-3xl flex-col rounded-3xl bg-white shadow-2xl"
       >
-        {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-black/5 p-5 sm:p-6">
           <div className="flex items-center gap-3">
             <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#2C2C2C] text-xs font-bold text-white">
@@ -126,7 +125,6 @@ export default function AdminCustomerTransactionsModal({
           </div>
         </div>
 
-        {/* Filter bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/5 bg-[#F9F9F7] px-5 py-3 sm:px-6">
           <div className="flex flex-wrap items-center gap-1.5 text-xs font-medium">
             <span className="mr-1 text-[11px] font-bold uppercase tracking-wider text-black/40">
@@ -162,7 +160,6 @@ export default function AdminCustomerTransactionsModal({
           </span>
         </div>
 
-        {/* Transactions list */}
         <div className="flex-1 overflow-y-auto p-5 sm:p-6">
           {isLoading ? (
             <div className="space-y-3">
@@ -276,7 +273,6 @@ export default function AdminCustomerTransactionsModal({
           )}
         </div>
 
-        {/* Modal Footer */}
         <div className="flex items-center justify-end border-t border-black/5 p-4 sm:px-6">
           <button
             type="button"

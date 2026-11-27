@@ -53,7 +53,6 @@ export async function GET(req: Request) {
 
   const sortOrder = { createdAt: -1 as const };
 
-  // Internal notes and forwarding metadata belong to bank staff only.
   const customerProjection = {
     internalNotes: 0,
     forwardedAt: 0,
@@ -179,12 +178,10 @@ export async function POST(req: Request) {
   const body = (await req.json()) as Record<string, unknown>;
   const { accountId, type, amount, termMonths, purpose, pin } = body;
 
-  // 1. Validate Account ID
   if (typeof accountId !== "string" || !ObjectId.isValid(accountId)) {
     return bad("Please select a valid bank account for this loan application.");
   }
 
-  // 2. Find and verify Account ownership
   const account = await db.collection("bankacc").findOne({
     _id: new ObjectId(accountId),
     userId: user.id,
@@ -197,37 +194,31 @@ export async function POST(req: Request) {
     );
   }
 
-  // 3. Verify Account Status: Must be active
   if (account.status !== "active") {
     return bad(
       `Loan applications are only permitted on active bank accounts. Your selected account is currently "${account.status}".`
     );
   }
 
-  // 4. Validate PIN
   if (typeof pin !== "string" || !/^\d{4}$/.test(pin)) {
     return bad("Bank account PIN must be 4 digits.");
   }
 
-  // 5. Verify PIN specifically against the selected account
   const isPinValid = verifyPin(pin, account.pinHash);
   if (!isPinValid) {
     return bad(`Invalid PIN for account ${account.accountNumber}.`);
   }
 
-  // 6. Validate Loan Type
   const validTypes = ["home", "car", "education", "personal", "business"];
   if (typeof type !== "string" || !validTypes.includes(type)) {
     return bad("Please select a valid loan category.");
   }
 
-  // 7. Validate Amount
   const parsedAmount = Number(amount);
   if (isNaN(parsedAmount) || parsedAmount <= 0) {
     return bad("Loan amount must be greater than 0.");
   }
 
-  // 8. Validate Term
   const parsedTerm = Number(termMonths) || 12;
   if (parsedTerm < 1 || parsedTerm > 360) {
     return bad("Loan repayment term must be between 1 and 360 months.");
@@ -258,7 +249,7 @@ export async function POST(req: Request) {
     amount: Math.round(parsedAmount * 100) / 100,
     termMonths: parsedTerm,
     purpose: cleanPurpose,
-    status: "pending", // Initially Pending
+    status: "pending",
     dueDate: dueDate.toLocaleDateString("en-US", {
       day: "2-digit",
       month: "short",
@@ -298,7 +289,6 @@ export async function DELETE(req: Request) {
       if (typeof body.id === "string") id = body.id;
       else if (typeof body.loanId === "string") id = body.loanId;
     } catch {
-      // Body not provided or invalid JSON
     }
   }
 
@@ -306,7 +296,6 @@ export async function DELETE(req: Request) {
     return bad("Loan ID is required for deletion.", 400);
   }
 
-  // Find loan belonging to this user
   const filter: Record<string, unknown> = { userId: user.id };
   if (ObjectId.isValid(id)) {
     filter.$or = [{ _id: new ObjectId(id) }, { loanId: id }];

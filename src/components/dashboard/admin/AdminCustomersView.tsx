@@ -99,9 +99,7 @@ export default function AdminCustomersView() {
         }
       />
 
-      {/* ── Search & Filter card ── */}
       <div className="space-y-4 rounded-3xl bg-white p-5 shadow-sm sm:p-6">
-        {/* Search input */}
         <div className="relative w-full">
           <Search
             size={18}
@@ -130,7 +128,6 @@ export default function AdminCustomersView() {
           )}
         </div>
 
-        {/* Status filter buttons */}
         <div className="flex flex-col gap-3 border-t border-black/5 pt-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-black/40">
@@ -195,7 +192,6 @@ export default function AdminCustomersView() {
         </div>
       </div>
 
-      {/* ── Customer list card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-4 flex items-center justify-between border-b border-black/5 pb-3">
           <div className="flex items-center gap-2">
@@ -258,7 +254,6 @@ export default function AdminCustomersView() {
           </div>
         ) : (
           <div>
-            {/* Desktop table */}
             <div className="hidden overflow-x-auto lg:block">
               <table className="w-full text-left">
                 <thead>
@@ -349,7 +344,6 @@ export default function AdminCustomersView() {
                             className="flex items-center justify-end gap-2"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            {/* Transaction Button */}
                             <button
                               type="button"
                               onClick={() => setTxCustomer(customer)}
@@ -360,7 +354,6 @@ export default function AdminCustomersView() {
                               Transaction
                             </button>
 
-                            {/* View Button */}
                             <button
                               type="button"
                               onClick={() => setSelectedCustomer(customer)}
@@ -379,7 +372,6 @@ export default function AdminCustomersView() {
               </table>
             </div>
 
-            {/* Mobile cards */}
             <div className="space-y-3 lg:hidden">
               {customers.map((customer) => {
                 const joined = formatDateTime(customer.createdAt);
@@ -475,7 +467,6 @@ export default function AdminCustomersView() {
           </div>
         )}
 
-        {/* Load more */}
         <div className="mt-8 flex flex-col items-center justify-center border-t border-black/5 pt-6 text-center">
           {hasMore ? (
             <div className="flex flex-col items-center gap-2">
@@ -506,7 +497,6 @@ export default function AdminCustomersView() {
         </div>
       </div>
 
-      {/* ── Modals ── */}
       <AdminCustomerDetailModal
         key={selectedCustomer?.id ?? "no-customer"}
         customer={selectedCustomer}

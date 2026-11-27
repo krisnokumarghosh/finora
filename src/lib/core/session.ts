@@ -5,7 +5,7 @@ import { auth } from "../auth";
 import { ensureDbConnected } from "../db/mongodb";
 
 export const getUserSession = async () => {
-  const h = await headers(); // try er baire
+  const h = await headers();
 
   try {
     await ensureDbConnected();

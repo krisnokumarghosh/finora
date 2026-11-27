@@ -7,7 +7,6 @@ import { db } from "@/lib/db/mongodb";
 const bad = (message: string, status = 400) =>
   NextResponse.json({ error: message }, { status });
 
-// GET: Fetch fund requests for the logged-in customer
 export async function GET(req: Request) {
   const user = await getUserSession();
   if (!user) {
@@ -40,24 +39,19 @@ export async function GET(req: Request) {
   return NextResponse.json(requests);
 }
 
-// POST: Create a new deposit or withdrawal request
 export async function POST(req: Request) {
-  // 1. Session verification
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 2. Request payload parsing
   const body = (await req.json()) as Record<string, unknown>;
   const { accountNumber, amount, type, description, pin } = body;
 
-  // Validate type
   if (type !== "deposit" && type !== "withdrawal") {
     return bad("Request type must be either 'Deposit' or 'Withdrawal'.");
   }
 
-  // Validate account number (12 digits)
   if (
     typeof accountNumber !== "string" ||
     !/^\d{12}$/.test(accountNumber.trim())
@@ -66,7 +60,6 @@ export async function POST(req: Request) {
   }
   const cleanAccountNumber = accountNumber.trim();
 
-  // Validate amount
   const parsedAmount = Number(amount);
   if (
     typeof amount !== "number" &&
@@ -79,14 +72,11 @@ export async function POST(req: Request) {
     return bad("Amount must be greater than 0.");
   }
 
-  // Round to 2 decimal places to prevent floating point issues
   const validAmount = Math.round(parsedAmount * 100) / 100;
 
-  // Request date is automatically generated on the server
   const now = new Date();
   const cleanRequestDate = now.toISOString().split("T")[0];
 
-  // Validate description
   const cleanDescription =
     typeof description === "string" && description.trim().length > 0
       ? description.trim().slice(0, 250)
@@ -94,12 +84,10 @@ export async function POST(req: Request) {
       ? "Deposit Request"
       : "Withdrawal Request";
 
-  // Validate PIN (4 digits)
   if (typeof pin !== "string" || !/^\d{4}$/.test(pin)) {
     return bad("Transaction PIN must be 4 digits.");
   }
 
-  // 3. Find bank account by account number AND user ID (Ensures ownership)
   const bankAccount = await db.collection("bankacc").findOne({
     accountNumber: cleanAccountNumber,
     userId: user.id,
@@ -112,20 +100,17 @@ export async function POST(req: Request) {
     );
   }
 
-  // 4. Validate account status: Transactions only work on ACTIVE accounts
   if (bankAccount.status !== "active") {
     return bad(
       `Transactions are only allowed on active bank accounts. Your account (${cleanAccountNumber}) is currently "${bankAccount.status}".`
     );
   }
 
-  // 5. Verify Bank Account PIN: Checked specifically against the account given in the account number field
   const isPinValid = verifyPin(pin, bankAccount.pinHash);
   if (!isPinValid) {
     return bad(`Invalid bank account PIN for account ${cleanAccountNumber}.`);
   }
 
-  // 6. For withdrawal, check available balance
   if (type === "withdrawal" && bankAccount.balance < validAmount) {
     return bad(
       `Insufficient balance. Available balance in this account is ৳${bankAccount.balance.toLocaleString(
@@ -135,12 +120,10 @@ export async function POST(req: Request) {
     );
   }
 
-  // 7. Generate unique request ID
   const timestamp = Date.now().toString(36).toUpperCase();
   const randomSuffix = randomInt(1000, 9999);
   const requestId = `REQ${timestamp}${randomSuffix}`;
 
-  // 8. Construct new fund request (Initially "pending")
   const doc = {
     requestId,
     userId: user.id,
@@ -151,7 +134,7 @@ export async function POST(req: Request) {
     amount: validAmount,
     requestDate: cleanRequestDate,
     description: cleanDescription,
-    status: "pending", // Initially Pending
+    status: "pending",
     createdAt: now,
     updatedAt: now,
   };

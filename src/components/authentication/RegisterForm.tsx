@@ -54,7 +54,6 @@ export default function RegisterForm() {
 
       successToast("Your account has been created successfully.");
       setIsRedirecting(true);
-      // notun account shobshomoy customer role e toiri hoy
       router.replace("/dashboard/customer/status");
     } catch (err) {
       console.error("Registration error:", err);

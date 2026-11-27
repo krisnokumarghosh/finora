@@ -8,8 +8,8 @@ import { Logo } from "@/lib/utils/Logo";
 import {
   AccountsIcon,
   FeaturesIcon,
-  PricingIcon,
   SecurityIcon,
+  TestimonialsIcon,
 } from "@/lib/utils/NavIcons";
 import { authClient } from "@/lib/auth-client";
 
@@ -17,7 +17,7 @@ const NAV_ITEMS = [
   { label: "Home", href: "#home", Icon: FeaturesIcon },
   { label: "Features", href: "#features", Icon: AccountsIcon },
   { label: "Security", href: "#security", Icon: SecurityIcon },
-  { label: "Pricing", href: "#pricing", Icon: PricingIcon },
+  { label: "Testimonials", href: "#testimonials", Icon: TestimonialsIcon },
 ] as const;
 
 const DASHBOARD_BY_ROLE: Record<string, string> = {
@@ -26,7 +26,6 @@ const DASHBOARD_BY_ROLE: Record<string, string> = {
   "bank-staff": "/dashboard/bank-staff/operations",
 };
 
-/** Highlights the link whose section is currently in view. */
 function useActiveSection(ids: string[]) {
   const [active, setActive] = useState<string | null>(null);
 
@@ -52,7 +51,6 @@ function useActiveSection(ids: string[]) {
   return active;
 }
 
-/** Hides the bar while scrolling down, shows it again on scroll up. */
 function useHideOnScroll(threshold = 8, topOffset = 64) {
   const [hidden, setHidden] = useState(false);
 
@@ -63,10 +61,10 @@ function useHideOnScroll(threshold = 8, topOffset = 64) {
     const update = () => {
       const y = window.scrollY;
       if (y < topOffset) {
-        setHidden(false); // always visible near the top
+        setHidden(false);
         lastY = y;
       } else if (Math.abs(y - lastY) > threshold) {
-        setHidden(y > lastY); // down = hide, up = show
+        setHidden(y > lastY);
         lastY = y;
       }
       ticking = false;
@@ -96,10 +94,8 @@ export default function Navbar() {
   const { hidden, show } = useHideOnScroll();
   const { data: session, isPending } = authClient.useSession();
 
-  // Navigation cholar shomoy true thake, shesh hole nijei false hoy
   const [isNavigating, startTransition] = useTransition();
 
-  // Mark a tapped item as selected right away; scroll-spy takes over once it arrives.
   const [pending, setPending] = useState<string | null>(null);
   useEffect(() => {
     if (!pending) return;
@@ -118,7 +114,6 @@ export default function Navbar() {
     });
   };
 
-  // Session load howar shomoy same size er placeholder, jate button ta lafay na
   const cta = isPending ? (
     <div className="flex h-11 min-w-33 items-center justify-center rounded-full bg-[#2C2C2C]">
       <span className="h-2.5 w-16 animate-pulse rounded-full bg-white/30" />
@@ -140,7 +135,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top bar */}
       <header
         onFocusCapture={show}
         className={`sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
@@ -156,7 +150,6 @@ export default function Navbar() {
           </Link>
 
           <div className="flex items-center gap-8">
-            {/* Desktop links */}
             <ul className="hidden items-center gap-1 md:flex">
               {NAV_ITEMS.map((item) => {
                 const isActive = active === item.href.slice(1);
@@ -183,7 +176,6 @@ export default function Navbar() {
         </nav>
       </header>
 
-      {/* Mobile glass dock */}
       <nav
         aria-label="Sections"
         className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden"

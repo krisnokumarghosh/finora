@@ -3,7 +3,6 @@ import { getUserSession } from "@/lib/core/session";
 import StaffOperationsView from "@/components/dashboard/staff/StaffOperationsView";
 
 export default async function BankStaffOperationsPage() {
-  // Server-side protection: only Bank Staff and Admin can use customer operations.
   const user = await getUserSession();
   if (!user) redirect("/login");
 

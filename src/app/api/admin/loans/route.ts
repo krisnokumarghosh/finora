@@ -39,7 +39,6 @@ const isLoanType = (value: unknown): value is LoanType =>
 const isLoanStatus = (value: unknown): value is LoanStatus =>
   typeof value === "string" && LOAN_STATUSES.includes(value as LoanStatus);
 
-// Escape user input before using it inside a MongoDB regex.
 const escapeRegex = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -134,7 +133,6 @@ const formatDueDate = (value: unknown) => {
 
 let loanIndexPromise: Promise<unknown> | null = null;
 
-// Create search/filter indexes once per server process.
 const ensureLoanIndexes = () => {
   if (!loanIndexPromise) {
     loanIndexPromise = Promise.all([
@@ -193,8 +191,6 @@ const mapRepayment = (
   };
 };
 
-// Load customer, account, and repayment details for a set of loans, then map
-// each loan document into the shape used by the admin UI.
 const mapAdminLoans = async (rows: LoanDoc[]): Promise<AdminLoan[]> => {
   if (rows.length === 0) return [];
 
@@ -406,7 +402,6 @@ export async function GET(req: Request) {
     query.status = statusParam;
   }
 
-  // Search is limited to the bank account number, matching the staff loan page.
   if (searchParam) {
     const cleanSearch = searchParam.replace(/\s+/g, "");
     query.accountNumber = new RegExp(escapeRegex(cleanSearch), "i");
@@ -756,7 +751,6 @@ export async function PATCH(req: Request) {
     });
   }
 
-  // Reject loan application
   const cleanReason = rawReason.slice(0, 300);
   const rejectionNote: LoanNoteDoc = {
     id: randomUUID(),

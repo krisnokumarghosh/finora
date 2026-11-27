@@ -16,7 +16,6 @@ import { setSelectedAccount } from "@/lib/redux/slices/accountSlice";
 import CreateAccountForm from "@/components/dashboard/customer/CreateAccountForm";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Helpers ─── */
 const formatBDT = (amount: number) =>
   `৳${amount.toLocaleString("en-BD", {
     minimumFractionDigits: 2,
@@ -26,7 +25,6 @@ const formatBDT = (amount: number) =>
 const formatAccNo = (no: string) =>
   no.replace(/(\d{4})/g, "$1 ").trim();
 
-/* ─── Account Card ─── */
 function AccountCard({
   account,
   onSelect,
@@ -52,7 +50,6 @@ function AccountCard({
       onClick={onSelect}
       className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-[#2C2C2C] p-6 text-white shadow-md transition-all duration-200 hover:shadow-xl sm:p-7"
     >
-      {/* Top row: Type, Contactless Icon, Status */}
       <div>
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -86,10 +83,8 @@ function AccountCard({
           </span>
         </div>
 
-        {/* Card Chip & Contactless Visual */}
 
 
-        {/* Account Number with Copy Button */}
         <div className="mt-5 flex items-center justify-between">
           <p className="font-mono text-base tracking-widest text-white/80 sm:text-lg">
             {formatAccNo(account.accountNumber)}
@@ -108,7 +103,6 @@ function AccountCard({
           </button>
         </div>
 
-        {/* Balance Section */}
         <div className="mt-6 border-t border-white/10 pt-4">
           <p className="text-xs font-medium uppercase tracking-wider text-white/50">
             Available Balance
@@ -119,7 +113,6 @@ function AccountCard({
         </div>
       </div>
 
-      {/* Card Footer: Holder Name, Limit & Quick Action */}
       <div className="mt-6 border-t border-white/10 pt-4">
         <div className="flex items-center justify-between text-xs text-white/60">
           <span className="truncate max-w-37.5 font-medium text-white/80">
@@ -131,7 +124,6 @@ function AccountCard({
           </span>
         </div>
 
-        {/* Quick Action Button */}
         <div className="mt-4 pt-1">
           <button
             type="button"
@@ -151,7 +143,6 @@ function AccountCard({
   );
 }
 
-/* ─── Add Account Placeholder Card ─── */
 function AddAccountCard({ onOpen }: { onOpen: () => void }) {
   return (
     <button
@@ -179,7 +170,6 @@ interface AccountsViewProps {
   children?: ReactNode;
 }
 
-/* ─── Accounts View Main Component ─── */
 export default function AccountsView({ children }: AccountsViewProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -192,7 +182,6 @@ export default function AccountsView({ children }: AccountsViewProps) {
     refetch,
   } = useGetAccountsQuery();
 
-  // Metrics summary
 
 
 
@@ -226,10 +215,8 @@ export default function AccountsView({ children }: AccountsViewProps) {
 
 
 
-      {/* Create Account Form Modal/Inline */}
       {showForm && <CreateAccountForm onClose={() => setShowForm(false)} />}
 
-      {/* Loading Skeletons */}
       {isLoading && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((n) => (
@@ -241,7 +228,6 @@ export default function AccountsView({ children }: AccountsViewProps) {
         </div>
       )}
 
-      {/* Error state */}
       {isError && (
         <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center">
           <p className="text-sm font-medium text-red-600">
@@ -256,7 +242,6 @@ export default function AccountsView({ children }: AccountsViewProps) {
         </div>
       )}
 
-      {/* Empty state */}
       {!isLoading && !isError && accounts.length === 0 && !showForm && (
         <div className="rounded-3xl border border-dashed border-black/15 bg-white/60 px-6 py-16 text-center">
           <h2 className="text-lg font-semibold text-black">
@@ -275,7 +260,6 @@ export default function AccountsView({ children }: AccountsViewProps) {
         </div>
       )}
 
-      {/* Account Cards Grid */}
       {accounts.length > 0 && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {accounts.map((a) => (
@@ -287,7 +271,6 @@ export default function AccountsView({ children }: AccountsViewProps) {
             />
           ))}
 
-          {/* Add Account Card placeholder to fill up the grid on desktop */}
           {accounts.length < 3 && !showForm && (
             <AddAccountCard onOpen={() => setShowForm(true)} />
           )}

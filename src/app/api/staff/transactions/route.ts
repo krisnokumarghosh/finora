@@ -8,12 +8,9 @@ type SessionRole = { role?: string | null };
 
 type DateRange = { $gte?: Date; $lt?: Date };
 
-// Escape user input before using it inside a MongoDB regex.
 const escapeRegex = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-// Convert YYYY-MM-DD strings into an inclusive date range based on the
-// server's local calendar day, matching the dates shown in the UI.
 const parseDate = (value: string, addDays = 0) => {
   const parts = value.split("-").map(Number);
   if (parts.length !== 3 || parts.some((part) => Number.isNaN(part))) {
@@ -33,7 +30,6 @@ const parseDateRange = (dateFrom: string, dateTo: string): DateRange | null => {
   }
 
   if (dateTo) {
-    // The range end is exclusive, so include the whole "to" day.
     const to = parseDate(dateTo, 1);
     if (to) range.$lt = to;
   }
@@ -51,8 +47,6 @@ const toIsoString = (value: unknown) => {
 
 let flagIndexPromise: Promise<string> | null = null;
 
-// Create the unique flag index once. A unique index prevents duplicate flags
-// for the same transaction, even if two staff members click at the same time.
 const ensureFlagIndex = () => {
   if (!flagIndexPromise) {
     flagIndexPromise = db
@@ -63,7 +57,6 @@ const ensureFlagIndex = () => {
 };
 
 export async function GET(req: Request) {
-  // 1. Authenticate and authorize: only Bank Staff / Admin can view all users' transactions
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -82,7 +75,6 @@ export async function GET(req: Request) {
     );
   }
 
-  // 2. Parse query parameters
   const { searchParams } = new URL(req.url);
 
   const limitParam = Number(searchParams.get("limit")) || 15;
@@ -101,8 +93,6 @@ export async function GET(req: Request) {
     ? new RegExp(escapeRegex(searchParam), "i")
     : null;
 
-  // 3. Build database filters.
-  // Transfers live in "transactions", deposit/withdrawal requests in "fund_requests".
   const includeTransfers = typeParam === "all" || typeParam === "transfer";
   const includeRequests =
     typeParam === "all" ||
@@ -139,7 +129,6 @@ export async function GET(req: Request) {
       : Promise.resolve([]),
   ]);
 
-  // 4. Load account information for the accounts referenced by these rows.
   const accountNumbers = new Set<string>();
   for (const tx of txRows) {
     if (tx.accountNumber) accountNumbers.add(tx.accountNumber);
@@ -172,10 +161,6 @@ export async function GET(req: Request) {
     });
   }
 
-  // 5. Map transfer records.
-  // Every transfer is stored twice (debit + credit, same transaction ID).
-  // For the staff ledger, show each transfer once, preferring the sender row
-  // so the counterpart column shows who received the money.
   const uniqueTransferRows = new Map<string, (typeof txRows)[number]>();
   for (const tx of txRows) {
     const key = tx.transactionId || tx._id.toString();
@@ -221,7 +206,6 @@ export async function GET(req: Request) {
     };
   });
 
-  // 6. Map deposit / withdrawal requests
   const mappedRequests = reqRows.map((req) => {
     const accInfo = accountInfoMap.get(req.accountNumber);
     const isDeposit = req.type === "deposit";
@@ -252,7 +236,6 @@ export async function GET(req: Request) {
     };
   });
 
-  // 7. Attach existing suspicious-transaction flags
   const transactionIds = [...mappedTransfers, ...mappedRequests].map(
     (tx) => tx.transactionId
   );
@@ -281,14 +264,12 @@ export async function GET(req: Request) {
     flag: flagMap.get(tx.transactionId) ?? null,
   }));
 
-  // 8. Filter by flag status (flags are stored separately, so filter after mapping)
   if (flaggedParam === "flagged") {
     combined = combined.filter((tx) => tx.flag !== null);
   } else if (flaggedParam === "unflagged") {
     combined = combined.filter((tx) => tx.flag === null);
   }
 
-  // 9. Sort newest first and paginate
   combined.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
@@ -306,7 +287,6 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  // 1. Authenticate and authorize
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -325,7 +305,6 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // 2. Validate request body
   const body = (await req.json()) as Record<string, unknown>;
   const transactionId =
     typeof body.transactionId === "string" ? body.transactionId.trim() : "";
@@ -346,7 +325,6 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // 3. Removing a flag is safe to do even if the record was deleted.
   if (action === "unflag") {
     await db.collection("transaction_flags").deleteOne({ transactionId });
     return NextResponse.json({
@@ -356,7 +334,6 @@ export async function PATCH(req: Request) {
     });
   }
 
-  // 4. Make sure the transaction really exists before flagging it
   const exists =
     (await db.collection("transactions").findOne({ transactionId })) ||
     (await db.collection("fund_requests").findOne({ requestId: transactionId }));
@@ -368,7 +345,6 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // 5. Create or update a flag for admin review
   if (reason.length < 3) {
     return NextResponse.json(
       { error: "Please provide a reason of at least 3 characters." },
@@ -392,7 +368,6 @@ export async function PATCH(req: Request) {
         flaggedBy: user.id,
         flaggedByName: user.name || "Bank Staff",
         updatedAt: now,
-        // Keep the flag date accurate when a flag is updated.
         createdAt: now,
       },
     },

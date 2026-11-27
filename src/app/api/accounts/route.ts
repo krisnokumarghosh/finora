@@ -16,7 +16,6 @@ export async function GET() {
     console.error("Failed to process due loan repayments:", err);
   });
 
-  // pinHash ar nid kokhono frontend-e pathabo na
   const rows = await db
     .collection("bankacc")
     .find({ userId: user.id }, { projection: { pinHash: 0, nid: 0 } })
@@ -47,7 +46,6 @@ export async function POST(req: Request) {
   }
   if (typeof pin !== "string" || !/^\d{4}$/.test(pin)) return bad("PIN must be 4 digits");
 
-  // Max 3 accounts per user
   const userAccountCount = await db
     .collection("bankacc")
     .countDocuments({ userId: user.id });
@@ -55,7 +53,6 @@ export async function POST(req: Request) {
     return bad("You can open a maximum of 3 bank accounts.");
   }
 
-  // NID can only be used for 3 accounts across all users
   const nidCount = await db
     .collection("bankacc")
     .countDocuments({ nid });
@@ -63,7 +60,6 @@ export async function POST(req: Request) {
     return bad("This NID has already been used for the maximum number of accounts.");
   }
 
-  // Mobile can only be used for 3 accounts across all users
   const mobileCount = await db
     .collection("bankacc")
     .countDocuments({ mobile });
@@ -78,7 +74,7 @@ export async function POST(req: Request) {
     mobile,
     nid,
     pinHash: hashPin(pin),
-    accountNumber: String(randomInt(1e11, 1e12)), // 12 digit
+    accountNumber: String(randomInt(1e11, 1e12)),
     balance: 0,
     status: "pending",
     transactionLimit: 100000,

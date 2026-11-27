@@ -99,7 +99,6 @@ export default function AdminCustomerDetailModal({
     }
   };
 
-  /* ── User Status Management ── */
   const handleSetUserStatus = async (
     newStatus: UserStatus,
     reason?: string
@@ -120,7 +119,6 @@ export default function AdminCustomerDetailModal({
     }
   };
 
-  /* ── Bank Account Status Management ── */
   const handleSetAccountStatus = async (
     accountId: string,
     newStatus: AccountStatus,
@@ -135,7 +133,6 @@ export default function AdminCustomerDetailModal({
       }).unwrap();
 
       successToast(res.message);
-      // Update local account in state
       setCurrent((prev) => {
         if (!prev) return prev;
         return {
@@ -152,7 +149,6 @@ export default function AdminCustomerDetailModal({
     }
   };
 
-  /* ── Verification Toggle ── */
   const toggleVerification = async () => {
     const action = current.verified ? "unverify" : "verify";
     try {
@@ -191,7 +187,6 @@ export default function AdminCustomerDetailModal({
         onMouseDown={(event) => event.stopPropagation()}
         className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl sm:p-7"
       >
-        {/* Header */}
         <div className="flex items-start justify-between border-b border-black/5 pb-4">
           <div className="flex items-center gap-3">
             <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#2C2C2C] text-sm font-bold text-white">
@@ -205,7 +200,6 @@ export default function AdminCustomerDetailModal({
                 >
                   {current.name}
                 </h2>
-                {/* User status badge */}
                 <span
                   className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                     current.status === "active"
@@ -242,7 +236,6 @@ export default function AdminCustomerDetailModal({
         </div>
 
         <div className="mt-4 space-y-4">
-          {/* User ID Card */}
           <div className="rounded-2xl bg-[#F9F9F7] p-4">
             <p className="text-[11px] font-bold uppercase tracking-wider text-black/40">
               User ID
@@ -266,7 +259,6 @@ export default function AdminCustomerDetailModal({
             </div>
           </div>
 
-          {/* Quick Metrics */}
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-black/5 p-3.5">
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/40">
@@ -300,7 +292,6 @@ export default function AdminCustomerDetailModal({
             </div>
           </div>
 
-          {/* ── User Status & Suspicious Account Controls ── */}
           <div
             className={`rounded-2xl border p-4 ${
               current.status === "blocked"
@@ -339,7 +330,6 @@ export default function AdminCustomerDetailModal({
                 </p>
               </div>
 
-              {/* Status Action Buttons */}
               <div className="flex flex-wrap items-center gap-2">
                 {current.status === "active" ? (
                   <>
@@ -397,7 +387,6 @@ export default function AdminCustomerDetailModal({
               </div>
             </div>
 
-            {/* Block Suspicious Confirm Dialog */}
             {showBlockConfirm && (
               <div className="mt-4 rounded-xl border border-red-200 bg-white p-4">
                 <div className="flex items-start gap-2.5">
@@ -451,7 +440,6 @@ export default function AdminCustomerDetailModal({
             )}
           </div>
 
-          {/* Verification Card */}
           <div
             className={`rounded-2xl border p-4 ${
               current.verified
@@ -516,7 +504,6 @@ export default function AdminCustomerDetailModal({
             </div>
           </div>
 
-          {/* ── Bank Accounts with Activate/Deactivate/Block Controls ── */}
           <div>
             <div className="mb-2.5 flex items-center justify-between">
               <h3 className="text-sm font-bold text-black">
@@ -565,7 +552,6 @@ export default function AdminCustomerDetailModal({
                       <div className="flex flex-wrap items-center justify-between gap-2.5 sm:justify-end">
                         <AccountStatusBadge status={account.status} />
 
-                        {/* Account status action buttons */}
                         <div className="flex items-center gap-1.5">
                           {account.status === "active" ? (
                             <button
@@ -623,7 +609,6 @@ export default function AdminCustomerDetailModal({
           </div>
         </div>
 
-        {/* Modal Footer */}
         <div className="mt-6 flex flex-col-reverse gap-3 border-t border-black/5 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"

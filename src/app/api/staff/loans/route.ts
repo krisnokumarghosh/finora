@@ -32,7 +32,6 @@ const isLoanType = (value: unknown): value is LoanType =>
 const isLoanStatus = (value: unknown): value is LoanStatus =>
   typeof value === "string" && LOAN_STATUSES.includes(value as LoanStatus);
 
-// Escape user input before using it inside a MongoDB regex.
 const escapeRegex = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -101,7 +100,6 @@ const formatDueDate = (value: unknown) => {
 
 let loanIndexPromise: Promise<unknown> | null = null;
 
-// Create search/filter indexes once per server process.
 const ensureLoanIndexes = () => {
   if (!loanIndexPromise) {
     loanIndexPromise = Promise.all([
@@ -120,8 +118,6 @@ const mapNote = (note: LoanNoteDoc): LoanInternalNote => ({
   createdAt: toIsoString(note.createdAt),
 });
 
-// Load the customer and account details for a set of loans, then map each
-// loan document into the shape used by the staff UI.
 const mapLoans = async (rows: LoanDoc[]): Promise<StaffLoan[]> => {
   if (rows.length === 0) return [];
 
@@ -244,7 +240,6 @@ const mapLoans = async (rows: LoanDoc[]): Promise<StaffLoan[]> => {
 };
 
 export async function GET(req: Request) {
-  // 1. Authenticate and authorize: only Bank Staff / Admin can review loans.
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -263,7 +258,6 @@ export async function GET(req: Request) {
     );
   }
 
-  // 2. Read and validate the query parameters.
   const { searchParams } = new URL(req.url);
   const limitParam = Number(searchParams.get("limit")) || 15;
   const offsetParam = Number(searchParams.get("offset")) || 0;
@@ -284,8 +278,6 @@ export async function GET(req: Request) {
     query.status = statusParam;
   }
 
-  // Search is limited to the bank account number, as required.
-  // Remove spaces so formatted numbers like "2026 1234 5678" also match.
   if (searchParam) {
     const cleanSearch = searchParam.replace(/\s+/g, "");
     query.accountNumber = new RegExp(escapeRegex(cleanSearch), "i");
@@ -295,7 +287,6 @@ export async function GET(req: Request) {
     console.error("Failed to create loan indexes:", error);
   });
 
-  // 3. Fetch the page and the total count in parallel.
   const [total, rows] = await Promise.all([
     db.collection("loans").countDocuments(query),
     db
@@ -319,7 +310,6 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  // 1. Authenticate and authorize.
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -338,7 +328,6 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // 2. Validate the request body.
   const body = (await req.json()) as Record<string, unknown>;
   const loanId = typeof body.loanId === "string" ? body.loanId.trim() : "";
   const action = body.action;
@@ -358,7 +347,6 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // 3. Find the loan by either its database ID or its loan code.
   const filter: Record<string, unknown> = ObjectId.isValid(loanId)
     ? { $or: [{ _id: new ObjectId(loanId) }, { loanId }] }
     : { loanId };
@@ -375,7 +363,6 @@ export async function PATCH(req: Request) {
   const now = new Date();
   const authorName = user.name || "Bank Staff";
 
-  // 4. Add an internal staff note.
   if (action === "note") {
     if (rawNote.length < 3) {
       return NextResponse.json(
@@ -409,7 +396,6 @@ export async function PATCH(req: Request) {
     });
   }
 
-  // 5. Forward the application to the admin approval queue.
   const currentStatus = isLoanStatus(existing.status)
     ? existing.status
     : "pending";
@@ -438,8 +424,6 @@ export async function PATCH(req: Request) {
     createdAt: now,
   };
 
-  // The status check is part of the update so two staff members cannot
-  // forward the same application at the same time.
   const result = await db.collection<LoanDoc>("loans").updateOne(
     { _id: existing._id, status: "pending" },
     {

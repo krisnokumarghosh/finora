@@ -28,14 +28,12 @@ import {
 import { successToast, errorToast } from "@/lib/utils/toasts";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Format Money Helper (BDT) ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 
-/* ─── Format Account Number Helper ─── */
 const formatAccNo = (no?: string) => {
   if (!no) return "—";
   return no.replace(/(\d{4})/g, "$1 ").trim();
@@ -75,7 +73,6 @@ const getTypeLabel = (tx: StaffTransaction) => {
 };
 
 export default function StaffTransactionsView() {
-  // Filters & search state
   const [transactionType, setTransactionType] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
@@ -85,7 +82,6 @@ export default function StaffTransactionsView() {
   const [currentLimit, setCurrentLimit] = useState(15);
   const searchInputId = useId();
 
-  // Review / flag modal state
   const [reviewTarget, setReviewTarget] = useState<StaffTransaction | null>(
     null
   );
@@ -98,7 +94,6 @@ export default function StaffTransactionsView() {
 
   const dateRangeInvalid = Boolean(dateFrom && dateTo && dateFrom > dateTo);
 
-  // Reset limit whenever a filter or search changes
   const handleTypeChange = (val: string) => {
     setTransactionType(val);
     setCurrentLimit(15);
@@ -139,7 +134,6 @@ export default function StaffTransactionsView() {
     setCurrentLimit(15);
   };
 
-  // RTK Query: fetch every customer's transactions with the active filters
   const { data, isLoading, isFetching, refetch } = useGetStaffTransactionsQuery(
     {
       limit: currentLimit,
@@ -157,7 +151,6 @@ export default function StaffTransactionsView() {
   const total = data?.total || 0;
   const hasMore = data?.hasMore || false;
 
-  // Close modal on Escape and lock page scroll while a modal is open
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
@@ -250,7 +243,6 @@ export default function StaffTransactionsView() {
     }
   };
 
-  // Status badge styling helper
   const renderStatusBadge = (status: StaffTransaction["status"]) => {
     switch (status) {
       case "approved":
@@ -294,7 +286,6 @@ export default function StaffTransactionsView() {
     );
   };
 
-  // Transaction type icon
   const renderTypeIcon = (tx: StaffTransaction) => {
     if (tx.status === "rejected") {
       return (
@@ -354,10 +345,8 @@ export default function StaffTransactionsView() {
         }
       />
 
-      {/* ── Filters & Search Bar Card ── */}
       <div className="rounded-2xl bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6">
         <div className="flex flex-col gap-4">
-          {/* Top row: Search by transaction ID */}
           <div className="relative w-full">
             <Search
               size={18}
@@ -386,7 +375,6 @@ export default function StaffTransactionsView() {
             )}
           </div>
 
-          {/* Middle row: Type & Status filters */}
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
@@ -450,7 +438,6 @@ export default function StaffTransactionsView() {
             </div>
           </div>
 
-          {/* Bottom row: Date range + flagged-only toggle */}
           <div className="grid gap-3 border-t border-black/5 pt-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto] lg:items-end">
             <div>
               <label
@@ -512,7 +499,6 @@ export default function StaffTransactionsView() {
           )}
         </div>
 
-        {/* Active Filters Display & Clear Action */}
         {hasActiveFilters && (
           <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 text-xs">
             <span className="text-black/50">Active filters:</span>
@@ -605,9 +591,7 @@ export default function StaffTransactionsView() {
         )}
       </div>
 
-      {/* ── Transactions List Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
-        {/* Results summary bar */}
         <div className="mb-4 flex items-center justify-between border-b border-black/5 pb-3">
           <div className="flex items-center gap-2">
             <Receipt size={18} className="text-black/50" />
@@ -652,7 +636,6 @@ export default function StaffTransactionsView() {
             ))}
           </div>
         ) : transactions.length === 0 ? (
-          /* Empty state */
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="flex size-14 items-center justify-center rounded-2xl bg-[#F3F3EE] text-black/40">
               <Filter size={24} />
@@ -676,7 +659,6 @@ export default function StaffTransactionsView() {
           </div>
         ) : (
           <div>
-            {/* Desktop table view */}
             <div className="hidden overflow-x-auto lg:block">
               <table className="w-full text-left">
                 <thead>
@@ -699,7 +681,6 @@ export default function StaffTransactionsView() {
                         key={`${tx.type}-${tx.id}`}
                         className="transition-colors hover:bg-black/2"
                       >
-                        {/* 1. Transaction ID & Date */}
                         <td className="py-4 pl-2">
                           <div className="flex items-center gap-3">
                             {renderTypeIcon(tx)}
@@ -714,7 +695,6 @@ export default function StaffTransactionsView() {
                           </div>
                         </td>
 
-                        {/* 2. Type & Description */}
                         <td className="py-4">
                           <div className="max-w-50">
                             <p className="truncate text-xs font-bold capitalize text-black">
@@ -726,7 +706,6 @@ export default function StaffTransactionsView() {
                           </div>
                         </td>
 
-                        {/* 3. Customer & Account */}
                         <td className="py-4">
                           <div>
                             <p className="max-w-40 truncate text-xs font-semibold text-black">
@@ -741,7 +720,6 @@ export default function StaffTransactionsView() {
                           </div>
                         </td>
 
-                        {/* 4. Counterpart */}
                         <td className="py-4">
                           {tx.counterpartAccountNumber ? (
                             <div>
@@ -757,7 +735,6 @@ export default function StaffTransactionsView() {
                           )}
                         </td>
 
-                        {/* 5. Status & Flag */}
                         <td className="py-4">
                           <div className="flex flex-col items-start gap-1.5">
                             {renderStatusBadge(tx.status)}
@@ -765,7 +742,6 @@ export default function StaffTransactionsView() {
                           </div>
                         </td>
 
-                        {/* 6. Amount */}
                         <td className="py-4 text-right">
                           <span
                             className={`text-sm font-bold ${
@@ -786,7 +762,6 @@ export default function StaffTransactionsView() {
                           )}
                         </td>
 
-                        {/* 7. Actions */}
                         <td className="py-4 pr-2">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
@@ -823,7 +798,6 @@ export default function StaffTransactionsView() {
               </table>
             </div>
 
-            {/* Mobile / tablet card view */}
             <div className="space-y-3 lg:hidden">
               {transactions.map((tx) => {
                 const when = formatDateTime(tx.createdAt);
@@ -923,7 +897,6 @@ export default function StaffTransactionsView() {
           </div>
         )}
 
-        {/* ── Load More Section ── */}
         <div className="mt-8 flex flex-col items-center justify-center border-t border-black/5 pt-6 text-center">
           {hasMore ? (
             <div className="flex flex-col items-center gap-2">
@@ -954,7 +927,6 @@ export default function StaffTransactionsView() {
         </div>
       </div>
 
-      {/* ── Transaction Review Modal ── */}
       {reviewTarget && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
@@ -1128,7 +1100,6 @@ export default function StaffTransactionsView() {
         </div>
       )}
 
-      {/* ── Flag Suspicious Transaction Modal ── */}
       {flagTarget && (
         <div
           className="fixed inset-0 z-60 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
@@ -1301,7 +1272,6 @@ export default function StaffTransactionsView() {
   );
 }
 
-/* ─── Small label/value row used inside the review modal ─── */
 function DetailRow({
   icon,
   label,

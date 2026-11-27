@@ -70,7 +70,6 @@ const bad = (message: string, status = 400) =>
 
 let indexPromise: Promise<unknown> | null = null;
 
-// Create the indexes used by the customer list and verification workflow.
 const ensureIndexes = () => {
   if (!indexPromise) {
     indexPromise = Promise.all([
@@ -98,7 +97,6 @@ const mapAccount = (doc: AccountDoc): StaffCustomerAccount => ({
 });
 
 export async function GET(req: Request) {
-  // 1. Authenticate and authorize: only Bank Staff / Admin can manage customers.
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -117,7 +115,6 @@ export async function GET(req: Request) {
     );
   }
 
-  // 2. Read and validate the query parameters.
   const { searchParams } = new URL(req.url);
   const limitParam = Number(searchParams.get("limit")) || 15;
   const offsetParam = Number(searchParams.get("offset")) || 0;
@@ -130,8 +127,6 @@ export async function GET(req: Request) {
     console.error("Failed to create customer operation indexes:", error);
   });
 
-  // 3. Customers are Better Auth users with the "customer" role.
-  // The search allows finding customers by name, email, or user ID.
   const query: Record<string, unknown> = { role: "customer" };
 
   if (searchParam) {
@@ -233,7 +228,6 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // 1. Authenticate and authorize: only Bank Staff / Admin can register customers.
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -252,7 +246,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // 2. Validate the customer details.
   const body = (await req.json()) as Record<string, unknown>;
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const email =
@@ -277,7 +270,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // 3. Give a clear message if the email is already registered.
   const existing = await db.collection("user").findOne({
     email: new RegExp(`^${escapeRegex(email)}$`, "i"),
   });
@@ -286,8 +278,6 @@ export async function POST(req: Request) {
     return bad("A user with this email already exists.", 409);
   }
 
-  // 4. Let Better Auth create the account so the password is hashed correctly.
-  // New sign-ups receive the default "customer" role.
   try {
     const created = await auth.api.signUpEmail({
       body: { name, email, password },
@@ -297,7 +287,6 @@ export async function POST(req: Request) {
       return bad("Could not register the customer. Please try again.", 500);
     }
 
-    // Keep the customer role explicit even if the auth defaults change later.
     if (ObjectId.isValid(created.user.id)) {
       await db
         .collection("user")
@@ -338,7 +327,6 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  // 1. Authenticate and authorize.
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -357,7 +345,6 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // 2. Validate the request body.
   const body = (await req.json()) as Record<string, unknown>;
   const userId = typeof body.userId === "string" ? body.userId.trim() : "";
   const action = body.action;
@@ -370,7 +357,6 @@ export async function PATCH(req: Request) {
     return bad("Action must be either 'verify' or 'unverify'.");
   }
 
-  // 3. Make sure the target user is a customer, not staff or admin.
   const customer = await db.collection("user").findOne({
     _id: new ObjectId(userId),
     role: "customer",
@@ -383,7 +369,6 @@ export async function PATCH(req: Request) {
   const now = new Date();
   const verifierName = user.name || "Bank Staff";
 
-  // 4. Store verification separately from Better Auth data.
   if (action === "verify") {
     await ensureIndexes().catch((error: unknown) => {
       console.error("Failed to create verification index:", error);

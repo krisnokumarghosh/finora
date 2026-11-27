@@ -76,18 +76,15 @@ export default function AdminAccountDetailModal({
     "status" | "details" | "limit" | null
   >(null);
 
-  // Status form
   const [statusValue, setStatusValue] = useState<AccountStatus>(
     account?.status ?? "pending"
   );
   const [statusReason, setStatusReason] = useState("");
 
-  // Account information form
   const [name, setName] = useState(account?.name ?? "");
   const [mobile, setMobile] = useState(account?.mobile ?? "");
   const [type, setType] = useState<AccountType>(account?.type ?? "savings");
 
-  // Transaction limit form
   const [limit, setLimit] = useState(
     String(account?.transactionLimit ?? 100000)
   );
@@ -233,7 +230,6 @@ export default function AdminAccountDetailModal({
         onMouseDown={(event) => event.stopPropagation()}
         className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl sm:p-7"
       >
-        {/* ── Header ── */}
         <div className="flex items-center justify-between border-b border-black/5 pb-4">
           <div className="flex items-center gap-2.5">
             <AccountTypeIcon type={current.type} />
@@ -261,7 +257,6 @@ export default function AdminAccountDetailModal({
         </div>
 
         <div className="mt-4 space-y-4">
-          {/* ── Summary ── */}
           <div className="rounded-2xl bg-[#F9F9F7] p-4">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[11px] font-bold uppercase tracking-wider text-black/40">
@@ -302,7 +297,6 @@ export default function AdminAccountDetailModal({
             </div>
           </div>
 
-          {/* ── Account information ── */}
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-black/5 p-3.5">
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/40">
@@ -367,7 +361,6 @@ export default function AdminAccountDetailModal({
             </div>
           )}
 
-          {/* ── Approval banner ── */}
           {isPendingApproval && (
             <div className="rounded-2xl border border-sky-200 bg-sky-50/60 p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -413,7 +406,6 @@ export default function AdminAccountDetailModal({
             </div>
           )}
 
-          {/* ── Status controls ── */}
           <div className="rounded-2xl border border-black/5 p-4">
             <div className="flex items-center gap-2">
               <ShieldAlert size={15} className="text-black/50" />
@@ -479,7 +471,6 @@ export default function AdminAccountDetailModal({
             </button>
           </div>
 
-          {/* ── Edit account information ── */}
           <div className="rounded-2xl border border-black/5 p-4">
             <div className="flex items-center gap-2">
               <Pencil size={15} className="text-black/50" />
@@ -565,7 +556,6 @@ export default function AdminAccountDetailModal({
             </button>
           </div>
 
-          {/* ── Transaction limit ── */}
           <div className="rounded-2xl border border-black/5 p-4">
             <div className="flex items-center gap-2">
               <Gauge size={15} className="text-black/50" />

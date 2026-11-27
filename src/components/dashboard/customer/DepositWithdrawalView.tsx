@@ -30,12 +30,10 @@ import { setSelectedAccount } from "@/lib/redux/slices/accountSlice";
 import { successToast } from "@/lib/utils/toasts";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Design Tokens (Identical to FundTransferView) ─── */
 const labelClass = "mb-2 block text-sm font-medium text-black/60";
 const inputClass =
   "h-[52px] w-full rounded-2xl bg-[#F3F3EE] px-5 text-base text-black outline-none placeholder:text-black/40 focus-visible:ring-[#E6FB2D] shadow-none";
 
-/* ─── Helper for formatting money ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 2,
@@ -48,7 +46,6 @@ export default function DepositWithdrawalView() {
     (state) => state.account.selectedAccountId
   );
 
-  // RTK Queries & Mutations
   const {
     data: accounts = [],
     isLoading: isAccountsLoading,
@@ -58,7 +55,6 @@ export default function DepositWithdrawalView() {
   const [createFundRequest, { isLoading: isSubmitting }] =
     useCreateFundRequestMutation();
 
-  // Sort accounts chronologically by creation time
   const sortedAccounts = useMemo(() => {
     return [...accounts].sort(
       (a, b) =>
@@ -66,7 +62,6 @@ export default function DepositWithdrawalView() {
     );
   }, [accounts]);
 
-  // Active bank account
   const activeAccount: Account | undefined = useMemo(() => {
     if (sortedAccounts.length === 0) return undefined;
     if (reduxSelectedAccountId) {
@@ -78,14 +73,12 @@ export default function DepositWithdrawalView() {
     return sortedAccounts[0];
   }, [sortedAccounts, reduxSelectedAccountId]);
 
-  // Sync selection to Redux
   useEffect(() => {
     if (sortedAccounts.length > 0 && !reduxSelectedAccountId) {
       dispatch(setSelectedAccount(sortedAccounts[0].id));
     }
   }, [sortedAccounts, reduxSelectedAccountId, dispatch]);
 
-  // Form State
   const [requestType, setRequestType] = useState<FundRequestType>("deposit");
   const [typedAccountNumber, setTypedAccountNumber] = useState<string | null>(
     null
@@ -95,13 +88,11 @@ export default function DepositWithdrawalView() {
   const [pin, setPin] = useState("1234");
   const [formError, setFormError] = useState("");
 
-  // Account number derives from user typing or defaults to the active account number
   const accountNumber =
     typedAccountNumber !== null
       ? typedAccountNumber
       : activeAccount?.accountNumber ?? "";
 
-  // Handle switching account
   const handleSelectAccount = (acc: Account) => {
     dispatch(setSelectedAccount(acc.id));
     setTypedAccountNumber(acc.accountNumber);
@@ -109,7 +100,6 @@ export default function DepositWithdrawalView() {
     setPin("1234");
   };
 
-  // Find the account matching the current typed/selected account number
   const selectedAccountInfo = useMemo(() => {
     const clean = accountNumber.replace(/\D/g, "");
     return sortedAccounts.find((acc) => acc.accountNumber === clean);
@@ -122,7 +112,6 @@ export default function DepositWithdrawalView() {
       ? numAmount > selectedAccountInfo.balance
       : false;
 
-  // Handle Form Submission
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError("");
@@ -182,7 +171,6 @@ export default function DepositWithdrawalView() {
           } request submitted! Status is currently Pending.`
       );
 
-      // Reset fields
       setTypedAccountNumber(null);
       setAmount("");
       setDescription("");
@@ -196,7 +184,6 @@ export default function DepositWithdrawalView() {
     }
   };
 
-  // Loading state
   if (isAccountsLoading) {
     return (
       <div className="space-y-6">
@@ -206,7 +193,6 @@ export default function DepositWithdrawalView() {
     );
   }
 
-  // Error state
   if (isAccountsError) {
     return (
       <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center">
@@ -220,7 +206,6 @@ export default function DepositWithdrawalView() {
     );
   }
 
-  // Empty state if user has no bank accounts
   if (sortedAccounts.length === 0) {
     return (
       <div className="rounded-3xl border border-dashed border-black/15 bg-white p-10 text-center">
@@ -252,9 +237,7 @@ export default function DepositWithdrawalView() {
         description="Submit deposit or withdrawal requests for your active bank accounts. All requests are reviewed with pending status initially."
       />
 
-      {/* Main Grid: Form (Left) + Status Definitions (Right) */}
       <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
-        {/* Left: Form Card */}
         <div className="lg:col-span-7">
         <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-8">
           <div className="mb-6 flex items-center justify-between border-b border-black/5 pb-4">
@@ -272,11 +255,9 @@ export default function DepositWithdrawalView() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Field: Radio Buttons for Deposit & Withdrawal */}
             <div>
               <Label className={labelClass}>Transaction Type</Label>
               <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3">
-                {/* Deposit Radio */}
                 <label
                   className={`relative flex cursor-pointer items-center justify-between rounded-2xl border-2 p-3.5 sm:p-4 transition-all duration-200 select-none ${
                     requestType === "deposit"
@@ -333,7 +314,6 @@ export default function DepositWithdrawalView() {
                   </span>
                 </label>
 
-                {/* Withdrawal Radio */}
                 <label
                   className={`relative flex cursor-pointer items-center justify-between rounded-2xl border-2 p-3.5 sm:p-4 transition-all duration-200 select-none ${
                     requestType === "withdrawal"
@@ -392,7 +372,6 @@ export default function DepositWithdrawalView() {
               </div>
             </div>
 
-            {/* Field 1: Account Number */}
             <div>
               <TextField isRequired name="accountNumber">
                 <div className="flex items-center justify-between">
@@ -423,7 +402,6 @@ export default function DepositWithdrawalView() {
                   )}
                 </div>
 
-                {/* Quick Account Switcher Pills */}
                 {sortedAccounts.length > 1 && (
                   <div className="mb-2.5 flex flex-wrap gap-2">
                     {sortedAccounts.map((acc) => {
@@ -464,7 +442,6 @@ export default function DepositWithdrawalView() {
                 />
               </TextField>
 
-              {/* Inactive notice if selected account is not active */}
               {selectedAccountInfo && !isAccountActive && (
                 <div className="mt-2.5 flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
                   <AlertCircle size={16} className="shrink-0 text-amber-600" />
@@ -477,7 +454,6 @@ export default function DepositWithdrawalView() {
               )}
             </div>
 
-            {/* Field 2: Amount */}
             <div>
               <TextField isRequired name="amount">
                 <div className="flex items-center justify-between">
@@ -510,7 +486,6 @@ export default function DepositWithdrawalView() {
                 </div>
               </TextField>
 
-              {/* Quick preset amount chips */}
               <div className="mt-2.5 flex flex-wrap gap-2">
                 {[500, 1000, 5000, 10000, 20000].map((preset) => (
                   <button
@@ -541,7 +516,6 @@ export default function DepositWithdrawalView() {
                   )}
               </div>
 
-              {/* Over-balance warning for withdrawal */}
               {isWithdrawalOverBalance && selectedAccountInfo && (
                 <p className="mt-1.5 text-xs font-medium text-red-600">
                   Withdrawal amount exceeds available balance of{" "}
@@ -550,7 +524,6 @@ export default function DepositWithdrawalView() {
               )}
             </div>
 
-            {/* Field 3: Description */}
             <TextField name="description">
               <Label className={labelClass}>Description / Purpose</Label>
               <Input
@@ -566,7 +539,6 @@ export default function DepositWithdrawalView() {
               />
             </TextField>
 
-            {/* Field 4: Bank Account PIN */}
             <TextField
               isRequired
               name="pin"
@@ -598,7 +570,6 @@ export default function DepositWithdrawalView() {
               </p>
             </TextField>
 
-            {/* Form Error Alert */}
             {formError && (
               <div className="flex items-start gap-2.5 rounded-2xl bg-red-50 p-4 text-xs font-medium text-red-700">
                 <AlertCircle className="size-4 shrink-0 text-red-600" />
@@ -606,7 +577,6 @@ export default function DepositWithdrawalView() {
               </div>
             )}
 
-            {/* Submit Button */}
             <Button
               type="submit"
               isDisabled={
@@ -635,7 +605,6 @@ export default function DepositWithdrawalView() {
         </div>
         </div>
 
-        {/* Right: Status Definitions */}
         <div className="lg:col-span-5">
           <div className="rounded-3xl border border-black/10 bg-[#FAFAFA] p-6">
             <h3 className="text-sm font-bold text-black">
@@ -646,7 +615,6 @@ export default function DepositWithdrawalView() {
             </p>
 
             <div className="mt-4 space-y-3.5">
-              {/* Pending */}
               <div className="flex items-start gap-3 rounded-2xl border border-black/5 bg-white p-3.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
                   <Clock size={16} />
@@ -663,7 +631,6 @@ export default function DepositWithdrawalView() {
                 </div>
               </div>
 
-              {/* Approved */}
               <div className="flex items-start gap-3 rounded-2xl border border-black/5 bg-white p-3.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                   <CheckCircle2 size={16} />
@@ -679,7 +646,6 @@ export default function DepositWithdrawalView() {
                 </div>
               </div>
 
-              {/* Rejected */}
               <div className="flex items-start gap-3 rounded-2xl border border-black/5 bg-white p-3.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
                   <XCircle size={16} />
@@ -697,7 +663,6 @@ export default function DepositWithdrawalView() {
               </div>
             </div>
 
-            {/* Note */}
             <div className="mt-4 rounded-2xl border border-black/5 bg-white p-3.5">
               <p className="text-xs text-black/50">
                 <strong className="text-black">Note:</strong> Only{" "}

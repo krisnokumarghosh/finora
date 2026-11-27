@@ -6,9 +6,8 @@ import { Red_Hat_Display } from "next/font/google";
 const display = Red_Hat_Display({ subsets: ["latin"] });
 
 const LIME = "#E6FB2D";
-const CHART_LIME = "#D4EF1B"; // slightly deeper lime so the line is readable on white
+const CHART_LIME = "#D4EF1B";
 
-/* ───────────────────────── icons ───────────────────────── */
 
 const svgProps = {
   viewBox: "0 0 24 24",
@@ -77,7 +76,6 @@ const CarIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-/* ───────────────────────── tab content ───────────────────────── */
 
 const TABS = [
   {
@@ -100,7 +98,6 @@ const TABS = [
   },
 ] as const;
 
-/* ───────────────────────── mockup pieces ───────────────────────── */
 
 function MockCard({
   title,
@@ -166,7 +163,6 @@ const WAVES = [
   "M2 8C25 6 55 5 78 4",
 ];
 
-/* Money flow line chart (inline SVG, no external data) */
 const MONTHS = ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"];
 const DEPOSIT = [1850, 1100, 1450, 2300, 1350, 2400, 750];
 const WITHDRAW = [1150, 1350, 1650, 1500, 1450, 1900, 1650];
@@ -412,7 +408,6 @@ function LoansMock() {
 
 const MOCKS = [DashboardMock, TransactionsMock, LoansMock];
 
-/* ───────────────────────── section ───────────────────────── */
 
 export default function Features() {
   const [active, setActive] = useState(0);
@@ -449,7 +444,6 @@ export default function Features() {
       `}</style>
 
       <div className="mx-auto max-w-7xl">
-        {/* header */}
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-8">
           <div>
             <h2 className="mt-5 max-w-[16ch] text-4xl font-normal leading-[1.1] tracking-tight text-black sm:text-5xl md:text-6xl">
@@ -491,14 +485,12 @@ export default function Features() {
           </div>
         </div>
 
-        {/* panel */}
         <div
           id="features-panel"
           role="tabpanel"
           aria-labelledby={`tab-${tab.id}`}
           className="relative mt-8 grid overflow-hidden rounded-[1.5rem] bg-[#F3F3EE] sm:rounded-[2rem] md:mt-12 md:h-135 md:grid-cols-[1.3fr_1fr]"
         >
-          {/* concave notches between the two halves (desktop) */}
           <span
             aria-hidden="true"
             className="absolute left-[56.5%] top-0 hidden h-10 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white md:block"
@@ -508,7 +500,6 @@ export default function Features() {
             className="absolute bottom-0 left-[56.5%] hidden h-10 w-24 -translate-x-1/2 translate-y-1/2 rounded-full bg-white md:block"
           />
 
-          {/* mockup */}
           <div
             role="img"
             aria-label={`${tab.label} preview of the Finora app`}
@@ -519,7 +510,6 @@ export default function Features() {
             </div>
           </div>
 
-          {/* copy */}
           <div className="flex flex-col justify-center px-5 pb-8 pt-6 sm:px-8 md:px-14 md:py-0">
             <div className="flex gap-2" aria-hidden="true">
               {TABS.map((t, i) => (

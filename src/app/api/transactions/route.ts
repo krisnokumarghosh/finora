@@ -5,7 +5,6 @@ import { processDueLoanRepayments } from "@/lib/server/loanRepayments";
 import type { AccountType } from "@/lib/redux/api";
 
 export async function GET(req: Request) {
-  // 1. Authenticate user
   const user = await getUserSession();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,7 +14,6 @@ export async function GET(req: Request) {
     console.error("Failed to process due loan repayments:", err);
   });
 
-  // 2. Parse query parameters
   const { searchParams } = new URL(req.url);
   const limitParam = Number(searchParams.get("limit")) || 15;
   const offsetParam = Number(searchParams.get("offset")) || 0;
@@ -26,7 +24,6 @@ export async function GET(req: Request) {
   const limit = Math.max(1, Math.min(100, limitParam));
   const offset = Math.max(0, offsetParam);
 
-  // 3. Fetch user's bank accounts to map account types
   const userAccounts = await db
     .collection("bankacc")
     .find({ userId: user.id })
@@ -43,14 +40,12 @@ export async function GET(req: Request) {
     });
   }
 
-  // Determine filtered account numbers if accountType filter is active
   let matchingAccountNumbers: string[] | null = null;
   if (accountTypeParam !== "all") {
     matchingAccountNumbers = userAccounts
       .filter((acc) => acc.type === accountTypeParam)
       .map((acc) => acc.accountNumber);
 
-    // If user has no accounts of this type, return 0 results immediately
     if (matchingAccountNumbers.length === 0) {
       return NextResponse.json({
         transactions: [],
@@ -62,7 +57,6 @@ export async function GET(req: Request) {
     }
   }
 
-  // 4. Fetch fund transfers from 'transactions' collection
   let mappedTransfers: Array<{
     id: string;
     transactionId: string;
@@ -142,7 +136,6 @@ export async function GET(req: Request) {
     });
   }
 
-  // 5. Fetch deposit / withdrawal requests from 'fund_requests' collection
   let mappedRequests: Array<{
     id: string;
     transactionId: string;
@@ -222,7 +215,6 @@ export async function GET(req: Request) {
     });
   }
 
-  // 6. Merge, sort chronologically (newest first), and slice
   const combined = [...mappedTransfers, ...mappedRequests];
   combined.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()

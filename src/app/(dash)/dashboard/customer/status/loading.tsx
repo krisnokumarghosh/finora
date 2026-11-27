@@ -1,18 +1,14 @@
 export default function Loading() {
   return (
     <div className="space-y-6 animate-pulse">
-      {/* ── Page Header ── */}
       <div>
         <div className="h-3 w-20 rounded-md bg-black/10" />
         <div className="mt-2 h-9 w-64 rounded-2xl bg-black/10 sm:h-10 sm:w-80" />
         <div className="mt-2 h-4 w-72 rounded-xl bg-black/5 sm:w-96" />
       </div>
 
-      {/* ── 2-Column Grid Layout ── */}
       <div className="grid gap-6 lg:grid-cols-12">
-        {/* Left Column: Financial Record & Chart */}
         <div className="space-y-6 lg:col-span-7 xl:col-span-8">
-          {/* Card 1: Financial Record */}
           <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
             <div className="flex items-center justify-between border-b border-black/5 pb-4">
               <div className="h-5 w-36 rounded-xl bg-black/10" />
@@ -30,7 +26,6 @@ export default function Loading() {
             </div>
           </div>
 
-          {/* Card 2: Chart Skeleton */}
           <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
             <div className="flex items-center justify-between border-b border-black/5 pb-4">
               <div className="space-y-1">
@@ -43,9 +38,7 @@ export default function Loading() {
           </div>
         </div>
 
-        {/* Right Column: Transactions & Loans */}
         <div className="space-y-6 lg:col-span-5 xl:col-span-4">
-          {/* Card 1: Recent Transactions */}
           <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
             <div className="flex items-center justify-between border-b border-black/5 pb-4">
               <div className="h-5 w-28 rounded-xl bg-black/10" />
@@ -67,7 +60,6 @@ export default function Loading() {
             </div>
           </div>
 
-          {/* Card 2: Recent Loans */}
           <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-7">
             <div className="flex items-center justify-between border-b border-black/5 pb-4">
               <div className="h-5 w-20 rounded-xl bg-black/10" />

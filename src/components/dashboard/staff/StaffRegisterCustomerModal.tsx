@@ -31,7 +31,6 @@ export default function StaffRegisterCustomerModal({
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  // Close on Escape and lock page scroll while the modal is open.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !isLoading) onClose();

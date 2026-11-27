@@ -8,7 +8,6 @@ const bad = (message: string, status = 400) =>
   NextResponse.json({ error: message }, { status });
 
 export async function GET() {
-  // 1. Only admins can access this endpoint.
   const user = await getUserSession();
   if (!user) return bad("Unauthorized", 401);
 
@@ -16,7 +15,6 @@ export async function GET() {
     return bad("You do not have permission to view admin analytics.", 403);
   }
 
-  // 2. Run all analytics queries in parallel for performance.
   const [
     totalCustomers,
     totalBankAccounts,
@@ -29,13 +27,10 @@ export async function GET() {
     accountTypeDistribution,
     yearlyTransactions,
   ] = await Promise.all([
-    // Total registered customers (role = "customer")
     db.collection("user").countDocuments({ role: "customer" }),
 
-    // Total bank accounts
     db.collection("bankacc").countDocuments({}),
 
-    // Total bank balance (sum of all account balances)
     db
       .collection("bankacc")
       .aggregate<{ total: number }>([
@@ -43,7 +38,6 @@ export async function GET() {
       ])
       .toArray(),
 
-    // Total approved deposits (from fund_requests)
     db
       .collection("fund_requests")
       .aggregate<{ total: number }>([
@@ -52,7 +46,6 @@ export async function GET() {
       ])
       .toArray(),
 
-    // Total approved withdrawals (from fund_requests)
     db
       .collection("fund_requests")
       .aggregate<{ total: number }>([
@@ -61,7 +54,6 @@ export async function GET() {
       ])
       .toArray(),
 
-    // Total completed transactions (transfers + approved fund requests)
     (async () => {
       const [transfers, fundReqs] = await Promise.all([
         db.collection("transactions").countDocuments({ status: "completed" }),
@@ -72,11 +64,8 @@ export async function GET() {
       return transfers + fundReqs;
     })(),
 
-    // Pending loan applications
     db.collection("loans").countDocuments({ status: "pending" }),
 
-    // Monthly transactions for the last 12 months
-    // We aggregate from both transactions (transfers) and fund_requests
     (async () => {
       const now = new Date();
       const twelveMonthsAgo = new Date(
@@ -97,7 +86,7 @@ export async function GET() {
               $match: {
                 createdAt: { $gte: twelveMonthsAgo },
                 status: "completed",
-                direction: "debit", // Count each transfer once (debit side)
+                direction: "debit",
               },
             },
             {
@@ -145,7 +134,6 @@ export async function GET() {
       return [...transferData, ...fundData];
     })(),
 
-    // Account type distribution (savings, current, business)
     db
       .collection("bankacc")
       .aggregate<{ _id: string; count: number; totalBalance: number }>([
@@ -159,7 +147,6 @@ export async function GET() {
       ])
       .toArray(),
 
-    // Yearly transactions for the last 5 years
     (async () => {
       const now = new Date();
       const fiveYearsAgo = new Date(now.getFullYear() - 4, 0, 1);
@@ -223,7 +210,6 @@ export async function GET() {
     })(),
   ]);
 
-  // 3. Build the monthly chart data (last 12 months)
   const months = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -233,7 +219,7 @@ export async function GET() {
   const monthlyChartData = Array.from({ length: 12 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
     const year = d.getFullYear();
-    const month = d.getMonth() + 1; // 1-based
+    const month = d.getMonth() + 1;
     return { name: months[d.getMonth()], year, month, deposit: 0, withdrawal: 0, transfer: 0 };
   });
 
@@ -248,7 +234,6 @@ export async function GET() {
     else if (type === "transfer") slot.transfer += row.total;
   }
 
-  // 4. Build the yearly chart data (last 5 years)
   const yearlyChartData = Array.from({ length: 5 }, (_, i) => {
     const year = now.getFullYear() - 4 + i;
     return { name: String(year), year, deposit: 0, withdrawal: 0, transfer: 0 };
@@ -263,7 +248,6 @@ export async function GET() {
     else if (type === "transfer") slot.transfer += row.total;
   }
 
-  // 5. Build pie chart data for account types
   const accountTypeData = accountTypeDistribution.map((row) => ({
     type: row._id || "savings",
     count: row.count,

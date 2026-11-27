@@ -38,14 +38,12 @@ import {
 import { successToast } from "@/lib/utils/toasts";
 import DashboardPageHeader from "@/components/dashboard/DashboardPageHeader";
 
-/* ─── Format Money Helper (BDT) ─── */
 const formatMoney = (val: number) =>
   `৳${val.toLocaleString("en-BD", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 
-/* ─── Format Account Number Helper ─── */
 const formatAccNo = (no?: string) => {
   if (!no) return "—";
   return no.replace(/(\d{4})/g, "$1 ").trim();
@@ -81,14 +79,12 @@ const getApiError = (err: unknown, fallback: string) => {
 };
 
 export default function AdminLoansView() {
-  // Filters & search state: initially show loans needing admin approval ("under_review")
   const [loanType, setLoanType] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("under_review");
   const [search, setSearch] = useState("");
   const [currentLimit, setCurrentLimit] = useState(15);
   const searchInputId = useId();
 
-  // Review / approve / reject modal state
   const [reviewTarget, setReviewTarget] = useState<AdminLoan | null>(null);
   const [decisionTarget, setDecisionTarget] = useState<{
     loan: AdminLoan;
@@ -116,7 +112,6 @@ export default function AdminLoansView() {
     }
   };
 
-  // Reset limit whenever a filter or search changes
   const handleLoanTypeChange = (val: string) => {
     setLoanType(val);
     setCurrentLimit(15);
@@ -139,7 +134,6 @@ export default function AdminLoansView() {
     setCurrentLimit(15);
   };
 
-  // RTK Query: fetch customer loan applications with active filters
   const { data, isLoading, isFetching, refetch } = useGetAdminLoansQuery({
     limit: currentLimit,
     offset: 0,
@@ -152,7 +146,6 @@ export default function AdminLoansView() {
   const total = data?.total || 0;
   const hasMore = data?.hasMore || false;
 
-  // Close modal on Escape and lock page scroll while a modal is open
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || isSaving) return;
@@ -265,7 +258,6 @@ export default function AdminLoansView() {
     }
   };
 
-  // Status badge styling helper
   const renderStatusBadge = (status: AdminLoan["status"]) => {
     switch (status) {
       case "approved":
@@ -305,7 +297,6 @@ export default function AdminLoansView() {
     }
   };
 
-  // Loan type icon helper
   const renderTypeIcon = (type: LoanType) => {
     switch (type) {
       case "home":
@@ -390,10 +381,8 @@ export default function AdminLoansView() {
         }
       />
 
-      {/* ── Filters & Search Bar Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4">
-          {/* Top row: Search by Account Number */}
           <div className="relative w-full">
             <Search
               size={18}
@@ -422,9 +411,7 @@ export default function AdminLoansView() {
             )}
           </div>
 
-          {/* Bottom row: Filter selectors */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            {/* Filter 1: Loan Type */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
                 Loan Type:
@@ -457,7 +444,6 @@ export default function AdminLoansView() {
               })}
             </div>
 
-            {/* Filter 2: Loan Status */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-xs font-bold text-black/50">
                 Status:
@@ -491,7 +477,6 @@ export default function AdminLoansView() {
           </div>
         </div>
 
-        {/* Active Filters Display & Clear Action */}
         {hasActiveFilters && (
           <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 text-xs">
             <span className="text-black/50">Active filters:</span>
@@ -552,9 +537,7 @@ export default function AdminLoansView() {
         )}
       </div>
 
-      {/* ── Loans List Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
-        {/* Results summary bar */}
         <div className="mb-4 flex items-center justify-between border-b border-black/5 pb-3">
           <div className="flex items-center gap-2">
             <HandCoins size={18} className="text-black/50" />
@@ -587,7 +570,6 @@ export default function AdminLoansView() {
           </div>
         )}
 
-        {/* Loading Skeleton */}
         {isLoading ? (
           <div className="divide-y divide-black/5">
             {[1, 2, 3, 4, 5].map((idx) => (
@@ -607,7 +589,6 @@ export default function AdminLoansView() {
             ))}
           </div>
         ) : loans.length === 0 ? (
-          /* Empty State */
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="flex size-14 items-center justify-center rounded-2xl bg-[#F3F3EE] text-black/40">
               <Filter size={24} />
@@ -644,9 +625,7 @@ export default function AdminLoansView() {
             </div>
           </div>
         ) : (
-          /* Responsive Loans Display */
           <div>
-            {/* Desktop Table View */}
             <div className="hidden overflow-x-auto lg:block">
               <table className="w-full text-left">
                 <thead>
@@ -666,7 +645,6 @@ export default function AdminLoansView() {
                       key={loan.id}
                       className="transition-colors hover:bg-black/2"
                     >
-                      {/* 1. Loan ID & Application Date */}
                       <td className="py-4 pl-2">
                         <div className="flex items-center gap-3">
                           {renderTypeIcon(loan.type)}
@@ -681,7 +659,6 @@ export default function AdminLoansView() {
                         </div>
                       </td>
 
-                      {/* 2. Customer & Account */}
                       <td className="py-4">
                         <div className="max-w-44">
                           <p className="truncate text-xs font-semibold text-black">
@@ -701,7 +678,6 @@ export default function AdminLoansView() {
                         </div>
                       </td>
 
-                      {/* 3. Type & Purpose */}
                       <td className="py-4">
                         <div className="max-w-50">
                           <p className="truncate text-xs font-bold capitalize text-black">
@@ -713,7 +689,6 @@ export default function AdminLoansView() {
                         </div>
                       </td>
 
-                      {/* 4. Term & Due Date */}
                       <td className="py-4">
                         <div>
                           <p className="text-xs font-medium text-black">
@@ -725,17 +700,14 @@ export default function AdminLoansView() {
                         </div>
                       </td>
 
-                      {/* 5. Status Badge */}
                       <td className="py-4">{renderStatusBadge(loan.status)}</td>
 
-                      {/* 6. Amount */}
                       <td className="py-4 text-right">
                         <span className="text-sm font-bold text-black">
                           {formatMoney(loan.amount)}
                         </span>
                       </td>
 
-                      {/* 7. Action: Review */}
                       <td className="py-4 pr-2 text-right">
                         <button
                           type="button"
@@ -753,7 +725,6 @@ export default function AdminLoansView() {
               </table>
             </div>
 
-            {/* Mobile / Tablet Card View */}
             <div className="space-y-3 lg:hidden">
               {loans.map((loan) => (
                 <div
@@ -831,7 +802,6 @@ export default function AdminLoansView() {
           </div>
         )}
 
-        {/* ── Load More Section ── */}
         <div className="mt-8 flex flex-col items-center justify-center border-t border-black/5 pt-6 text-center">
           {hasMore ? (
             <div className="flex flex-col items-center gap-2">
@@ -862,7 +832,6 @@ export default function AdminLoansView() {
         </div>
       </div>
 
-      {/* ── Loan Review Modal ── */}
       {reviewTarget && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
@@ -967,7 +936,6 @@ export default function AdminLoansView() {
               )}
 
               <div className="grid gap-4 md:grid-cols-2">
-                {/* Customer information */}
                 <div className="rounded-2xl bg-[#F9F9F7] p-4">
                   <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-black/50">
                     <User size={13} />
@@ -1017,7 +985,6 @@ export default function AdminLoansView() {
                   </div>
                 </div>
 
-                {/* Loan details */}
                 <div className="rounded-2xl bg-[#F9F9F7] p-4">
                   <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-black/50">
                     <FileText size={13} />
@@ -1075,7 +1042,6 @@ export default function AdminLoansView() {
                 </div>
               </div>
 
-              {/* Loan Repayment History */}
               <div className="rounded-2xl border border-black/5 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-black/50">
@@ -1091,7 +1057,6 @@ export default function AdminLoansView() {
                   </span>
                 </div>
 
-                {/* Repayment summary metrics */}
                 <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
                   <div className="rounded-2xl bg-[#F9F9F7] p-3">
                     <p className="text-[10px] font-bold uppercase tracking-wide text-black/40">
@@ -1174,7 +1139,6 @@ export default function AdminLoansView() {
                 )}
               </div>
 
-              {/* Internal notes */}
               <div className="rounded-2xl border border-black/5 p-4">
                 <div className="flex items-center justify-between">
                   <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-black/50">
@@ -1324,7 +1288,6 @@ export default function AdminLoansView() {
         </div>
       )}
 
-      {/* ── Approve / Reject Confirmation Modal ── */}
       {decisionTarget && (
         <div
           className="fixed inset-0 z-60 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
@@ -1499,7 +1462,6 @@ export default function AdminLoansView() {
   );
 }
 
-/* ─── Small label/value row used inside the review modal ─── */
 function DetailRow({
   icon,
   label,

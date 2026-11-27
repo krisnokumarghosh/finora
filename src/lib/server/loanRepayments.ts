@@ -44,10 +44,6 @@ export const calculateMonthlyInstallment = (
   return roundMoney(safeAmount / safeTerm);
 };
 
-/**
- * Adds one calendar month while clamping to the last day of the target month
- * (e.g. Jan 31 -> Feb 28/29 instead of overflowing into March).
- */
 export const addOneMonth = (baseDate: Date): Date => {
   const result = new Date(baseDate.getTime());
   const originalDay = result.getDate();
@@ -146,7 +142,6 @@ const executeSingleInstallmentDeduction = async (params: {
   try {
     session.startTransaction();
 
-    // Atomically deduct from active bank account only if sufficient balance exists.
     const updatedAccount = await db
       .collection<BankAccountDoc>("bankacc")
       .findOneAndUpdate(
@@ -170,7 +165,6 @@ const executeSingleInstallmentDeduction = async (params: {
     const balanceAfter = roundMoney(Number(updatedAccount.balance) || 0);
     const balanceBefore = roundMoney(balanceAfter + dueAmount);
 
-    // Atomically update loan repayment progress (guard against concurrent deduction).
     const loanUpdateRes = await db
       .collection<LoanForRepaymentDoc>("loans")
       .updateOne(
@@ -256,7 +250,6 @@ const executeSingleInstallmentDeduction = async (params: {
       await session.abortTransaction().catch(() => {});
     }
 
-    // Fallback for standalone MongoDB instances that do not support replica-set transactions.
     const message = error instanceof Error ? error.message : "";
     const isTxnUnsupported =
       message.includes("Transaction numbers are only allowed") ||
@@ -310,7 +303,6 @@ const executeSingleInstallmentDeduction = async (params: {
       );
 
     if (loanUpdateRes.modifiedCount === 0) {
-      // Roll back the account debit if the loan was already updated concurrently.
       await db
         .collection<BankAccountDoc>("bankacc")
         .updateOne({ _id: account._id }, { $inc: { balance: dueAmount } });
@@ -374,11 +366,6 @@ export type ProcessRepaymentsSummary = {
   loansChecked: number;
 };
 
-/**
- * Checks approved loans whose nextPaymentDate has arrived and deducts
- * the monthly installment from the customer's bank account, recording each
- * payment in the `loan-payment-history` collection.
- */
 export async function processDueLoanRepayments(options?: {
   userId?: string;
   loanId?: string;
@@ -439,7 +426,6 @@ export async function processDueLoanRepayments(options?: {
       toValidDate(loan.nextPaymentDate) ||
       addOneMonth(toValidDate(loan.approvedAt) || now);
 
-    // Safety cap prevents runaway loops on malformed termMonths.
     let guard = 0;
     while (
       currentDueDate.getTime() <= now.getTime() &&
@@ -508,7 +494,6 @@ export async function processDueLoanRepayments(options?: {
             });
           }
         }
-        // Stop further monthly deductions for this loan until balance is available.
         break;
       }
 

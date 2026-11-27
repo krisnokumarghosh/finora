@@ -1,7 +1,6 @@
 export default function Loading() {
   return (
     <div className="space-y-6 animate-pulse">
-      {/* ── Page Header ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="h-9 w-56 rounded-2xl bg-black/10 sm:h-10 sm:w-68" />
@@ -10,12 +9,9 @@ export default function Loading() {
         <div className="h-10 w-28 rounded-full bg-black/5" />
       </div>
 
-      {/* ── Filter & Search Bar Card ── */}
       <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-6 space-y-4">
-        {/* Search input skeleton */}
         <div className="h-12 w-full rounded-2xl bg-[#F3F3EE]" />
 
-        {/* Filter pills skeleton */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-1">
           <div className="flex items-center gap-2">
             <div className="h-4 w-16 rounded bg-black/5" />
@@ -31,14 +27,12 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* ── Transactions List Card ── */}
       <div className="rounded-3xl bg-white p-5 sm:p-7 shadow-sm">
         <div className="flex items-center justify-between border-b border-black/5 pb-4">
           <div className="h-5 w-44 rounded-xl bg-black/10" />
           <div className="h-4 w-24 rounded bg-black/5" />
         </div>
 
-        {/* Table rows skeleton */}
         <div className="divide-y divide-black/5 mt-2">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div

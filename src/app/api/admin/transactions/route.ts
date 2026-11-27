@@ -41,7 +41,6 @@ const toIsoString = (value: unknown) => {
     : parsed.toISOString();
 };
 
-// Admin-only middleware
 const requireAdmin = async () => {
   const user = await getUserSession();
   if (!user) return { error: "Unauthorized", status: 401, user: null };
@@ -56,7 +55,6 @@ const requireAdmin = async () => {
   return { error: null, status: 200, user };
 };
 
-/* ─── GET: Fetch all transactions (admin view) ─── */
 export async function GET(req: Request) {
   const { error, status } = await requireAdmin();
   if (error) return NextResponse.json({ error }, { status });
@@ -114,7 +112,6 @@ export async function GET(req: Request) {
       : Promise.resolve([]),
   ]);
 
-  // Load account info
   const accountNumbers = new Set<string>();
   for (const tx of txRows) {
     if (tx.accountNumber) accountNumbers.add(tx.accountNumber);
@@ -148,7 +145,6 @@ export async function GET(req: Request) {
     });
   }
 
-  // Deduplicate transfers (show each once)
   const uniqueTransferRows = new Map<string, (typeof txRows)[number]>();
   for (const tx of txRows) {
     const key = tx.transactionId || tx._id.toString();
@@ -222,7 +218,6 @@ export async function GET(req: Request) {
     };
   });
 
-  // Attach flags
   const transactionIds = [...mappedTransfers, ...mappedRequests].map(
     (tx) => tx.transactionId
   );
@@ -272,7 +267,6 @@ export async function GET(req: Request) {
   });
 }
 
-/* ─── PATCH: Update transaction / fund-request status ─── */
 export async function PATCH(req: Request) {
   const { error, status } = await requireAdmin();
   if (error) return NextResponse.json({ error }, { status });
@@ -299,7 +293,6 @@ export async function PATCH(req: Request) {
     );
   }
 
-  // Try to update a transfer first
   const txResult = await db
     .collection("transactions")
     .updateMany({ transactionId }, { $set: { status: newStatus } });
@@ -313,7 +306,6 @@ export async function PATCH(req: Request) {
     });
   }
 
-  // Try fund_requests — read the record BEFORE updating so we can validate balance
   const fundReq = await db
     .collection("fund_requests")
     .findOne({ requestId: transactionId });
@@ -322,7 +314,6 @@ export async function PATCH(req: Request) {
     const amount = Number(fundReq.amount) || 0;
     const isWithdrawal = fundReq.type === "withdrawal";
 
-    // Balance check: only needed when approving a withdrawal
     if (newStatus === "approved" && isWithdrawal) {
       const account = await db
         .collection("bankacc")
@@ -349,12 +340,10 @@ export async function PATCH(req: Request) {
       }
     }
 
-    // Now update the status
     await db
       .collection("fund_requests")
       .updateOne({ requestId: transactionId }, { $set: { status: newStatus } });
 
-    // Adjust account balance when approving
     if (newStatus === "approved") {
       const delta = isWithdrawal ? -amount : amount;
       if (delta !== 0) {

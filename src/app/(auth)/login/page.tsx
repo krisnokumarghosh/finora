@@ -49,7 +49,6 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          {/* Demo quick-login cards for reviewer access */}
           <DemoAccountCards />
         </div>
       </div>

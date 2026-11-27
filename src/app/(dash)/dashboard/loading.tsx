@@ -1,7 +1,6 @@
 export default function Loading() {
   return (
     <div className="space-y-6 animate-pulse">
-      {/* Header skeleton */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">
           <div className="h-8 w-44 rounded-2xl bg-black/5 sm:h-10 sm:w-60" />
@@ -10,7 +9,6 @@ export default function Loading() {
         <div className="h-10 w-28 rounded-full bg-black/5" />
       </div>
 
-      {/* Stats / Cards skeleton grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3].map((i) => (
           <div
@@ -29,7 +27,6 @@ export default function Loading() {
         ))}
       </div>
 
-      {/* Main content skeleton */}
       <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
         <div className="flex items-center justify-between border-b border-black/5 pb-4">
           <div className="h-5 w-36 rounded-xl bg-black/5" />

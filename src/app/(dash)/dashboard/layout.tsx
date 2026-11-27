@@ -4,7 +4,6 @@ import { getUserSession } from "@/lib/core/session";
 import DashboardSidebar from "@/components/dashboard/DashboardSideBar";
 import StoreProvider from "@/lib/redux/StoreProvider";
 
-// cacheComponents on thakle eta lagbe (Blocking Route error ashbe na)
 export const instant = false;
 
 const DashboardLayout = async ({ children }: { children: ReactNode }) => {
